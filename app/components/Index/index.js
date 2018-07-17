@@ -9,8 +9,7 @@ class Index extends Component<Props> {
 
   render() {
     return (
-      <div>
-        哈哈哈；
+      <div className={styles.container}>
       </div>
     );
   }

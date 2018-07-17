@@ -7,9 +7,11 @@ import TitleBar from './components/TitleBar';
 
 export default () => (
   <App>
-    <TitleBar />
+    <header className="title">
+      <TitleBar />
+    </header>
     <Switch>
-      <Route path="/" component={ IndexPage } />
+      <Route path="/" component={IndexPage} />
     </Switch>
   </App>
 );
