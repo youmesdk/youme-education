@@ -10,7 +10,7 @@
  *
  * @flow
  */
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import MenuBuilder from './menu';
 
 let mainWindow = null;
@@ -44,6 +44,8 @@ const installExtensions = async () => {
  * Add event listeners...
  */
 
+
+
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
@@ -63,7 +65,9 @@ app.on('ready', async () => {
   mainWindow = new BrowserWindow({
     show: false,
     width: 1024,
-    height: 728
+    height: 728,
+    frame: false,
+    transparent:true
   });
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
@@ -80,6 +84,22 @@ app.on('ready', async () => {
 
   mainWindow.on('closed', () => {
     mainWindow = null;
+  });
+
+  ipcMain.on('hide-window', () => {
+    mainWindow.minimize();
+  });
+
+  ipcMain.on('max-window', () => {
+    mainWindow.maximize();
+  });
+
+  ipcMain.on('restore-window', () => {
+    mainWindow.unmaximize();
+  });
+
+  ipcMain.on('close-window', () => {
+    app.quit();
   });
 
   const menuBuilder = new MenuBuilder(mainWindow);
