@@ -2,9 +2,9 @@
  * @NOTE: Prepend a `~` to css file paths that are in your node_modules
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
+
 @import "~font-awesome/css/font-awesome.css";
 @import "~antd/dist/antd.css";
-
 body {
   position: relative;
   color: white;
@@ -40,10 +40,4 @@ a:hover {
   opacity: 1;
   text-decoration: none;
   cursor: pointer;
-}
-
-.title {
-  -webkit-app-region: drag;
-  z-index: 99999;
-  overflow: hidden;
 }
