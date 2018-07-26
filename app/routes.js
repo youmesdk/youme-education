@@ -2,16 +2,12 @@
 import React from 'react';
 import { Switch, Route } from 'react-router';
 import App from './containers/App';
-import IndexPage from './containers/IndexPage';
-import TitleBar from './components/TitleBar';
+import Index from './components/Index';
 
 export default () => (
   <App>
-    <header className="title">
-      <TitleBar />
-    </header>
     <Switch>
-      <Route path="/" component={IndexPage} />
+      <Route path="/" component={Index} />
     </Switch>
   </App>
 );
