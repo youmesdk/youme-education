@@ -2,18 +2,18 @@
  * @Author: fan.li
  * @Date: 2018-07-27 14:25:18
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-07-27 17:37:13
+ * @Last Modified time: 2018-07-27 18:26:45
  *
  * @flow
  */
 import * as React from "react";
-import { Form, Icon, Input, Button, Radio, Modal } from "antd";
 import { Link } from "react-router-dom";
+import { Form, Icon, Input, Button, Radio, Modal } from "antd";
 import TitleBar from "../TitleBar";
 import styles from "./style.scss";
 
-const FormItem = Form.Item;
-const { RadioGroup } = Radio;
+const { Item: FormItem } = Form;
+const { Group: RadioGroup } = Radio;
 const { info } = Modal;
 
 type Props = {
@@ -100,7 +100,7 @@ class Index extends React.Component<Props> {
               )}
             </FormItem>
 
-            <div className={styles.help} onClick={this.showHelpInfo} role="label">
+            <div className={styles.help} onClick={this.showHelpInfo}>
               账号相关问题?
             </div>
 

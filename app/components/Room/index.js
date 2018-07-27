@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-07-27 16:16:37
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-07-27 17:11:42
+ * @Last Modified time: 2018-07-27 18:45:29
  *
  * @flow
  */
@@ -33,16 +33,17 @@ class Room extends React.Component<Props> {
         </header>
 
         <main className={styles.main}>
-          <header className={styles.header}>
-            <div>学生1</div>
-          </header>
-
-          <section className={styles.content}>
-            <div className={styles.left}>左边</div>
-            <div className={styles.right}>
-              <div className={styles.main_video}>教师摄像头</div>
-              <div className={styles.im}>IM 聊天</div>
-            </div>
+          <section className={styles.remote}>
+            <div>远端视频</div>
+          </section>
+          <section className={styles.workspace}>
+            <div>录屏</div>
+          </section>
+          <section className={styles.local}>
+            <div>本地视频</div>
+          </section>
+          <section className={styles.im}>
+            <div>IM</div>
           </section>
         </main>
       </div>
