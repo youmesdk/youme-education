@@ -1,17 +1,37 @@
-import React from "react";
+/*
+ * @Author: fan.li
+ * @Date: 2018-07-27 11:13:13
+ * @Last Modified by: fan.li
+ * @Last Modified time: 2018-07-27 17:35:01
+ *
+ * @flow
+ */
+
+import * as React from "react";
 import { Button, Modal } from "antd";
 import styles from "./style.scss";
 
-const confirm = Modal.confirm;
-const ipcRenderer = require("electron").ipcRenderer;
+const { confirm } = Modal;
+const { ipcRenderer } = require("electron");
 
-class TitleBar extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      isFullScreen: false
-    };
-  }
+type Props = {
+  children?: React.Node
+};
+
+type State = {
+  isFullScreen: boolean
+};
+
+class TitleBar extends React.Component<Props, State> {
+  props: Props;
+
+  static defaultProps = {
+    children: null
+  };
+
+  state = {
+    isFullScreen: false
+  };
 
   handleMax = () => {
     if (this.state.isFullScreen) {
@@ -29,8 +49,10 @@ class TitleBar extends React.Component {
 
   handleClose = () => {
     confirm({
-      title: "Do you Want to close app?",
+      title: "确定要退出应用吗?",
       content: "",
+      okText: "确定",
+      cancelText: "取消",
       onOk: () => {
         ipcRenderer.send("close-window");
       }
@@ -46,28 +68,27 @@ class TitleBar extends React.Component {
     const btnIcon = this.state.isFullScreen ? "shrink" : "arrows-alt";
 
     return (
-      <header className={styles.header}>
-        <div className={styles["btn-group"]}>
-          <Button
-            className={styles.btn}
-            ghost
-            icon="minus"
-            onClick={this.handleMin}
-          />
-          <Button
-            className={styles.btn}
-            ghost
-            icon={btnIcon}
-            onClick={this.handleMax}
-          />
-          <Button
-            className={styles.btn}
-            ghost
-            icon="close"
-            onClick={this.handleClose}
-          />
-        </div>
-      </header>
+      <div className={styles["btn-group"]}>
+        {this.props && this.props.children}
+        <Button
+          className={styles.btn}
+          ghost
+          icon="minus"
+          onClick={this.handleMin}
+        />
+        <Button
+          className={styles.btn}
+          ghost
+          icon={btnIcon}
+          onClick={this.handleMax}
+        />
+        <Button
+          className={styles.btn}
+          ghost
+          icon="close"
+          onClick={this.handleClose}
+        />
+      </div>
     );
   }
 }

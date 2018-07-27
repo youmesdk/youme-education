@@ -1,22 +1,22 @@
-// @flow
+/**
+ * @flow
+ */
 import React, { Component } from "react";
-import TitleBar from "../components/TitleBar";
 import { Switch, Route } from "react-router";
 import Index from "../components/Index";
 import Room from "../components/Room";
-import Register from "../components/Register";
+import DeviceCheck from "../components/DeviceCheck";
 
-export default class App extends React.Component {
+type Props = {};
+
+export default class App extends Component<Props> {
   render() {
     return (
       <div>
-        <header>
-          <TitleBar />
-        </header>
         <Switch>
+          <Route exact path="/" component={Index} />
           <Route path="/room" component={Room} />
-          <Route path="/register" component={Register} />
-          <Route path="/" component={Index} />
+          <Route path="/devicecheck" component={DeviceCheck} />
         </Switch>
       </div>
     );

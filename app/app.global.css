@@ -5,11 +5,10 @@
 
 @import "~font-awesome/css/font-awesome.css";
 @import "~antd/dist/antd.css";
+
 body {
   position: relative;
-  color: white;
   height: 100vh;
-  background-color: #232c39;
   font-family: Arial, Helvetica, Helvetica Neue, serif;
   overflow-y: hidden;
 }

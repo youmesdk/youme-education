@@ -14,11 +14,6 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      color: burlywood;
     }
-  }
-
-  .header {
-    -webkit-app-region: drag;
-    z-index: 99999;
-    overflow: hidden;
   }

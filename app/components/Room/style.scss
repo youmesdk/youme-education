@@ -1,0 +1,41 @@
+.container {
+  background: url('../../assets/images/background.jpg') no-repeat center;
+  background-size: cover;
+  padding-top: 3.0rem;
+  box-sizing: border-box;
+  height: 100vh;
+  position: relative;
+  .title {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px;
+    overflow: hidden;
+    -webkit-app-region: drag;
+    cursor: move;
+    .menu_btn {
+      -webkit-app-region: no-drag !important;
+      margin: 0.5rem;
+      width: 1.5rem;
+      height: 1.5rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: burlywood;
+    }
+  }
+  .main {
+    background: green;
+    height: 100%;
+    .header {
+      height: 10%;
+      background: blue;
+    }
+    .content {
+      background: gray;
+      height: 80%;
+    }
+  }
+}

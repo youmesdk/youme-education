@@ -18,14 +18,21 @@
     -webkit-app-region: drag;
     cursor: move;
   }
-  .form {
-    width: 20%;
-    min-width: 250px;
-    .help {
-      margin-bottom: 1rem;
-      color: green;
-      text-align: right;
-      cursor: pointer;
+  .main {
+    width: 42rem;
+    height: 24rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    .form {
+      width: 50%;
+      min-width: 22rem;
     }
+  }
+  .btnGroup {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 }
