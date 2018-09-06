@@ -1,56 +1,96 @@
 .container {
   background: url('../../assets/images/background.jpg') no-repeat center;
   background-size: cover;
-  padding-top: 3.0rem;
-  box-sizing: border-box;
-  height: 100vh;
-  position: relative;
-  .title {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    padding: 1.0rem;
-    overflow: hidden;
-    -webkit-app-region: drag;
-    cursor: move;
-    .menu_btn {
-      -webkit-app-region: no-drag !important;
-      margin: 0.5rem;
-      width: 1.5rem;
-      height: 1.5rem;
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: burlywood;
-    }
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  overflow: hidden;
+
+  .menu_btn {
+    -webkit-app-region: no-drag !important;
+    margin: 5px;
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: burlywood;
   }
-  .main {
-    display: grid;
-    height: auto;
-    padding: 1rem;
-    grid-template-columns: 80% 20%;
-    grid-template-rows: 10% 90%;
-    grid-gap: 1rem;
-    height: 85%;
-    .remote {
-      grid-column: 1 / 3;
-      background: #FFF;
-      border-radius: 1rem;
+
+  .spin {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 20px;
+
+    &_header {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      min-height: 100px;
+
+      &_item {
+        display: inline-block;
+        background: #000;
+        border-radius: 5px;
+        min-width: 100px;
+        min-height: 100px;
+        position: relative;
+        cursor: pointer;
+
+        &:first-child {
+          margin-left: 8px;
+        }
+
+        &:not(:last-child) {
+          margin-right: 8px;
+        }
+      }
     }
-    .workspace {
-      grid-row: 2 / 4;
-      background: #FFF;
-      border-radius: 1rem;
-    }
-    .local {
-      background: #FFF;
-      border-radius: 1rem;
-    }
-    .im {
-      background: #FFF;
-      border-radius: 1rem;
+
+    &_main {
+      flex: 1;
+      display: flex;
+      margin-top: 8px;
+
+      &_left {
+        border: 1px solid coral;
+        border-radius: 5px;
+        flex: 1;
+        background: #FFF;
+      }
+
+      &_right {
+        margin-left: 8px;
+        display: flex;
+        flex-direction: column;
+        min-width: 240px;
+
+        .video {
+          border-radius: 10px;
+          background: #000;
+          min-height: 240px;
+          cursor: pointer;
+          position: relative;
+        }
+
+        .im {
+          flex: 1;
+          margin-top: 8px;
+          border: 1px solid coral;
+          border-radius: 8px;
+        }
+      }
     }
   }
 }

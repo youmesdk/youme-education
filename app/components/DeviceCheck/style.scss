@@ -1,33 +1,19 @@
 .container {
   background: url('../../assets/images/background.jpg') no-repeat center;
   background-size: cover;
-  padding: 4.5rem;
-  box-sizing: border-box;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  position: relative;
-  .title {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    padding: 10px;
-    overflow: hidden;
-    -webkit-app-region: drag;
-    cursor: move;
-  }
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  height: 100%;
   .main {
-    width: 42rem;
-    height: 24rem;
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    position: relative;
     .form {
-      width: 50%;
-      min-width: 22rem;
+      width: 20%;
+      min-width: 250px;
     }
   }
   .btnGroup {
