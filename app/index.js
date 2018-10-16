@@ -5,6 +5,9 @@ import Root from './containers/Root'
 import { configureStore, history } from './store/configureStore'
 import './app.global.scss'
 
+// for video.js
+window.HELP_IMPROVE_VIDEOJS = false
+
 const store = configureStore()
 
 render(

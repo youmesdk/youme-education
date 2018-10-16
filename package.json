@@ -201,6 +201,7 @@
   },
   "dependencies": {
     "antd": "^3.7.0",
+    "axios": "^0.18.0",
     "devtron": "^1.4.0",
     "electron-debug": "^1.5.0",
     "font-awesome": "^4.7.0",
@@ -214,7 +215,9 @@
     "react-router-redux": "^5.0.0-alpha.6",
     "redux": "^4.0.0",
     "redux-thunk": "^2.2.0",
-    "source-map-support": "^0.5.6"
+    "source-map-support": "^0.5.6",
+    "video.js": "^7.1.0",
+    "videojs-contrib-hls": "^5.14.1"
   },
   "devEngines": {
     "node": ">=7.x",

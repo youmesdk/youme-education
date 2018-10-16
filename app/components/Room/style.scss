@@ -1,5 +1,5 @@
 .container {
-  background: url('../../assets/images/background.jpg') no-repeat center;
+  background: url('../../assets/images/background.png') no-repeat center;
   background-size: cover;
   height: 100%;
   display: flex;
@@ -68,6 +68,25 @@
         border-radius: 5px;
         flex: 1;
         background: #FFF;
+        display: flex;
+        flex-direction: column;
+        #screen-video {
+          flex: 1;
+          align-self: center;
+          background:transparent;
+        }
+        .record_dock {
+          background: salmon;
+          cursor: pointer;
+          height: 30px;
+          line-height: 30px;
+          text-align: center;
+          font-size: 18px;
+          font-weight: 400;
+          &:hover {
+            opacity: 0.8;
+          }
+        }
       }
 
       &_right {
@@ -89,6 +108,20 @@
           margin-top: 8px;
           border: 1px solid coral;
           border-radius: 8px;
+          display: flex;
+          flex-direction: column;
+          &_list {
+            flex: 1
+          }
+          &_send {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 5px;
+            &_input {
+              margin-right: 5px;
+            }
+          }
         }
       }
     }
