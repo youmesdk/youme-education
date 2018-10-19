@@ -1,25 +1,90 @@
 .container {
-  background: url('../../assets/images/background.png') no-repeat center;
+  background: url('../../assets/images/background.png') no-repeat center center;
   background-size: cover;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
   height: 100%;
+  position: relative;
   .content {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-    .form {
-      width: 20%;
-      min-width: 250px;
+    position: absolute;
+    width: 80%;
+    height: 75%;
+    left: 50%;
+    top: 50%;
+    z-index: 10;
+    transform: translate(-50%, -50%);
+    background: #ffffff url('../../assets/images/demo.png') no-repeat center center;
+    background-size: contain;
+    box-shadow: 1px 1px 3px #cccccc;
+    padding-left: 5%;
+    padding-top: 3%;
+    .logo {
+      max-height: 40px;
+      display: block;
     }
-    .help {
-      margin-bottom: 1rem;
-      color: green;
-      text-align: right;
+    .title {
+      font-size: 18px;
+      margin-top: 5%;
+      font-weight: bold;
+    }
+    .form {
+      margin-top: 4%;
+      border: 1px solid #AEAEAE;
+      border-radius: 10px;
+      width: 30%;
+      &__input {
+        display: block;
+        width: 100%;
+        padding: 8px 5px 8px 15px;
+        outline: 0;
+        background: transparent;
+        border: none;
+        font-size: 14px;
+      }
+      & > input:first-child {
+        border-bottom: 1px solid #AEAEAE;
+      }
+    }
+    .roles {
+      margin-top: 4%;
+      &_radio {
+        font-size: 16px;
+        font-weight: 600;
+      }
+    }
+    .submit_btn {
+      min-width: 18%;
+      display: inline-block;
+      font-weight: 400;
+      text-align: center;
+      border: none;
+      outline: 0;
+      white-space: nowrap;
+      background: #4E3684;
+      border-radius: 20px;
+      padding: 8px 0;
+      user-select: none;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 400;
       cursor: pointer;
+      &::before {
+        position: absolute;
+        top: -1px;
+        bottom: -1px;
+        left: -1px;
+        right: -1px;
+        background: #fff;
+        opacity: 0.35;
+        content: "";
+        z-index: 1;
+        transition: opacity 0.2s;
+        display: none;
+      }
+      &:active::before {
+        display: inline-block;
+      }
     }
   }
 }

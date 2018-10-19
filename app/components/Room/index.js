@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-07-27 16:16:37
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-09-07 15:31:44
+ * @Last Modified time: 2018-10-19 17:34:44
  *
  */
 import * as React from 'react'
@@ -69,24 +69,24 @@ class Room extends React.Component {
     this.recorder.stop();
   }
 
-  render() {
-    const renderRecordBtn = () => {
-      const isRecording = this.state.isRecording
-      if (isRecording) {
-        return (
-          <div className={styles.record_dock} onClick={this.stopScreenRecord}>
-            结束录屏
-          </div>
-        )
-      } else {
-        return (
-          <div className={styles.record_dock} onClick={this.startScreenRecord}>
-            开始录屏
-          </div>
-        )
-      }
+  renderRecordBtn = () => {
+    const isRecording = this.state.isRecording;
+    if (isRecording) {
+      return (
+        <div className={styles.record_dock} onClick={this.stopScreenRecord}>
+          结束录屏
+        </div>
+      );
+    } else {
+      return (
+        <div className={styles.record_dock} onClick={this.startScreenRecord}>
+          开始录屏
+        </div>
+      );
     }
+  }
 
+  render() {
     return (
       <div className={styles.container}>
         <TitleBar>
@@ -122,7 +122,7 @@ class Room extends React.Component {
               >
                 <source source={this.playUrl} type="application/x-mpegURL" />
               </video>
-              {renderRecordBtn()}
+              {this.renderRecordBtn()}
             </div>
             <div className={styles.content_main_right}>
               <div className={styles.video}>
@@ -139,7 +139,7 @@ class Room extends React.Component {
           </section>
         </main>
       </div>
-    )
+    );
   }
 }
 

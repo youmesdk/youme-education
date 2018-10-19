@@ -2,126 +2,96 @@
  * @Author: fan.li
  * @Date: 2018-07-27 14:25:18
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-09-06 12:06:12
+ * @Last Modified time: 2018-10-19 16:30:40
  *
- * @flow
+ *  主页，登录页
  */
-import * as React from 'react'
-import { Link } from 'react-router-dom'
-import { Form, Icon, Input, Button, Radio, Modal } from 'antd'
-import TitleBar from '../commons/TitleBar'
-import styles from './style.scss'
+import * as React from 'react';
+import { Link } from 'react-router-dom';
+import { Radio, message } from 'antd';
+import logo from '../../assets/images/logo.png';
+import TitleBar from '../commons/TitleBar';
+import styles from './style.scss';
+import { isEmpty } from '../../utils/utils';
 
-const { Item: FormItem } = Form
-const { Group: RadioGroup } = Radio
-const { info } = Modal
+const { Group: RadioGroup } = Radio;
 
-type Props = {
-  form: {
-    getFieldDecorator: Function
-  },
-  history: { push: Function }
-}
+export default class Index extends React.Component {
 
-class Index extends React.Component<Props> {
-  props: Props
-
-  handleSubmit = e => {
-    e.preventDefault()
-    this.props.history.push('/devicecheck')
+  constructor(props) {
+    super(props);
+    this.state = {
+      role: 'teacher',
+      name: '',
+      passwd: ''
+    };
   }
 
-  showHelpInfo = () => {
-    info({
-      title: '帮助',
-      content: '第一次登录我们将给你创建账号，请妥善保管好账号和密码',
-      okText: '我知道了'
-    })
+  handleSubmit = () => {
+    const { role, name, passwd } = this.state;
+    if (isEmpty(name) || isEmpty(passwd)) {
+      message.info("username and password not allow empty");
+      return;
+    }
+    this.props.history.push('/devicecheck');
+  }
+
+  onInputChange = (e) => {
+    const name = e.target.name;
+    this.setState({
+      [name]: e.target.value
+    });
+  }
+
+  onRadioChange = (e) => {
+    this.setState({
+      role: e.target.value
+    });
   }
 
   render() {
-    const { getFieldDecorator } = this.props.form
-
     return (
       <div className={styles.container}>
         <TitleBar />
-
         <main className={styles.content}>
+          <img src={logo} alt="youme tech logo" className={styles.logo} />
+          <h1 className={styles.title}>LOGO IN</h1>
+
           <section className={styles.form}>
-            <Form onSubmit={this.handleSubmit}>
-              <FormItem>
-                {getFieldDecorator('room', {
-                  rules: [{ required: true, message: '请输入房间号' }]
-                })(
-                  <Input
-                    prefix={
-                      <Icon type="home" style={{ color: 'rgba(0,0,0,.25)' }} />
-                    }
-                    placeholder="房间"
-                  />
-                )}
-              </FormItem>
+            <input
+              name="name"
+              className={styles.form__input}
+              placeholder="N A M E"
+              onChange={this.onInputChange}
+            />
+            <input
+              name="passwd"
+              className={styles.form__input}
+              placeholder="P A S S W O R D"
+              type="password"
+              onChange={this.onInputChange}
+            />
+          </section>
 
-              <FormItem>
-                {getFieldDecorator('userName', {
-                  rules: [{ required: true, message: '请输入用户名' }]
-                })(
-                  <Input
-                    prefix={
-                      <Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />
-                    }
-                    placeholder="用户名"
-                  />
-                )}
-              </FormItem>
+          <RadioGroup
+            className={styles.roles}
+            value={this.state.role}
+            onChange={this.onRadioChange}
+          >
+            <Radio className={styles.roles_radio} value="teacher">Teacher</Radio>
+            <Radio className={styles.roles_radio} value="student">Student</Radio>
+          </RadioGroup>
 
-              <FormItem>
-                {getFieldDecorator('password', {
-                  rules: [{ required: true, message: '请输入密码' }]
-                })(
-                  <Input
-                    prefix={
-                      <Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />
-                    }
-                    type="password"
-                    placeholder="密码"
-                  />
-                )}
-              </FormItem>
-
-              <FormItem>
-                {getFieldDecorator('role', {
-                  initialValue: 'teacher'
-                })(
-                  <RadioGroup>
-                    <Radio value="teacher">教师</Radio>
-                    <Radio value="student">学生</Radio>
-                  </RadioGroup>
-                )}
-              </FormItem>
-
-              <div className={styles.help} onClick={this.showHelpInfo}>
-                账号相关问题?
-              </div>
-
-              <FormItem>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  style={{ width: '100%' }}
-                >
-                  登录
-                </Button>
-                <Link to="/register">注册</Link>
-              </FormItem>
-            </Form>
+          <section style={{ marginTop: '3%' }}>
+            <button
+              className={styles.submit_btn}
+              onClick={this.handleSubmit}
+            >
+              Join
+            </button>
           </section>
         </main>
       </div>
-    )
+    );
   }
 }
-
-const IndexForm = Form.create()(Index)
-
-export default IndexForm

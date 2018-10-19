@@ -2,33 +2,31 @@
  * @Author: fan.li
  * @Date: 2018-07-27 11:13:13
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-09-06 14:27:09
+ * @Last Modified time: 2018-10-16 15:47:12
  *
  * @flow
  */
 
-import * as React from 'react'
-import { Button, Modal } from 'antd'
-import styles from './style.scss'
+import * as React from 'react';
+import { Button, Modal } from 'antd';
+import styles from './style.scss';
 
-const { confirm } = Modal
-const { ipcRenderer } = require('electron')
+const { confirm } = Modal;
+const { ipcRenderer } = require('electron');
 
 type Props = {
   children?: React.Node
-}
+};
 
 type State = {
   isFullScreen: boolean
-}
+};
 
 class TitleBar extends React.Component<Props, State> {
   props: Props
-
   static defaultProps = {
     children: null
   }
-
   state = {
     isFullScreen: false
   }
@@ -60,12 +58,12 @@ class TitleBar extends React.Component<Props, State> {
   }
 
   handleMin = () => {
-    ipcRenderer.send('hide-window')
+    ipcRenderer.send('hide-window');
   }
 
   render() {
     // max/shrink button
-    const btnIcon = this.state.isFullScreen ? 'shrink' : 'arrows-alt'
+    const btnIcon = this.state.isFullScreen ? 'shrink' : 'arrows-alt';
 
     return (
       <div className={styles['btn-group']}>
@@ -93,4 +91,4 @@ class TitleBar extends React.Component<Props, State> {
   }
 }
 
-export default TitleBar
+export default TitleBar;
