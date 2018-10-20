@@ -1,6 +1,6 @@
 {
   "name": "youme-education",
-  "productName": "Youme-Education",
+  "productName": "YoumeEducation",
   "version": "1.0.0",
   "description": "Youme Sdk for education electron demo",
   "main": "./main.prod.js",

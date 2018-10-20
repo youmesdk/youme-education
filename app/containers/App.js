@@ -4,9 +4,7 @@ import Index from '../components/Index'
 import Room from '../components/Room'
 import DeviceCheck from '../components/DeviceCheck'
 
-type Props = {}
-
-export default class App extends Component<Props> {
+export default class App extends Component {
   render() {
     return (
       <div style={{ height: '100%' }}>

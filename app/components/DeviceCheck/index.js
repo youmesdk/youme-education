@@ -2,17 +2,18 @@
  * @Author: fan.li
  * @Date: 2018-07-27 10:58:16
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-10-19 17:14:17
+ * @Last Modified time: 2018-10-20 16:46:39
  *
  * 设备检测
  */
 
 import * as React from 'react';
-import { Form, Select, Button } from 'antd';
+import { Form, Select, Button, message, Spin } from 'antd';
 import { Link } from 'react-router-dom';
 import styles from './style.scss';
 import TitleBar from '../commons/TitleBar';
 import logo from '../../assets/images/logo.png';
+import Client from '../../utils/client';
 
 const { Item: FormItem } = Form
 const { Option } = Select
@@ -20,12 +21,55 @@ const { Option } = Select
 export default class DeviceCheck extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      isLogouting: false
+    };
+    this.$client = Client.getInstance();
+  }
+
+  componentDidMount() {
+    this.bindEvents();
+  }
+
+  componentWillUnmount() {
+    this.unbindEvents();
+  }
+
+  bindEvents = () => {
+    this.$client.$im.emitter.on('OnLogout', this._onLogout);
+  }
+
+  unbindEvents = () => {
+    this.$client.$im.emitter.removeListener('OnLogout', this._onLogout);
+  }
+
+  // 退出事件监听
+  _onLogout = () => {
+    this.setState({
+      isLogouting: false
+    });
+    message.info('logout!');
+    this.props.history.push('/');
+  }
+
+  handleLogoutBtn = () => {
+    this.setState({
+      isLogouting: true
+    });
+    this.$client.logout();
   }
 
   render() {
     return (
       <div className={styles.container}>
-        <TitleBar />
+        <TitleBar>
+          <Button
+            ghost
+            icon="logout"
+            onClick={this.handleLogoutBtn}
+            className={styles.menu_btn}
+          />
+        </TitleBar>
 
         <main className={styles.content}>
           <img src={logo} alt="youme tech logo" className={styles.logo} />

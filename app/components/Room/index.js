@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-07-27 16:16:37
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-10-19 17:34:44
+ * @Last Modified time: 2018-10-19 20:03:06
  *
  */
 import * as React from 'react'
@@ -19,7 +19,7 @@ class Room extends React.Component {
     this.publishUrl = 'rtmp://pili-publish.youme.im/youmetest/953853?token=ypDnZRsbZWX_OADwfpAPc-syJNme9j_U_rg2VVAN:f9NJlmKFhSctm7AwjI52AYKnAH8=';
     // 流媒体地址
     this.playUrl = 'http://pili-live-rtmp.youme.im/youmetest/953853.m3u8';
-    this.recorder = window.YRecord;
+    this.recorder = window.YoumeScreenSDK;
     this.play = null;
     this.state = {
       isRecording: false // 是否正在录屏

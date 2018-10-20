@@ -3,6 +3,17 @@
   background-size: cover;
   height: 100%;
   position: relative;
+  .menu_btn {
+    -webkit-app-region: no-drag !important;
+    margin: 5px;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: burlywood;
+  }
   .content {
     position: absolute;
     width: 80%;

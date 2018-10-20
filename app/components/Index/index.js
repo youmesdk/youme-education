@@ -2,17 +2,18 @@
  * @Author: fan.li
  * @Date: 2018-07-27 14:25:18
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-10-19 16:30:40
+ * @Last Modified time: 2018-10-20 16:02:47
  *
  *  主页，登录页
  */
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Radio, message } from 'antd';
+import { Radio, message, Spin } from 'antd';
 import logo from '../../assets/images/logo.png';
 import TitleBar from '../commons/TitleBar';
 import styles from './style.scss';
 import { isEmpty } from '../../utils/utils';
+import Client from '../../utils/client';
 
 const { Group: RadioGroup } = Radio;
 
@@ -23,17 +24,36 @@ export default class Index extends React.Component {
     this.state = {
       role: 'teacher',
       name: '',
-      passwd: ''
+      room: '',
+      isLogining: false
     };
+    this.$client = Client.getInstance();
   }
 
   handleSubmit = () => {
-    const { role, name, passwd } = this.state;
-    if (isEmpty(name) || isEmpty(passwd)) {
-      message.info("username and password not allow empty");
+    const { role, name, room } = this.state;
+    if (isEmpty(name) || isEmpty(room)) {
+      message.warn("username and roomname not allow empty");
       return;
     }
-    this.props.history.push('/devicecheck');
+    this.setState({
+      isLogining: true
+    });
+    // IM 登录
+    this.$client.login(name).then(() => {
+      // 加入房间
+      this.$client.joinRoom(room).then(() => {
+        message.info('login success!');
+        this.setState({ isLogining: false });
+        this.props.history.push('/devicecheck');
+      }).catch(code => {
+        message.error(`join room error, code=${code}`);
+        this.setState({ isLogining: false });
+      });
+    }).catch((code) => {
+      message.error(`login fail! code=${code}`);
+      this.setState({ isLogining: false });
+    });
   }
 
   onInputChange = (e) => {
@@ -50,10 +70,14 @@ export default class Index extends React.Component {
   }
 
   render() {
+    const { isLogining } = this.state;
+
     return (
       <div className={styles.container}>
+        { <Spin className={styles.spin} /> }
         <TitleBar />
         <main className={styles.content}>
+          {/* isLogining ? ( <Spin size="small" />) : (null) */}
           <img src={logo} alt="youme tech logo" className={styles.logo} />
           <h1 className={styles.title}>LOGO IN</h1>
 
@@ -65,10 +89,9 @@ export default class Index extends React.Component {
               onChange={this.onInputChange}
             />
             <input
-              name="passwd"
+              name="room"
               className={styles.form__input}
-              placeholder="P A S S W O R D"
-              type="password"
+              placeholder="R O O M"
               onChange={this.onInputChange}
             />
           </section>

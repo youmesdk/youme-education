@@ -1,6 +1,6 @@
 {
-  "name": "electron-react-boilerplate",
-  "productName": "ElectronReact",
+  "name": "youme-education",
+  "productName": "YoumeEducation",
   "version": "0.13.3",
   "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
   "scripts": {
@@ -41,8 +41,8 @@
     ]
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.develar.ElectronReact",
+    "productName": "YoumeEducation",
+    "appId": "im.youme.YoumeEducation",
     "files": [
       "dist/",
       "node_modules/",
