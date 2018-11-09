@@ -6,9 +6,10 @@
   position: relative;
   .spin {
     position: absolute;
-    top: 50%;
+    top: 20%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
+    z-index: 1000;
   }
   .content {
     position: absolute;
@@ -30,7 +31,6 @@
     .title {
       font-size: 18px;
       margin-top: 5%;
-      font-weight: bold;
     }
     .form {
       margin-top: 4%;

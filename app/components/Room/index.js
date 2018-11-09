@@ -2,47 +2,71 @@
  * @Author: fan.li
  * @Date: 2018-07-27 16:16:37
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-10-19 20:03:06
+ * @Last Modified time: 2018-10-22 11:25:54
  *
  */
 import * as React from 'react'
-import { Button, Spin, Input, message } from 'antd'
-import videojs from 'video.js'
-// import 'video.js/dist/video-js.css'
-import TitleBar from '../commons/TitleBar'
-import styles from './style.scss'
+import { Button, Spin, Input, message } from 'antd';
+import TitleBar from '../commons/TitleBar';
+import styles from './style.scss';
+import Client from '../../utils/client';
+import MessageList from './Message';
+
 
 class Room extends React.Component {
   constructor(props) {
     super(props)
-    // 推流地址，后期从服务端获取
-    this.publishUrl = 'rtmp://pili-publish.youme.im/youmetest/953853?token=ypDnZRsbZWX_OADwfpAPc-syJNme9j_U_rg2VVAN:f9NJlmKFhSctm7AwjI52AYKnAH8=';
-    // 流媒体地址
-    this.playUrl = 'http://pili-live-rtmp.youme.im/youmetest/953853.m3u8';
-    this.recorder = window.YoumeScreenSDK;
-    this.play = null;
     this.state = {
       isRecording: false // 是否正在录屏
     }
+    this.interval = 50 * 1;
+    this.pollingTask = null;
+
+    this.$client = Client.getInstance();
+    this.$client.$video.setVideoLocalResolution(320, 240);
+    this.$client.$video.setVideoNetResolution(320, 240);
+    this.$client.$video.setVideoCallback("");
+    this.$client.$video.setAutoSendStatus(true);
+    this.$client.$video.setVolume(100);
+    this.$client.$video.startCapture();
+    if (this.pollingTask) {
+      clearInterval(this.pollingTask);
+    }
+    this.pollingTask = setInterval(this.doupdate, this.interval);
   }
 
   componentDidMount() {
-    const options = {
-      controls: false
-    };
+  }
 
-    const videoEle = document.getElementById('screen-video');
-    this.player = videojs(videoEle, options, function() {
-      const { isRecording } = this.state;
-      this.on('ended', () => {
-        videojs.log('Awww.....over soon?!')
+  componentWillUnmount() {
+    if (this.pollingTask) {
+      clearInterval(this.pollingTask);
+    }
+  }
+
+  // 更新视频画面
+  doupdate = () => {
+  }
+
+  bindEvents = () => {
+    this.$client.$video.on('YOUME_ENVENT_JOIN_OK', () => {
+    });
+
+    this.$client.$video.on('YOUME_EVENT_OTHERS_VIDEO_ON', () => {
+    });
+
+    this.$client.$video.on('YOUME_EVENT_OTHERS_VIDEO_SHUT_DOWN', () => {
+    });
+
+    this.$client.$video.on('onMemberChange', (memchange) => {
+      memchange.foreach(item => {
+        const userid = item.userid;
+        const isJoin = item.isJoin;
+        if (isJoin) {
+          message.info('memberchange: ', memchange);
+        }
       });
-
-      if (isRecording) {
-        videojs.log('Videojs player is ready!');
-        this.play();
-      }
-    })
+    });
   }
 
   handleStopBtn = () => {
@@ -50,23 +74,9 @@ class Room extends React.Component {
   }
 
   startScreenRecord = () => {
-    message.info('开始录屏', 3)
-    this.setState({ isRecording: true })
-    this.recorder.start(this.publishUrl, code => {
-      this.setState({ isRecording: false })
-      if (code === 0) {
-        message.info('已成功停止录屏', 3)
-      } else {
-        message.error('录屏错误，请确保麦克风设备正常', 3)
-      }
-    })
-    setTimeout(() => {
-      this.player.play()
-    }, 3500)
   }
 
   stopScreenRecord = () => {
-    this.recorder.stop();
   }
 
   renderRecordBtn = () => {
@@ -111,17 +121,6 @@ class Room extends React.Component {
 
           <section className={styles.content_main}>
             <div className={styles.content_main_left}>
-              <video
-                id="screen-video"
-                style={{flex: 1, alignSelf: 'center', background: 'transparent'}}
-                className="video-js"
-                preload="auto"
-                autoPlay={true}
-                source={this.playUrl}
-                data-setup="{}"
-              >
-                <source source={this.playUrl} type="application/x-mpegURL" />
-              </video>
               {this.renderRecordBtn()}
             </div>
             <div className={styles.content_main_right}>
@@ -129,7 +128,7 @@ class Room extends React.Component {
                 <Spin className={styles.spin} size="large" />
               </div>
               <div className={styles.im}>
-                <div className={styles.im_list} />
+                <MessageList className={styles.im_list} />
                 <div className={styles.im_send}>
                   <Input className={styles.im_send_input} />
                   <Button type="primary">发送</Button>

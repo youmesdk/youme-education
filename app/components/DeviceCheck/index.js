@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-07-27 10:58:16
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-10-20 16:46:39
+ * @Last Modified time: 2018-10-22 10:43:08
  *
  * 设备检测
  */
@@ -22,17 +22,34 @@ export default class DeviceCheck extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLogouting: false
+      isLogouting: false,
+      cameras: [],
+      outputVolume: 0
     };
     this.$client = Client.getInstance();
   }
 
   componentDidMount() {
     this.bindEvents();
+
+    let cameras = [], outputVolume = 0;
+    const count = this.$client.$video.getCameraCount();
+    for (let i = 0; i < count; i++) {
+      cameras.push(this.$client.$video.getCameraName(i));
+    }
+    outputVolume = this.$client.$video.getVolume();
+    this.setState({
+      outputVolume,
+      cameras
+    });
   }
 
   componentWillUnmount() {
     this.unbindEvents();
+  }
+
+  componentDidCatch(err, info) {
+    console.error(err);
   }
 
   bindEvents = () => {
@@ -41,6 +58,14 @@ export default class DeviceCheck extends React.Component {
 
   unbindEvents = () => {
     this.$client.$im.emitter.removeListener('OnLogout', this._onLogout);
+  }
+
+  initData = () => {
+    this.cameras = [];
+    const count = this.$client.$video.getCameraCount();
+    for (let i = 0; i < count; ++i) {
+      this.cameras.push(this.$client.$video.getCameraName(i));
+    }
   }
 
   // 退出事件监听
@@ -60,6 +85,9 @@ export default class DeviceCheck extends React.Component {
   }
 
   render() {
+    const { cameras, outputVolume } = this.state;
+    console.log(cameras);
+
     return (
       <div className={styles.container}>
         <TitleBar>
@@ -78,8 +106,14 @@ export default class DeviceCheck extends React.Component {
           <section className={styles.devices}>
             <Form>
               <FormItem label="Camera" colon={false}>
-                <Select defaultValue="camera1">
-                  <Option value="camera1">USB2.0 PC CAMERA</Option>
+                <Select defaultValue={cameras[0]}>
+                {
+                  cameras.map((item, index) => {
+                    return (
+                      <Option value={item} key={index}>{item}</Option>
+                    );
+                  })
+                }
                 </Select>
               </FormItem>
 

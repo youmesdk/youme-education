@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-07-27 14:25:18
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-10-20 16:02:47
+ * @Last Modified time: 2018-10-20 17:18:26
  *
  *  主页，登录页
  */
@@ -74,10 +74,9 @@ export default class Index extends React.Component {
 
     return (
       <div className={styles.container}>
-        { <Spin className={styles.spin} /> }
         <TitleBar />
         <main className={styles.content}>
-          {/* isLogining ? ( <Spin size="small" />) : (null) */}
+          { isLogining ? ( <Spin className={styles.spin} size="large" />) : (null) }
           <img src={logo} alt="youme tech logo" className={styles.logo} />
           <h1 className={styles.title}>LOGO IN</h1>
 

@@ -1,0 +1,19 @@
+.container {
+  height: 100%;
+  overflow-y: scroll;
+  .msg {
+    .avatar {
+      min-width: 50px;
+    }
+  }
+  .voice {
+
+  }
+  .text {
+
+  }
+  .align_right {
+    float: right;
+    clear: both;
+  }
+}
