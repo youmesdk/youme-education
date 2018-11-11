@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-07-27 16:16:37
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-10-22 11:25:54
+ * @Last Modified time: 2018-11-11 14:16:32
  *
  */
 import * as React from 'react'
@@ -10,14 +10,33 @@ import { Button, Spin, Input, message } from 'antd';
 import TitleBar from '../commons/TitleBar';
 import styles from './style.scss';
 import Client from '../../utils/client';
-import MessageList from './Message';
+import MessageList from './MessageList';
+import MessageText from './MessageText';
+import ChatBottom from './ChatBottom';
+
+import avatar from '../../assets/images/avatar.png';
 
 
 class Room extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      isRecording: false // 是否正在录屏
+      isRecording: false, // 是否正在录屏
+      fakeList: [
+        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: true, messageId: 1 },
+        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: true, messageId: 2 },
+        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: true, messageId: 3 },
+        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: true, messageId: 4 },
+        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: true, messageId: 5 },
+        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: true, messageId: 6 },
+        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: false, messageId: 7 },
+        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: false, messageId: 8 },
+        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: false, messageId: 9 },
+        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: true, messageId: 10 },
+        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: true, messageId: 11 },
+        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: false, messageId: 12 },
+        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: true, messageId: 13 },
+      ]
     }
     this.interval = 50 * 1;
     this.pollingTask = null;
@@ -79,6 +98,21 @@ class Room extends React.Component {
   stopScreenRecord = () => {
   }
 
+  renderListItem = ({ item }) => {
+    return (
+      <MessageText
+        key={item.messageId}
+        avatar={item.avatar}
+        nickname={item.nickname}
+        content={item.content}
+        isFromMe={item.isFromMe}
+      />
+    );
+  }
+
+  _keyExtractor = ({ item }) => {
+  }
+
   renderRecordBtn = () => {
     const isRecording = this.state.isRecording;
     if (isRecording) {
@@ -128,11 +162,12 @@ class Room extends React.Component {
                 <Spin className={styles.spin} size="large" />
               </div>
               <div className={styles.im}>
-                <MessageList className={styles.im_list} />
-                <div className={styles.im_send}>
-                  <Input className={styles.im_send_input} />
-                  <Button type="primary">发送</Button>
-                </div>
+                <MessageList
+                  className={styles.im_list}
+                  data={this.state.fakeList}
+                  renderItem={this.renderListItem}
+                />
+                <ChatBottom />
               </div>
             </div>
           </section>

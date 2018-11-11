@@ -1,0 +1,20 @@
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5px;
+  .inputWrap {
+    display: flex;
+    flex: 1;
+  }
+  .input {
+    margin-right: 5px;
+    display: inline-block;
+  }
+  .switch {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    margin-right: 8px;
+  }
+}

@@ -92,32 +92,23 @@
         margin-left: 8px;
         display: flex;
         flex-direction: column;
-        min-width: 240px;
+        min-width: 300px;
         .video {
           border-radius: 10px;
           background: #000;
-          min-height: 240px;
+          min-height: 300px;
           cursor: pointer;
           position: relative;
         }
         .im {
           flex: 1;
-          margin-top: 8px;
-          border-radius: 8px;
           display: flex;
           flex-direction: column;
+          margin-top: 8px;
+          border-radius: 8px;
           background: #FFF;
           &_list {
             flex: 1
-          }
-          &_send {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 5px;
-            &_input {
-              margin-right: 5px;
-            }
           }
         }
       }
