@@ -2,23 +2,27 @@
  * @Author: fan.li
  * @Date: 2018-07-27 14:25:18
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-10-20 17:18:26
+ * @Last Modified time: 2018-11-11 17:25:53
  *
  *  主页，登录页
  */
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Radio, message, Spin } from 'antd';
+import { bindActionCreators } from 'redux';
+
 import logo from '../../assets/images/logo.png';
+import { connect } from 'react-redux';
+
 import TitleBar from '../commons/TitleBar';
 import styles from './style.scss';
 import { isEmpty } from '../../utils/utils';
-import Client from '../../utils/client';
+import YIMClient from '../../utils/client';
+import * as actions from '../../actions/app';
 
 const { Group: RadioGroup } = Radio;
 
-export default class Index extends React.Component {
-
+class Index extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -27,46 +31,51 @@ export default class Index extends React.Component {
       room: '',
       isLogining: false
     };
-    this.$client = Client.getInstance();
   }
 
-  handleSubmit = () => {
+  handleSubmit = async () => {
     const { role, name, room } = this.state;
+    const { setRoom, setNickname } = this.props;
+
     if (isEmpty(name) || isEmpty(room)) {
       message.warn("username and roomname not allow empty");
       return;
     }
-    this.setState({
-      isLogining: true
-    });
-    // IM 登录
-    this.$client.login(name).then(() => {
-      // 加入房间
-      this.$client.joinRoom(room).then(() => {
-        message.info('login success!');
+
+    this.setState({ isLogining: true });
+    try {
+      // login
+      await YIMClient.instance.login(name).catch((code) => {
+        message.error(`login fail! code=${code}`);
         this.setState({ isLogining: false });
-        this.props.history.push('/devicecheck');
-      }).catch(code => {
+      });
+
+      // join chat room
+      await YIMClient.instance.joinRoom(room).catch(code => {
         message.error(`join room error, code=${code}`);
         this.setState({ isLogining: false });
       });
-    }).catch((code) => {
-      message.error(`login fail! code=${code}`);
+
+      message.info('login success!');
       this.setState({ isLogining: false });
-    });
+
+      this.props.history.push('/devicecheck');
+      // save room and nickname into redux
+      setRoom(room);
+      setNickname(name);
+    } catch(err) {
+      this.setState({ isLoading: false });
+      message.error('unknow error!!' + err);
+    }
   }
 
   onInputChange = (e) => {
     const name = e.target.name;
-    this.setState({
-      [name]: e.target.value
-    });
+    this.setState({ [name]: e.target.value });
   }
 
   onRadioChange = (e) => {
-    this.setState({
-      role: e.target.value
-    });
+    this.setState({ role: e.target.value });
   }
 
   render() {
@@ -117,3 +126,12 @@ export default class Index extends React.Component {
     );
   }
 }
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setRoom: bindActionCreators(actions.setRoom, dispatch),
+    setNickname: bindActionCreators(actions.setNickname, dispatch)
+  };
+};
+
+export default connect(null, mapDispatchToProps)(Index);

@@ -2,46 +2,41 @@
  * @Author: fan.li
  * @Date: 2018-07-27 16:16:37
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-11-11 14:16:32
+ * @Last Modified time: 2018-11-18 11:38:57
+ *
+ * @flow
  *
  */
 import * as React from 'react'
-import { Button, Spin, Input, message } from 'antd';
+import { Button, Spin, message } from 'antd';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+
 import TitleBar from '../commons/TitleBar';
 import styles from './style.scss';
-import Client from '../../utils/client';
 import MessageList from './MessageList';
 import MessageText from './MessageText';
 import ChatBottom from './ChatBottom';
+import * as actions from '../../actions/app';
+import YIMClient from '../../utils/client';
+import { isEmpty } from '../../utils/utils';
+import avatarIcon from '../../assets/images/avatar.png';
 
-import avatar from '../../assets/images/avatar.png';
+type Props = {
+  history: { push: Function }
+};
 
 
-class Room extends React.Component {
+class Room extends React.Component<Props> {
   constructor(props) {
     super(props)
     this.state = {
       isRecording: false, // 是否正在录屏
-      fakeList: [
-        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: true, messageId: 1 },
-        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: true, messageId: 2 },
-        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: true, messageId: 3 },
-        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: true, messageId: 4 },
-        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: true, messageId: 5 },
-        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: true, messageId: 6 },
-        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: false, messageId: 7 },
-        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: false, messageId: 8 },
-        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: false, messageId: 9 },
-        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: true, messageId: 10 },
-        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: true, messageId: 11 },
-        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: false, messageId: 12 },
-        { nickname: 'Random', avatar: avatar, content: '我是休息休息', isFromMe: true, messageId: 13 },
-      ]
     }
     this.interval = 50 * 1;
     this.pollingTask = null;
 
-    this.$client = Client.getInstance();
+    this.$client = YIMClient.getInstance();
     this.$client.$video.setVideoLocalResolution(320, 240);
     this.$client.$video.setVideoNetResolution(320, 240);
     this.$client.$video.setVideoCallback("");
@@ -78,9 +73,8 @@ class Room extends React.Component {
     });
 
     this.$client.$video.on('onMemberChange', (memchange) => {
-      memchange.foreach(item => {
-        const userid = item.userid;
-        const isJoin = item.isJoin;
+      memchange.foreach((item) => {
+        const { isJoin } = item;
         if (isJoin) {
           message.info('memberchange: ', memchange);
         }
@@ -89,6 +83,7 @@ class Room extends React.Component {
   }
 
   handleStopBtn = () => {
+    YIMClient.instance.logout(); // logout
     this.props.history.push('/');
   }
 
@@ -114,23 +109,57 @@ class Room extends React.Component {
   }
 
   renderRecordBtn = () => {
-    const isRecording = this.state.isRecording;
+    const { isRecording } = this.state;
     if (isRecording) {
       return (
-        <div className={styles.record_dock} onClick={this.stopScreenRecord}>
+        <div
+          className={styles.record_dock}
+          onClick={this.stopScreenRecord}
+          role='btn'
+        >
           结束录屏
         </div>
       );
-    } else {
-      return (
-        <div className={styles.record_dock} onClick={this.startScreenRecord}>
-          开始录屏
-        </div>
-      );
     }
+
+    return (
+      <div className={styles.record_dock} onClick={this.startScreenRecord}>
+        开始录屏
+      </div>
+    );
+  }
+
+  handleChatBottomSendBtnClick = (text) => {
+    const { addOneMessage, updateOneMessage, room, nickname } = this.props;
+
+    if (isEmpty(text)) {
+      return;
+    }
+    const msg = {
+      messageId: Date.now(),
+      nickname: nickname,
+      avatar: avatarIcon,
+      content: text,
+      isFromMe: true,
+      status: 0 // 0 sending， 1 success， 2 fail
+    };
+
+    // add msg into redux
+    addOneMessage(msg);
+    YIMClient.instance.sendTextMessage(room, 2, text).then(() => {
+      // update message status to success;
+      msg.status = 1;
+      updateOneMessage(msg);
+    }).catch((err) => {
+      // update message status to fail;
+      msg.status = 2;
+      updateOneMessage(msg);
+    });
   }
 
   render() {
+    const { messages } = this.props;
+
     return (
       <div className={styles.container}>
         <TitleBar>
@@ -164,10 +193,12 @@ class Room extends React.Component {
               <div className={styles.im}>
                 <MessageList
                   className={styles.im_list}
-                  data={this.state.fakeList}
+                  data={messages}
                   renderItem={this.renderListItem}
                 />
-                <ChatBottom />
+                <ChatBottom
+                  onSendText={this.handleChatBottomSendBtnClick}
+                />
               </div>
             </div>
           </section>
@@ -177,4 +208,17 @@ class Room extends React.Component {
   }
 }
 
-export default Room;
+const mapStateToProps = (state) => {
+  const { messages, room, nickname } = state.app;
+  return { messages, room, nickname };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    addOneMessage: bindActionCreators(actions.addOneMessage, dispatch),
+    updateOneMessage: bindActionCreators(actions.updateOneMessage, dispatch),
+    delOneMessage: bindActionCreators(actions.delOneMessage, dispatch)
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Room);

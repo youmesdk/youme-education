@@ -1,9 +1,22 @@
+/*
+ * @Author: fan.li
+ * @Date: 2018-11-11 15:36:30
+ * @Last Modified by: fan.li
+ * @Last Modified time: 2018-11-11 16:40:42
+ *
+ * @flow
+ *
+ * 游密SDK 工具
+ */
+
 import {
   APP_KEY,
   APP_SECRET,
   VIDEO_SERVERE_REGION,
   VIDEO_REGION_NAME
 } from '../config';
+import * as appActions from '../actions/app';
+import { bindActionCreators } from 'redux';
 
 export default class Client {
   static _instance = null;
@@ -19,10 +32,15 @@ export default class Client {
     this.role = '';
     this.uroom = '';
     this.init();
+    return Client._instance = this;
   }
 
   static getInstance() {
     return Client._instance || (Client._instance = new Client());
+  }
+
+  static get instance() {
+    return Client.getInstance();
   }
 
   init() {
@@ -34,6 +52,8 @@ export default class Client {
     this.$video.setExternalInputMode(false);
     this.$video.setAVStatisticInterval(5000);
     this.$video.videoEngineModelEnabled(false);
+
+    this._bindEvents();
   }
 
   login(uname, upasswd = '123456', utoken = '') {
@@ -75,5 +95,48 @@ export default class Client {
     }
     this.channel = channel;
     this.role = role;
+  }
+
+  sendTextMessage(recvId: string, chatType: number, text: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.$im.sendTextMessage(recvId, chatType, text, (code, eve) => {
+        if (code !== 0) {
+          return reject(code);
+        }
+        return resolve({ code, eve });
+      });
+
+    });
+  }
+
+  _bindEvents() {
+    console.log('bding event==============')
+    this.$im.on('OnRecvMessage', (msg) => {
+      console.log('OnRecvMessage:', msg);
+    });
+
+    this.$im.on('OnKickOff', (msg) => {
+      console.log('OnKickOf:', msg);
+    });
+
+    this.$im.on('OnRecvReconnectResult', (msg) => {
+      console.log('OnRecvReconnectResult:', msg);
+    });
+
+    this.$im.on('OnStartReconnect', (msg) => {
+      console.log('OnStartReconnect:', msg);
+    });
+
+    this.$im.on('OnUserLeaveChatRoom', (msg) => {
+      console.log('OnUserLeaveChatRoom:', msg);
+    });
+
+    this.$im.on('OnUserJoinChatRoom', (msg) => {
+      console.log('OnUserJoinChatRoom:', msg);
+    });
+
+    this.$im.on('OnLogout', (msg) => {
+      console.log('OnLogout:', msg);
+    });
   }
 }

@@ -10,6 +10,7 @@
 import * as React from 'react';
 import styles from './style.scss';
 import sendFailIcon from '../../../assets/images/msg_send_fail.png';
+import sendGoingIcon from '../../../assets/images/msg_send_going.gif';
 
 export default class Message extends React.Component {
   constructor(props) {
@@ -32,7 +33,7 @@ export default class Message extends React.Component {
   }
 
   renderRight = () => {
-    const { avatar, nickname, content } = this.props;
+    const { avatar, nickname, content, status } = this.props;
     return (
       <div className={styles.containerRight}>
         <img src={avatar} className={styles.avatar} />
@@ -40,16 +41,28 @@ export default class Message extends React.Component {
           <span className={styles.nickname}>{nickname}</span>
           <div className={styles.contentWrapRight}>
             <div className={styles.contentRight}>{content}</div>
-            <img
-              src={sendFailIcon}
-              className={styles.status}
-              style={{ marginRight: '8px' }}
-            />
+            { status === 2 &&
+              <img
+                src={sendFailIcon}
+                className={styles.status}
+                style={{ marginRight: '8px' }}
+              />
+            }
+            {
+              status === 0 &&
+              <img
+                src={sendGoingIcon}
+                className={styles.status}
+                style={{ marginRight: '8px' }}
+              />
+            }
           </div>
-          <span className={styles.sendFailInfo}>
-            消息发送失败
-            <span className={styles.sendFailLink}>重新发送</span>
-          </span>
+          { status === 2 &&
+            <span className={styles.sendFailInfo}>
+              消息发送失败
+              <span className={styles.sendFailLink}>重新发送</span>
+            </span>
+          }
         </div>
       </div>
     );
@@ -57,7 +70,7 @@ export default class Message extends React.Component {
 
   render() {
     const { isFromMe } = this.props;
-    const child = isFromMe ? this.renderLeft() : this.renderRight();
+    const child = isFromMe ? this.renderRight() : this.renderLeft();
     return ( child);
   }
 }
