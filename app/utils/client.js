@@ -15,8 +15,9 @@ import {
   VIDEO_SERVERE_REGION,
   VIDEO_REGION_NAME
 } from '../config';
-import * as appActions from '../actions/app';
-import { bindActionCreators } from 'redux';
+
+import { configureStore } from '../store/configureStore';
+import * as actions from '../actions/app';
 
 export default class Client {
   static _instance = null;
@@ -43,6 +44,10 @@ export default class Client {
     return Client.getInstance();
   }
 
+  static injectStore(store) {
+    Client.store = store;
+  }
+
   init() {
     // 初始化IM
     this.$im.init(APP_KEY, APP_SECRET);
@@ -52,7 +57,6 @@ export default class Client {
     this.$video.setExternalInputMode(false);
     this.$video.setAVStatisticInterval(5000);
     this.$video.videoEngineModelEnabled(false);
-
     this._bindEvents();
   }
 
@@ -110,9 +114,17 @@ export default class Client {
   }
 
   _bindEvents() {
-    console.log('bding event==============')
     this.$im.on('OnRecvMessage', (msg) => {
-      console.log('OnRecvMessage:', msg);
+      if (msg.messageType === 1) { // 文本消息
+        const formatedMsg = {
+          messageId: msg.serial,
+          nickname: msg.senderID,
+          content: msg.content,
+          isFromMe: false,
+          avatar: require('../assets/images/avatar.png')
+        };
+        Client.store.dispatch(actions.addOneMessage(formatedMsg));
+      }
     });
 
     this.$im.on('OnKickOff', (msg) => {

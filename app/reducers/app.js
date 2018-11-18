@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-11-11 15:04:27
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-11-11 18:09:07
+ * @Last Modified time: 2018-11-18 17:21:28
  *
  * @flow
  *
@@ -23,7 +23,7 @@ const initialState = {
   nickname: '',
 };
 
-export default (state = initialState, action) => {
+export default (state = initialState, action: { type: string }) => {
   switch(action.type) {
     // append new message
     case PUSH_MESSAGE: {
@@ -49,7 +49,6 @@ export default (state = initialState, action) => {
         ...state,
         messages: newMessages
       };
-      return state;
     }
 
     // remove all message

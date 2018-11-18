@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-11-11 13:50:53
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-11-18 11:48:53
+ * @Last Modified time: 2018-11-18 16:51:33
  *
  * @flow
  *
@@ -35,7 +35,7 @@ export default class ChatBottom extends React.Component<Props, State> {
     this.setState({ isRecording: !isRecording });
   }
 
-  handleTextChange = (e) => {
+  handleTextChange = (e: any) => {
     this.setState({ text: e.target.value });
   }
 

@@ -21,6 +21,7 @@ import * as actions from '../../actions/app';
 import YIMClient from '../../utils/client';
 import { isEmpty } from '../../utils/utils';
 import avatarIcon from '../../assets/images/avatar.png';
+import videojs from 'video.js';
 
 type Props = {
   history: { push: Function }
@@ -50,12 +51,16 @@ class Room extends React.Component<Props> {
   }
 
   componentDidMount() {
+    this.player = videojs(this.videoNode, this.props, function onPlayerReady() {
+      console.log('onPlayerReady', this);
+    });
   }
 
   componentWillUnmount() {
     if (this.pollingTask) {
       clearInterval(this.pollingTask);
     }
+    this.player.dispose();
   }
 
   // 更新视频画面
@@ -184,6 +189,9 @@ class Room extends React.Component<Props> {
 
           <section className={styles.content_main}>
             <div className={styles.content_main_left}>
+              <div data-vjs-player>
+                <video ref={(node) => this.videoNode = node} className="video-js"></video>
+              </div>
               {this.renderRecordBtn()}
             </div>
             <div className={styles.content_main_right}>
