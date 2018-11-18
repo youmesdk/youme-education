@@ -4,7 +4,6 @@
  * @Last Modified by: fan.li
  * @Last Modified time: 2018-11-11 11:36:47
  *
- * @flow
  *
  * 消息列表
  */
@@ -12,13 +11,16 @@
 import * as React from 'react';
 import styles from './style.scss';
 
-type Props = {
-  data: Array<any>,
-  renderItem: ({item: any, index: number}) => any,
-  keyExtractor?: ({item: any, index: number}) => (string | number)
-};
+// type Props = {
+//   data: Array<any>,
+//   renderItem: ({item: any, index: number}) => any,
+//   keyExtractor?: ({item: any, index: number}) => (string)
+// };
 
-export default class MessageList extends React.Component<Props> {
+export default class MessageList extends React.Component {
+  constructor(props) {
+    super(props);
+  }
 
   render() {
     const { data, renderItem, keyExtractor } = this.props;
