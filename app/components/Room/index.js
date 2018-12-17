@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-07-27 16:16:37
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-11-18 11:38:57
+ * @Last Modified time: 2018-12-17 14:41:52
  *
  * @flow
  *
@@ -225,7 +225,6 @@ const mapDispatchToProps = (dispatch) => {
   return {
     addOneMessage: bindActionCreators(actions.addOneMessage, dispatch),
     updateOneMessage: bindActionCreators(actions.updateOneMessage, dispatch),
-    delOneMessage: bindActionCreators(actions.delOneMessage, dispatch)
   };
 };
 

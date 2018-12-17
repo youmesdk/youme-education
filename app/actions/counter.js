@@ -1,4 +1,14 @@
-// @flow
+/*
+ * @Author: fan.li
+ * @Date: 2018-12-17 14:35:54
+ * @Last Modified by: fan.li
+ * @Last Modified time: 2018-12-17 14:36:28
+ *
+ * @flow
+ *
+ * demo for redux action
+ */
+
 import type { counterStateType } from '../reducers/counter';
 
 type actionType = {

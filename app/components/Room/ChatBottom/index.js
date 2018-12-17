@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-11-11 13:50:53
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-11-18 16:51:33
+ * @Last Modified time: 2018-12-17 14:49:39
  *
  * @flow
  *
@@ -20,20 +20,13 @@ type Props = {
 };
 
 type State = {
-  isRecording: boolean,
   text: string,
 };
 
 export default class ChatBottom extends React.Component<Props, State> {
   state = {
-    isRecording: false,
     text: '',
   };
-
-  changeRole = () => {
-    const { isRecording } = this.state;
-    this.setState({ isRecording: !isRecording });
-  }
 
   handleTextChange = (e: any) => {
     this.setState({ text: e.target.value });
@@ -41,14 +34,15 @@ export default class ChatBottom extends React.Component<Props, State> {
 
   handleSendBtnClick = () => {
     const { text } = this.state;
+    const { onSendText } = this.props;
     this.setState({ text: '' });
-    this.props.onSendText && this.props.onSendText(text);
+    onSendText(text);
   }
 
-  renderText = () => {
+  render () {
     const { text } = this.state;
     return (
-      <div className={styles.inputWrap}>
+      <div className={styles.container}>
         <Input
           className={styles.input}
           value={text}
@@ -62,34 +56,10 @@ export default class ChatBottom extends React.Component<Props, State> {
           send
         </Button>
       </div>
-    )
-  }
-
-  renderVoice = () => {
-    return (
-      <div className={styles.inputWrap}>
-        <Button
-          block
-          type='ghost'
-        >
-          Press to send voice
-        </Button>
-      </div>
-    );
-  }
-
-  render () {
-    const { isRecording } = this.state;
-    const children = isRecording ? this.renderVoice() : this.renderText();
-    return (
-      <div className={styles.container}>
-        <img
-          className={styles.switch}
-          src={isRecording ? chatKeyboardIcon : chatSoundIcon }
-          onClick={this.changeRole}
-        />
-        { children }
-      </div>
     );
   }
 }
+
+ChatBottom.defaultProps = {
+  onSendText: f => f, // noop
+};
