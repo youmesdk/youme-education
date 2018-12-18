@@ -25,6 +25,7 @@ const JOIN_ROOM_EVENT = 'JOIN_ROOM_EVENT';
 
 export const CLASS_IS_EXIST = -100000;
 export const CLASS_IS_NOT_EXIST = -100001;
+export const MAX_NUMBER_MEMBER_ERROR = -100002;
 
 const TASK_INTERVAL_IN_SECOND = 1000 * 12;  // 定时器时间间隔（以秒为单位）
 const MAX_NUMBER_MEMBER_IN_ROOM = 5;        // 房间最多允许多少人加入
@@ -200,11 +201,15 @@ export default class Client {
       const { channelID, userID } = msg;
       const state = Client.store.getState();
       const { app } = state;
-      const { user, room, region } = app;
+      const { user, room, region, users } = app;
       const { id, name, role } = user;
       if (role === 0) {  // teacher should send a sigining to student
-        const cmd = { cmd: 0, data: { teacher: user, region: region, room: room } };
-        this.signing(userID, 1, cmd);
+        if (users.length > MAX_NUMBER_MEMBER_IN_ROOM) {
+          const cmd = { cmd: 1, data: { max: MAX_NUMBER_MEMBER_IN_ROOM, count: users.length - 1 }};
+        } else {
+          const cmd = { cmd: 0, data: { teacher: user, region: region, room: room } };
+          this.signing(userID, 1, cmd);
+        }
       }
     });
 
@@ -239,7 +244,7 @@ export default class Client {
     const { cmd, data } = JSON.parse(content);
 
     switch (cmd) {
-      case 0: {  // teacher init siging
+      case 0: {
         this.resolveHash.delete(CREATE_ROOM_EVENT);
         if (this.rejectHash.has(CREATE_ROOM_EVENT)) {
           const reject = this.rejectHash.get(CREATE_ROOM_EVENT);
@@ -253,6 +258,24 @@ export default class Client {
           const resolve = this.resolveHash.get(JOIN_ROOM_EVENT);
           // 收到了该课堂老师的回应，学生可以加入到房间
           resolve({ code: 0, evt: data });
+        }
+        break;
+      }
+
+      case 1: {
+        this.resolveHash.delete(CREATE_ROOM_EVENT);
+        if (this.rejectHash.has(CREATE_ROOM_EVENT)) {
+          const reject = this.rejectHash.get(CREATE_ROOM_EVENT);
+          this.rejectHash.delete(CREATE_ROOM_EVENT);
+          // 该课堂有其他老师声明课程被占用了, 不能再这个房间再次开课
+          reject({ code: CLASS_IS_EXIST });
+        }
+
+        this.resolveHash.delete(JOIN_ROOM_EVENT);
+        if (this.rejectHash.has(JOIN_ROOM_EVENT)) {
+          const reject = this.rejectHash.get(JOIN_ROOM_EVENT);
+          // 收到了该课堂老师的回应，但是房间超员了，学生也不能进入房间
+          reject({ code: MAX_NUMBER_MEMBER_ERROR });
         }
         break;
       }

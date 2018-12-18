@@ -36,7 +36,7 @@ class DeviceCheck extends React.Component {
     const { id } = user;
     // init video sdk
     YIMClient.instance.initVideo();
-    YIMClient.instance.joinVideoRoom(id, room).catch((code) => {
+    YIMClient.instance.joinVideoRoom(id, room).catch(({ code }) => {
       message.error(`join video room error!: ${code}`);
     });
   }

@@ -19,7 +19,11 @@ import { connect } from 'react-redux';
 import TitleBar from '../commons/TitleBar';
 import styles from './style.scss';
 import { isEmpty } from '../../utils/utils';
-import YIMClient, { CLASS_IS_EXIST, CLASS_IS_NOT_EXIST } from '../../utils/client';
+import YIMClient, {
+   CLASS_IS_EXIST,
+   CLASS_IS_NOT_EXIST,
+   MAX_NUMBER_MEMBER_ERROR,
+} from '../../utils/client';
 import * as actions from '../../actions/app';
 
 const { Group: RadioGroup } = Radio;
@@ -49,7 +53,7 @@ class Index extends React.Component<null, State> {
       const { setRoom, setUser, addOneUser, history } = this.props;
 
       if (isEmpty(name) || isEmpty(room)) {
-        return message.warn("username and roomname not allow empty");
+        return message.warn("username and room name not allow empty");
       }
 
       // login
@@ -73,6 +77,11 @@ class Index extends React.Component<null, State> {
           if (code === CLASS_IS_NOT_EXIST) {
             throw new Error(`join room error, room is not exist, code=${code}`)
           }
+
+          if (code === MAX_NUMBER_MEMBER_ERROR) {
+            throw new Error(`join room error, too manay student in room, code=${code}`);
+          }
+
           throw new Error(`join room error, code=${code}`);
         });
       }
