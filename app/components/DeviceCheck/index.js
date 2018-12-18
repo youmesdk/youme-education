@@ -10,15 +10,18 @@
 import * as React from 'react';
 import { Form, Select, Button, message, Spin } from 'antd';
 import { Link } from 'react-router-dom';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+
 import styles from './style.scss';
 import TitleBar from '../commons/TitleBar';
 import logo from '../../assets/images/logo.png';
-import Client from '../../utils/client';
+import YIMClient from '../../utils/client';
 
 const { Item: FormItem } = Form
 const { Option } = Select
 
-export default class DeviceCheck extends React.Component {
+class DeviceCheck extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -26,18 +29,27 @@ export default class DeviceCheck extends React.Component {
       cameras: [],
       outputVolume: 0
     };
-    this.$client = Client.getInstance();
+  }
+
+  componentWillMount() {
+    const { user, room } = this.props;
+    const { id } = user;
+    // init video sdk
+    YIMClient.instance.initVideo();
+    YIMClient.instance.joinVideoRoom(id, room).catch((code) => {
+      message.error(`join video room error!: ${code}`);
+    });
   }
 
   componentDidMount() {
     this.bindEvents();
-
-    let cameras = [], outputVolume = 0;
-    const count = this.$client.$video.getCameraCount();
+    const cameras = [];
+    let outputVolume = 0;
+    const count = YIMClient.instance.$video.getCameraCount();
     for (let i = 0; i < count; i++) {
-      cameras.push(this.$client.$video.getCameraName(i));
+      cameras.push(YIMClient.instance.$video.getCameraName(i));
     }
-    outputVolume = this.$client.$video.getVolume();
+    outputVolume = YIMClient.instance.$video.getVolume();
     this.setState({
       outputVolume,
       cameras
@@ -48,24 +60,12 @@ export default class DeviceCheck extends React.Component {
     this.unbindEvents();
   }
 
-  componentDidCatch(err, info) {
-    console.error(err);
-  }
-
   bindEvents = () => {
-    this.$client.$im.emitter.on('OnLogout', this._onLogout);
+    YIMClient.instance.$im.emitter.on('OnLogout', this._onLogout);
   }
 
   unbindEvents = () => {
-    this.$client.$im.emitter.removeListener('OnLogout', this._onLogout);
-  }
-
-  initData = () => {
-    this.cameras = [];
-    const count = this.$client.$video.getCameraCount();
-    for (let i = 0; i < count; ++i) {
-      this.cameras.push(this.$client.$video.getCameraName(i));
-    }
+    YIMClient.instance.$im.emitter.removeListener('OnLogout', this._onLogout);
   }
 
   // 退出事件监听
@@ -81,13 +81,11 @@ export default class DeviceCheck extends React.Component {
     this.setState({
       isLogouting: true
     });
-    this.$client.logout();
+    YIMClient.instance.logout();
   }
 
   render() {
     const { cameras, outputVolume } = this.state;
-    console.log(cameras);
-
     return (
       <div className={styles.container}>
         <TitleBar>
@@ -135,3 +133,11 @@ export default class DeviceCheck extends React.Component {
     )
   }
 }
+
+const mapStateToProps = (state, ownProps) => {
+  const { app } = state;
+  const { room, user } = app;
+  return { room, user };
+}
+
+export default connect(mapStateToProps, null)(DeviceCheck);

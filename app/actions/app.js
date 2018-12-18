@@ -3,14 +3,19 @@
 export const PUSH_MESSAGE = 'PUSH_MESSAGE';
 export const UPDATE_MESSAGE = 'UPDATE_MESSAGE';
 export const SET_ROOM = 'SET_ROOM';
-export const SET_NICKNAME = 'SET_NICKNAME';
-export const SET_ROLE = 'SET_ROLE';
 export const SET_USER_LIST = 'SET_USER_LIST';
 export const REMOVE_ONE_USER = 'REMOVE_ONE_USER';
 export const ADD_ONE_USER = 'ADD_ONE_USER';
+export const SET_USER = 'SET_USER';
 
-import type { User } from '../reducers/app';
+import type { User, Role } from '../reducers/app';
 
+export function setRoom(room: string) {
+  return {
+    type: SET_ROOM,
+    room,
+  };
+}
 
 export function addOneMessage(message: any) {
   return {
@@ -26,24 +31,10 @@ export function updateOneMessage(message: any) {
   }
 }
 
-export function setRoom(room: string) {
+export function setUser(user: User) {
   return {
-    type: SET_ROOM,
-    room,
-  };
-}
-
-export function setNickname(nickname: string) {
-  return {
-    type: SET_NICKNAME,
-    nickname,
-  };
-}
-
-export function setRole(role: 0 | 1) {
-  return {
-    type: SET_ROLE,
-    role,
+    type: SET_USER,
+    user,
   };
 }
 

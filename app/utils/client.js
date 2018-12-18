@@ -28,10 +28,8 @@ export default class Client {
     }
     this.$video = window.YoumeVideoSDK.getInstance();
     this.$im = window.YoumeIMSDK.getInstance();
-    this.uname = '';
-    this.role = '';
-    this.uroom = '';
-    this.init();
+    this.initIM();
+
     return Client._instance = this;
   }
 
@@ -47,12 +45,18 @@ export default class Client {
     Client.store = store;
   }
 
-  init() {
+  initIM() {
     // 初始化IM
     this.$im.init(APP_KEY, APP_SECRET);
+    this._bindIMEvents();
+  }
+
+  initVideo(videoServerRegin?: number, videoReginName?: string) {
+    const serverRegin = videoServerRegin ? videoServerRegin : VIDEO_SERVERE_REGION;
+    const reginName = videoReginName ? videoReginName : VIDEO_REGION_NAME;
 
     // 初始化Video
-    this.$video.init(APP_KEY, APP_SECRET, VIDEO_SERVERE_REGION, VIDEO_REGION_NAME);
+    this.$video.init(APP_KEY, APP_SECRET, serverRegin, reginName);
     this.$video.setExternalInputMode(false);
     this.$video.setAVStatisticInterval(5000);
     this.$video.videoEngineModelEnabled(false);
@@ -62,14 +66,11 @@ export default class Client {
     this.$video.setVideoCallback("");
     this.$video.setAutoSendStatus(true);
     this.$video.setVolume(100);
-
-    this._bindEvents();
   }
 
   login(uname, upasswd = '123456', utoken = '') {
-    this.uname = uname;
     return new Promise((resolve, reject) => {
-      this.$im.login(this.uname, upasswd, utoken, (code, evt) => {
+      this.$im.login(uname, upasswd, utoken, (code, evt) => {
         return code === 0 ? resolve() : reject(evt);
       });
     });
@@ -80,37 +81,43 @@ export default class Client {
     this.$video.leaveChannelAll();
   }
 
-  joinRoom(uroom) {
-    this.uroom = uroom;
+  joinChatRoom(uroom) {
     return new Promise((resolve, reject) => {
-      this.$im.joinChatRoom(this.uroom, (code, evt) => {
-        if (code !== 0) {
-          return reject(code);
-        }
+      this.$im.joinChatRoom(uroom, (code, evt) => {
+        return code === 0 ? resolve(code) : reject(evt);
       });
+    });
+  }
 
-      const vcode = this.$video.joinChannelSingleMode(this.uname, this.uroom, 1);
-      console.log('video join room', vcode);
-      if (vcode !== 0) {
-        return reject(vcode);
-      }
-      return resolve();
+  joinVideoRoom(uname: string, uroom: string, roleType: number = 1) {
+    return new Promise((resolve, reject) => {
+      const code = this.$video.joinChannelSingleMode(uname, uroom, roleType);
+      return code === 0 ? resolve(code) : reject(code);
     });
   }
 
   sendTextMessage(recvId: string, chatType: number, text: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.$im.sendTextMessage(recvId, chatType, text, (code, eve) => {
-        if (code !== 0) {
-          return reject(code);
-        }
-        return resolve({ code, eve });
+        return code === 0 ? resolve(eve) : reject(code);
       });
-
     });
   }
 
-  _bindEvents() {
+  sendCustomerMessage(recvId: string, chatType: number, content: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.$im.sendCustomerMessage(recvId, chatType, content, (code, msg) => {
+        return code === 0 ? resolve(msg) : reject(code);
+      });
+    });
+  }
+
+  signing(recvId: string, chatType: number, content: object): Promise<any> {
+    const base64 = btoa(JSON.stringify(content));
+    return this.sendCustomerMessage(recvId, chatType, base64);
+  }
+
+  _bindIMEvents() {
     this.$im.on('OnRecvMessage', (msg) => {
       if (msg.messageType === 1) { // 文本消息
         const formatedMsg = {
@@ -121,6 +128,8 @@ export default class Client {
           avatar: require('../assets/images/avatar.png')
         };
         Client.store.dispatch(actions.addOneMessage(formatedMsg));
+      } else if (msg.messageType === 2) {  // customer message singing
+        console.log('customer message: ', msg);
       }
     });
 
@@ -137,28 +146,38 @@ export default class Client {
     });
 
     this.$im.on('OnUserLeaveChatRoom', (msg) => {
+      const { channelID, userID } = msg;
       console.log('OnUserLeaveChatRoom:', msg);
     });
 
     this.$im.on('OnUserJoinChatRoom', (msg) => {
-      console.log('OnUserJoinChatRoom:', msg);
+      const { channelID, userID } = msg;
+      const state = Client.store.getState();
+      const { app } = state;
+      const { user, room, region } = state;
+      const cmd = { cmd: 1, data: { teacher: user, region: region } };
+      this.signing(userID, 0, cmd);
     });
 
     this.$im.on('OnLogout', (msg) => {
-      console.log('OnLogout:', msg);
+      console.log('OnLogout');
     });
+  }
 
+  _bindVideoEvents() {
     this.$video.on('onMemberChange', ({ memchange }) => {
       const { isJoin, userid } = memchange;
       const state = Client.store.getState();
       const { app } = state;
-      const { users } = app;
+      const { users, role } = app;
       if (isJoin) {
-        const index = users.findIndex((u) => u.name === userid);
-        if (index !== -1) {
+        const index = users.findIndex((u) => u.id === userid);
+        if (index === -1) {
+          const name = userid.split('_')[1];
           const user = {
-            name: userid,
-            role: 1, // student,
+            id: userid,
+            name: name,
+            role: role === 1, // student,
           };
           Client.store.dispatch(actions.addOneUser(user));
         }

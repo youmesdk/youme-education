@@ -12,24 +12,26 @@ import {
   PUSH_MESSAGE,
   UPDATE_MESSAGE,
   SET_ROOM,
-  SET_NICKNAME,
-  SET_ROLE,
   SET_USER_LIST,
   REMOVE_ONE_USER,
   ADD_ONE_USER,
+  SET_USER,
 } from '../actions/app';
 
 export type AppStateType = {
   messages: Array<Object>,
   room: string,
   nickname: string,
-  role: 0 | 1,
+  role: Role,
   users: Array<User>
 };
 
+export type Role = 0 | 1;  // 0: teacher; 1 student;
+
 export type User = {
-  name: string,
-  role: 0 | 1,
+  id: string,       // user id
+  name: string,     // user name
+  role: Role,
 };
 
 const initialState: AppStateType = {
@@ -38,6 +40,7 @@ const initialState: AppStateType = {
   nickname: '',
   role: 0, // 0: teacher 1: student
   users: [],
+  user: { id: '', name: '', role: 0 },
 };
 
 
@@ -72,23 +75,6 @@ export default (state = initialState, action: { type: string }) => {
       };
     }
 
-    // set current user's name
-    case SET_NICKNAME: {
-      const { nickname } = action;
-      return {
-        ...state,
-        nickname: nickname
-      };
-    }
-
-    case SET_ROLE: {
-      const { role } = action;
-      return {
-        ...state,
-        role: role,
-      };
-    }
-
     case SET_USER_LIST: {
       const { users } = action;
       return {
@@ -113,6 +99,14 @@ export default (state = initialState, action: { type: string }) => {
       return {
         ...state,
         users: [...users, user],
+      };
+    }
+
+    case SET_USER: {
+      const { user } = action;
+      return {
+        ...state,
+        user,
       };
     }
 

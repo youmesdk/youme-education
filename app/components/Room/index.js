@@ -36,12 +36,10 @@ type State = {
 class Room extends React.Component<Props, State> {
   constructor(props) {
     super(props)
-
-    this.$client = YIMClient.getInstance();
   }
 
   componentDidMount() {
-    this.$client.$video.startCapture();
+    YIMClient.instance.$video.startCapture();
     this.pollingTask = setInterval(this.doupdate, 50);
   }
 
@@ -55,7 +53,7 @@ class Room extends React.Component<Props, State> {
   doupdate = () => {
     const { users } = this.props;
     users.forEach((user) => {
-      this.$client.$video.updateCanvas(user.name, `canvas-${user.name}`);
+      YIMClient.instance.$video.updateCanvas(user.id, `canvas-${user.id}`);
     });
   }
 
@@ -81,14 +79,15 @@ class Room extends React.Component<Props, State> {
   }
 
   handleChatBottomSendBtnClick = (text) => {
-    const { addOneMessage, updateOneMessage, room, nickname } = this.props;
+    const { addOneMessage, updateOneMessage, room, user } = this.props;
 
     if (isEmpty(text)) {
       return;
     }
+    const { name } = user;
     const msg = {
       messageId: Date.now(),
-      nickname: nickname,
+      nickname: name,
       avatar: avatarIcon,
       content: text,
       isFromMe: true,
@@ -111,7 +110,7 @@ class Room extends React.Component<Props, State> {
   render() {
     const { messages, nickname, users } = this.props;
     const index = users.findIndex((u) => u.role === 0);
-    const teacherName = index !== -1 ? users[index].name : '';
+    const teacherId = index !== -1 ? users[index].id : '';
     const students = users.filter((u) => u.role === 1);
 
     return (
@@ -130,7 +129,7 @@ class Room extends React.Component<Props, State> {
             {
               students.map((s) => {
                 return (
-                  <canvas className={styles.content_header_item} id={`canvas-${s.name}`} key={s.name}>
+                  <canvas className={styles.content_header_item} id={`canvas-${s.id}`} key={s.id}>
                     <Spin className={styles.spin} size="small" />
                   </canvas>
                 );
@@ -144,7 +143,7 @@ class Room extends React.Component<Props, State> {
             </div>
 
             <div className={styles.content_main_right}>
-              <canvas id={`canvas-${teacherName}`} className={styles.video}>
+              <canvas id={`canvas-${teacherId}`} className={styles.video}>
                 <Spin className={styles.spin} size="large" />
               </canvas>
 
@@ -168,8 +167,8 @@ class Room extends React.Component<Props, State> {
 
 const mapStateToProps = (state) => {
   const { app } = state;
-  const { messages, room, nickname, users, role  } = app;
-  return { messages, room, nickname, users, role };
+  const { messages, room, users, user } = app;
+  return { messages, room, users, user };
 };
 
 const mapDispatchToProps = (dispatch) => {

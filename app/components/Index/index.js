@@ -33,7 +33,7 @@ class Index extends React.Component<null, State> {
   constructor(props) {
     super(props);
     this.state = {
-      role: 0,
+      role: 1,
       name: '',
       room: '',
       isLogining: false
@@ -44,7 +44,7 @@ class Index extends React.Component<null, State> {
     try {
       this.setState({ isLogining: true });
       const { role, name, room } = this.state;
-      const { setRoom, setNickname, setRole, addOneUser, history } = this.props;
+      const { setRoom, setUser, addOneUser, history } = this.props;
 
       if (isEmpty(name) || isEmpty(room)) {
         return message.warn("username and roomname not allow empty");
@@ -56,15 +56,21 @@ class Index extends React.Component<null, State> {
       });
 
       // join chat room
-      await YIMClient.instance.joinRoom(room).catch(code => {
+      await YIMClient.instance.joinChatRoom(room).catch(code => {
         message.error(`join room error, code=${code}`);
       });
 
+      const user = {
+        id: `${name}_${Date.now()}`,
+        name: name,
+        role: role,
+      };
+
       // save room and nickname into redux
       setRoom(room);
-      setNickname(name);
-      setRole(role);
-      addOneUser({ name, role });
+      setUser(user)
+      addOneUser(user);
+
       message.info('login success!');
       this.setState({ isLoading: false });
 
@@ -85,7 +91,7 @@ class Index extends React.Component<null, State> {
   }
 
   render() {
-    const { isLogining } = this.state;
+    const { isLogining, role } = this.state;
 
     return (
       <div className={styles.container}>
@@ -112,7 +118,7 @@ class Index extends React.Component<null, State> {
 
           <RadioGroup
             className={styles.roles}
-            value={this.state.role}
+            value={role}
             onChange={this.onRadioChange}
           >
             <Radio className={styles.roles_radio} value={0}>Teacher</Radio>
@@ -136,9 +142,8 @@ class Index extends React.Component<null, State> {
 const mapDispatchToProps = (dispatch) => {
   return {
     setRoom: bindActionCreators(actions.setRoom, dispatch),
-    setNickname: bindActionCreators(actions.setNickname, dispatch),
-    setRole: bindActionCreators(actions.setRole, dispatch),
     addOneUser: bindActionCreators(actions.addOneUser, dispatch),
+    setUser: bindActionCreators(actions.setUser, dispatch),
   };
 };
 
