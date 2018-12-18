@@ -1,0 +1,21 @@
+{
+  "code": 200,
+  "msg": {
+    "room": {
+      "id": 30754,
+      "name": "youme",
+      "limit": 5,
+      "teamId": 97,
+      "adminId": 66,
+      "mode": "persistent",
+      "template": "meeting",
+      "region": "cn",
+      "uuid": "9ad1d01243f34d6782b468aead5a831c",
+      "updatedAt": "2018-12-18T13:35:02.684Z",
+      "createdAt": "2018-12-18T13:35:02.684Z"
+    },
+    "hare": "{\"uuid\":\"9ad1d01243f34d6782b468aead5a831c\",\"teamId\":\"97\",\"mode\":\"persistent\",\"region\":\"cn\",\"isBan\":false,\"beginTimestamp\":1545140102764,\"endTimestamp\":1545140102764,\"endFrameId\":0,\"usersMaxCount\":5,\"survivalDuration\":30000,\"chunkFramesCount\":700,\"snapshotIdInterval\":80}",
+    "roomToken": "WHITEcGFydG5lcl9pZD1uVUcwRUFmaGpkRzZLd1BScWdqSnBjblRDbE0zUDYycm1Vc0Imc2lnPWYxM2VjZWJhZmFmYTkwNGZkMDhmOTEyZDU3NzAyY2EwZGRiMjdlY2Y6YWRtaW5JZD02NiZyb29tSWQ9OWFkMWQwMTI0M2YzNGQ2NzgyYjQ2OGFlYWQ1YTgzMWMmdGVhbUlkPTk3JmV4cGlyZV90aW1lPTE1NzY2OTcwNTUmYWs9blVHMEVBZmhqZEc2S3dQUnFnakpwY25UQ2xNM1A2MnJtVXNCJmNyZWF0ZV90aW1lPTE1NDUxNDAxMDMmbm9uY2U9MTU0NTE0MDEwMjY4NDAwJnJvbGU9cHVibGlzaGVy",
+    "code": 201
+  }
+}

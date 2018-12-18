@@ -69,18 +69,6 @@
         flex: 1;
         background: #FFF;
         display: flex;
-        flex-direction: column;
-        .record_dock {
-          cursor: pointer;
-          height: 30px;
-          line-height: 30px;
-          text-align: center;
-          font-size: 18px;
-          font-weight: 400;
-          &:hover {
-            opacity: 0.8;
-          }
-        }
       }
 
       &_right {

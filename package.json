@@ -222,7 +222,8 @@
     "sylvester": "0.0.21",
     "uclass": "^2.4.0",
     "video.js": "^7.1.0",
-    "videojs-contrib-hls": "^5.14.1"
+    "videojs-contrib-hls": "^5.14.1",
+    "white-react-sdk": "^1.3.2"
   },
   "devEngines": {
     "node": ">=7.x",
