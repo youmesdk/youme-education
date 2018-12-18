@@ -9,6 +9,8 @@ export const SET_USER_LIST = 'SET_USER_LIST';
 export const REMOVE_ONE_USER = 'REMOVE_ONE_USER';
 export const ADD_ONE_USER = 'ADD_ONE_USER';
 
+import type { User } from '../reducers/app';
+
 
 export function addOneMessage(message: any) {
   return {
@@ -45,21 +47,21 @@ export function setRole(role: 0 | 1) {
   };
 }
 
-export function setUserList(users: Array<string>) {
+export function setUserList(users: Array<User>) {
   return {
     type: SET_USER_LIST,
     users,
   };
 }
 
-export function removeOneUser(user: string) {
+export function removeOneUser(user: User) {
   return {
     type: REMOVE_ONE_USER,
     user,
   };
 }
 
-export function addOneUser(user: string) {
+export function addOneUser(user: User) {
   return {
     type: ADD_ONE_USER,
     user,

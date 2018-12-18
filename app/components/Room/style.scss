@@ -44,8 +44,8 @@
         display: inline-block;
         background: #000;
         border-radius: 5px;
-        min-width: 100px;
-        min-height: 100px;
+        width: 165px;
+        height: 165px;
         position: relative;
         cursor: pointer;
 
@@ -70,11 +70,6 @@
         background: #FFF;
         display: flex;
         flex-direction: column;
-        #screen-video {
-          flex: 1;
-          align-self: center;
-          background:transparent;
-        }
         .record_dock {
           cursor: pointer;
           height: 30px;
@@ -92,11 +87,11 @@
         margin-left: 8px;
         display: flex;
         flex-direction: column;
-        min-width: 300px;
+        width: 250px;
         .video {
           border-radius: 10px;
           background: #000;
-          min-height: 300px;
+          height: 250px;
           cursor: pointer;
           position: relative;
         }

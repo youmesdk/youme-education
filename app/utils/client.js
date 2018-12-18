@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-11-11 15:36:30
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-11-11 16:40:42
+ * @Last Modified time: 2018-12-18 10:15:28
  *
  * @flow
  *
@@ -28,7 +28,6 @@ export default class Client {
     }
     this.$video = window.YoumeVideoSDK.getInstance();
     this.$im = window.YoumeIMSDK.getInstance();
-    this.$screeen = window.YoumeScreenSDK;
     this.uname = '';
     this.role = '';
     this.uroom = '';
@@ -57,6 +56,13 @@ export default class Client {
     this.$video.setExternalInputMode(false);
     this.$video.setAVStatisticInterval(5000);
     this.$video.videoEngineModelEnabled(false);
+    this.$video.setVideoLocalResolution(320, 240);
+    this.$video.setVideoNetResolution(320, 240);
+    this.$video.setMixVideoSize(320, 240);
+    this.$video.setVideoCallback("");
+    this.$video.setAutoSendStatus(true);
+    this.$video.setVolume(100);
+
     this._bindEvents();
   }
 
@@ -82,23 +88,14 @@ export default class Client {
           return reject(code);
         }
       });
+
       const vcode = this.$video.joinChannelSingleMode(this.uname, this.uroom, 1);
+      console.log('video join room', vcode);
       if (vcode !== 0) {
         return reject(vcode);
       }
       return resolve();
     });
-  }
-
-  setData(userid, channel, role) {
-    if (role === 'teacher') {
-      this.userid = 'teacher_' + userid;
-      this.teacher = userid;
-    } else if (role === 'student') {
-      this.userid = 'student_' + userid;
-    }
-    this.channel = channel;
-    this.role = role;
   }
 
   sendTextMessage(recvId: string, chatType: number, text: string): Promise<any> {
@@ -149,6 +146,23 @@ export default class Client {
 
     this.$im.on('OnLogout', (msg) => {
       console.log('OnLogout:', msg);
+    });
+
+    this.$video.on('onMemberChange', ({ memchange }) => {
+      const { isJoin, userid } = memchange;
+      const state = Client.store.getState();
+      const { app } = state;
+      const { users } = app;
+      if (isJoin) {
+        const index = users.findIndex((u) => u.name === userid);
+        if (index !== -1) {
+          const user = {
+            name: userid,
+            role: 1, // student,
+          };
+          Client.store.dispatch(actions.addOneUser(user));
+        }
+      }
     });
   }
 }

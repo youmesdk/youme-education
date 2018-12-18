@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-11-11 13:50:53
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-12-17 14:49:39
+ * @Last Modified time: 2018-12-17 15:01:45
  *
  * @flow
  *
@@ -24,6 +24,10 @@ type State = {
 };
 
 export default class ChatBottom extends React.Component<Props, State> {
+  static defaultProps = {
+    onSendText: f => f,
+  };
+
   state = {
     text: '',
   };
@@ -59,7 +63,3 @@ export default class ChatBottom extends React.Component<Props, State> {
     );
   }
 }
-
-ChatBottom.defaultProps = {
-  onSendText: f => f, // noop
-};

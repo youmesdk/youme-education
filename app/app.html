@@ -4,7 +4,6 @@
 <head>
   <meta charset="utf-8">
   <title>游密教育</title>
-  <link href="https://unpkg.com/video.js/dist/video-js.css" rel="stylesheet">
   <script>
     (function () {
       if (!process.env.HOT) {
@@ -22,10 +21,6 @@
 <body>
   <div id="root"></div>
   <script>
-    // for video.js
-    window.HELP_IMPROVE_VIDEOJS = false;
-  </script>
-  <script>
     {
       const scripts = [];
 
@@ -42,7 +37,7 @@
       // youme sdk for im, video and screen record
       document.write('<script>window.YoumeIMSDK = require("./YouMeSDK/IM/youmeim.min.js");<\/script>');
       document.write('<script>window.YoumeVideoSDK = require("./YouMeSDK/Video/youmevideo.min.js");<\/script>');
-      document.write('<script>window.YoumeScreenSDK = require("./YouMeSDK/ScreenRecord/screenrecord.js");<\/script>');
+      // document.write('<script>window.YoumeScreenSDK = require("./YouMeSDK/ScreenRecord/screenrecord.js");<\/script>');
       document.write(scripts.map(script => `<script defer src="${script}"><\/script>`).join(''));
     }
 

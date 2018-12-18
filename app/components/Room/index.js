@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-07-27 16:16:37
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-12-17 14:41:52
+ * @Last Modified time: 2018-12-18 10:27:51
  *
  * @flow
  *
@@ -21,81 +21,48 @@ import * as actions from '../../actions/app';
 import YIMClient from '../../utils/client';
 import { isEmpty } from '../../utils/utils';
 import avatarIcon from '../../assets/images/avatar.png';
-import videojs from 'video.js';
+
+import type { User } from '../../reducers/app';
 
 type Props = {
-  history: { push: Function }
+  history: { push: Function },
+};
+
+type State = {
+  isRecording: boolean,
 };
 
 
-class Room extends React.Component<Props> {
+class Room extends React.Component<Props, State> {
   constructor(props) {
     super(props)
-    this.state = {
-      isRecording: false, // 是否正在录屏
-    }
-    this.interval = 50 * 1;
-    this.pollingTask = null;
 
     this.$client = YIMClient.getInstance();
-    this.$client.$video.setVideoLocalResolution(320, 240);
-    this.$client.$video.setVideoNetResolution(320, 240);
-    this.$client.$video.setVideoCallback("");
-    this.$client.$video.setAutoSendStatus(true);
-    this.$client.$video.setVolume(100);
-    this.$client.$video.startCapture();
-    if (this.pollingTask) {
-      clearInterval(this.pollingTask);
-    }
-    this.pollingTask = setInterval(this.doupdate, this.interval);
   }
 
   componentDidMount() {
-    this.player = videojs(this.videoNode, this.props, function onPlayerReady() {
-      console.log('onPlayerReady', this);
-    });
+    this.$client.$video.startCapture();
+    this.pollingTask = setInterval(this.doupdate, 50);
   }
 
   componentWillUnmount() {
     if (this.pollingTask) {
       clearInterval(this.pollingTask);
     }
-    this.player.dispose();
   }
 
   // 更新视频画面
   doupdate = () => {
-  }
-
-  bindEvents = () => {
-    this.$client.$video.on('YOUME_ENVENT_JOIN_OK', () => {
-    });
-
-    this.$client.$video.on('YOUME_EVENT_OTHERS_VIDEO_ON', () => {
-    });
-
-    this.$client.$video.on('YOUME_EVENT_OTHERS_VIDEO_SHUT_DOWN', () => {
-    });
-
-    this.$client.$video.on('onMemberChange', (memchange) => {
-      memchange.foreach((item) => {
-        const { isJoin } = item;
-        if (isJoin) {
-          message.info('memberchange: ', memchange);
-        }
-      });
+    const { users } = this.props;
+    users.forEach((user) => {
+      this.$client.$video.updateCanvas(user.name, `canvas-${user.name}`);
     });
   }
 
   handleStopBtn = () => {
+    const { history } = this.props;
     YIMClient.instance.logout(); // logout
-    this.props.history.push('/');
-  }
-
-  startScreenRecord = () => {
-  }
-
-  stopScreenRecord = () => {
+    history.push('/');
   }
 
   renderListItem = ({ item }) => {
@@ -111,27 +78,6 @@ class Room extends React.Component<Props> {
   }
 
   _keyExtractor = ({ item }) => {
-  }
-
-  renderRecordBtn = () => {
-    const { isRecording } = this.state;
-    if (isRecording) {
-      return (
-        <div
-          className={styles.record_dock}
-          onClick={this.stopScreenRecord}
-          role='btn'
-        >
-          结束录屏
-        </div>
-      );
-    }
-
-    return (
-      <div className={styles.record_dock} onClick={this.startScreenRecord}>
-        开始录屏
-      </div>
-    );
   }
 
   handleChatBottomSendBtnClick = (text) => {
@@ -163,7 +109,10 @@ class Room extends React.Component<Props> {
   }
 
   render() {
-    const { messages } = this.props;
+    const { messages, nickname, users } = this.props;
+    const index = users.findIndex((u) => u.role === 0);
+    const teacherName = index !== -1 ? users[index].name : '';
+    const students = users.filter((u) => u.role === 1);
 
     return (
       <div className={styles.container}>
@@ -178,26 +127,27 @@ class Room extends React.Component<Props> {
 
         <main className={styles.content}>
           <section className={styles.content_header}>
-            <div className={styles.content_header_item}>
-              <Spin className={styles.spin} size="small" />
-            </div>
-
-            <div className={styles.content_header_item}>
-              <Spin className={styles.spin} size="small" />
-            </div>
+            {
+              students.map((s) => {
+                return (
+                  <canvas className={styles.content_header_item} id={`canvas-${s.name}`} key={s.name}>
+                    <Spin className={styles.spin} size="small" />
+                  </canvas>
+                );
+              })
+            }
           </section>
 
           <section className={styles.content_main}>
             <div className={styles.content_main_left}>
-              <div data-vjs-player>
-                <video ref={(node) => this.videoNode = node} className="video-js"></video>
-              </div>
-              {this.renderRecordBtn()}
+              画板
             </div>
+
             <div className={styles.content_main_right}>
-              <div className={styles.video}>
+              <canvas id={`canvas-${teacherName}`} className={styles.video}>
                 <Spin className={styles.spin} size="large" />
-              </div>
+              </canvas>
+
               <div className={styles.im}>
                 <MessageList
                   className={styles.im_list}
@@ -217,8 +167,9 @@ class Room extends React.Component<Props> {
 }
 
 const mapStateToProps = (state) => {
-  const { messages, room, nickname } = state.app;
-  return { messages, room, nickname };
+  const { app } = state;
+  const { messages, room, nickname, users, role  } = app;
+  return { messages, room, nickname, users, role };
 };
 
 const mapDispatchToProps = (dispatch) => {

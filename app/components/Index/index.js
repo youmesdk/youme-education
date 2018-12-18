@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-07-27 14:25:18
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-11-11 17:25:53
+ * @Last Modified time: 2018-12-17 18:05:53
  *
  *  主页，登录页
  */
@@ -22,11 +22,18 @@ import * as actions from '../../actions/app';
 
 const { Group: RadioGroup } = Radio;
 
-class Index extends React.Component {
+type State = {
+  role: 0 | 1,   // 0: teacher 1: student;
+  name: string,
+  room: string,
+  isLoading: boolean,
+};
+
+class Index extends React.Component<null, State> {
   constructor(props) {
     super(props);
     this.state = {
-      role: 'teacher',
+      role: 0,
       name: '',
       room: '',
       isLogining: false
@@ -34,35 +41,34 @@ class Index extends React.Component {
   }
 
   handleSubmit = async () => {
-    const { role, name, room } = this.state;
-    const { setRoom, setNickname } = this.props;
-
-    if (isEmpty(name) || isEmpty(room)) {
-      message.warn("username and roomname not allow empty");
-      return;
-    }
-
-    this.setState({ isLogining: true });
     try {
+      this.setState({ isLogining: true });
+      const { role, name, room } = this.state;
+      const { setRoom, setNickname, setRole, addOneUser, history } = this.props;
+
+      if (isEmpty(name) || isEmpty(room)) {
+        return message.warn("username and roomname not allow empty");
+      }
+
       // login
       await YIMClient.instance.login(name).catch((code) => {
         message.error(`login fail! code=${code}`);
-        this.setState({ isLogining: false });
       });
 
       // join chat room
       await YIMClient.instance.joinRoom(room).catch(code => {
         message.error(`join room error, code=${code}`);
-        this.setState({ isLogining: false });
       });
 
-      message.info('login success!');
-      this.setState({ isLogining: false });
-
-      this.props.history.push('/devicecheck');
       // save room and nickname into redux
       setRoom(room);
       setNickname(name);
+      setRole(role);
+      addOneUser({ name, role });
+      message.info('login success!');
+      this.setState({ isLoading: false });
+
+      history.push('/devicecheck');
     } catch(err) {
       this.setState({ isLoading: false });
       message.error('unknow error!!' + err);
@@ -109,8 +115,8 @@ class Index extends React.Component {
             value={this.state.role}
             onChange={this.onRadioChange}
           >
-            <Radio className={styles.roles_radio} value="teacher">Teacher</Radio>
-            <Radio className={styles.roles_radio} value="student">Student</Radio>
+            <Radio className={styles.roles_radio} value={0}>Teacher</Radio>
+            <Radio className={styles.roles_radio} value={1}>Student</Radio>
           </RadioGroup>
 
           <section style={{ marginTop: '3%' }}>
@@ -130,7 +136,9 @@ class Index extends React.Component {
 const mapDispatchToProps = (dispatch) => {
   return {
     setRoom: bindActionCreators(actions.setRoom, dispatch),
-    setNickname: bindActionCreators(actions.setNickname, dispatch)
+    setNickname: bindActionCreators(actions.setNickname, dispatch),
+    setRole: bindActionCreators(actions.setRole, dispatch),
+    addOneUser: bindActionCreators(actions.addOneUser, dispatch),
   };
 };
 

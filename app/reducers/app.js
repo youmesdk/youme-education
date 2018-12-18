@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-11-11 15:04:27
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-12-17 14:41:15
+ * @Last Modified time: 2018-12-17 17:38:05
  *
  * @flow
  *
@@ -24,7 +24,12 @@ export type AppStateType = {
   room: string,
   nickname: string,
   role: 0 | 1,
-  users: Array<string>
+  users: Array<User>
+};
+
+export type User = {
+  name: string,
+  role: 0 | 1,
 };
 
 const initialState: AppStateType = {
@@ -95,7 +100,7 @@ export default (state = initialState, action: { type: string }) => {
     case REMOVE_ONE_USER: {
       const { user } = action;
       const { users } = state;
-      const result = users.filter((item) => item !== user);
+      const result = users.filter((item) => item.name !== user.name);
       return {
         ...state,
         users: result,
