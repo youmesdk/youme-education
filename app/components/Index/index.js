@@ -4,6 +4,8 @@
  * @Last Modified by: fan.li
  * @Last Modified time: 2018-12-17 18:05:53
  *
+ * @flow
+ *
  *  主页，登录页
  */
 import * as React from 'react';
@@ -17,7 +19,7 @@ import { connect } from 'react-redux';
 import TitleBar from '../commons/TitleBar';
 import styles from './style.scss';
 import { isEmpty } from '../../utils/utils';
-import YIMClient from '../../utils/client';
+import YIMClient, { CLASS_IS_EXIST, CLASS_IS_NOT_EXIST } from '../../utils/client';
 import * as actions from '../../actions/app';
 
 const { Group: RadioGroup } = Radio;
@@ -36,13 +38,13 @@ class Index extends React.Component<null, State> {
       role: 1,
       name: '',
       room: '',
-      isLogining: false
+      isLoading: false
     };
   }
 
   handleSubmit = async () => {
     try {
-      this.setState({ isLogining: true });
+      this.setState({ isLoading: true });
       const { role, name, room } = this.state;
       const { setRoom, setUser, addOneUser, history } = this.props;
 
@@ -51,14 +53,29 @@ class Index extends React.Component<null, State> {
       }
 
       // login
-      await YIMClient.instance.login(name).catch((code) => {
-        message.error(`login fail! code=${code}`);
+      await YIMClient.instance.login(name).catch(({ code }) => {
+        throw new Error(`login fail, code=${code}`);
       });
 
-      // join chat room
-      await YIMClient.instance.joinChatRoom(room).catch(code => {
-        message.error(`join room error, code=${code}`);
-      });
+      if (role === 0) {
+        // teacher create a chat room
+        await YIMClient.instance.createChatRoom(room).catch(({ code }) => {
+          YIMClient.instance.logout();
+          if (code === CLASS_IS_EXIST) {
+            throw new Error(`current room is used, code=${CLASS_IS_EXIST}`);
+          }
+          throw new Error(`create room error, code=${code}`);
+        });
+      } else {
+        // student join a chat room
+        await YIMClient.instance.joinChatRoom(room).catch(({ code }) => {
+          YIMClient.instance.logout();
+          if (code === CLASS_IS_NOT_EXIST) {
+            throw new Error(`join room error, room is not exist, code=${code}`)
+          }
+          throw new Error(`join room error, code=${code}`);
+        });
+      }
 
       const user = {
         id: `${name}_${Date.now()}`,
@@ -73,11 +90,10 @@ class Index extends React.Component<null, State> {
 
       message.info('login success!');
       this.setState({ isLoading: false });
-
       history.push('/devicecheck');
     } catch(err) {
+      message.error(err.message);
       this.setState({ isLoading: false });
-      message.error('unknow error!!' + err);
     }
   }
 
@@ -91,13 +107,13 @@ class Index extends React.Component<null, State> {
   }
 
   render() {
-    const { isLogining, role } = this.state;
+    const { isLoading, role } = this.state;
 
     return (
       <div className={styles.container}>
         <TitleBar />
         <main className={styles.content}>
-          { isLogining ? ( <Spin className={styles.spin} size="large" />) : (null) }
+          { isLoading ? ( <Spin className={styles.spin} size="large" />) : (null) }
           <img src={logo} alt="youme tech logo" className={styles.logo} />
           <h1 className={styles.title}>LOGO IN</h1>
 

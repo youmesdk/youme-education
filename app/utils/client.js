@@ -19,6 +19,17 @@ import {
 import { configureStore } from '../store/configureStore';
 import * as actions from '../actions/app';
 
+const CREATE_ROOM_EVENT = 'CREATE_ROOM_EVENT';
+const JOIN_ROOM_EVENT = 'JOIN_ROOM_EVENT';
+
+
+export const CLASS_IS_EXIST = -100000;
+export const CLASS_IS_NOT_EXIST = -100001;
+
+const TASK_INTERVAL_IN_SECOND = 1000 * 12;  // 定时器时间间隔（以秒为单位）
+const MAX_NUMBER_MEMBER_IN_ROOM = 5;        // 房间最多允许多少人加入
+
+
 export default class Client {
   static _instance = null;
 
@@ -26,6 +37,10 @@ export default class Client {
     if (Client._instance !== null) {
       return Client._instance;
     }
+    this.resolveHash = new Map();
+    this.rejectHash = new Map();
+    this.task = null;
+
     this.$video = window.YoumeVideoSDK.getInstance();
     this.$im = window.YoumeIMSDK.getInstance();
     this.initIM();
@@ -33,12 +48,8 @@ export default class Client {
     return Client._instance = this;
   }
 
-  static getInstance() {
-    return Client._instance || (Client._instance = new Client());
-  }
-
   static get instance() {
-    return Client.getInstance();
+    return Client._instance || (Client._instance = new Client());
   }
 
   static injectStore(store) {
@@ -71,7 +82,7 @@ export default class Client {
   login(uname, upasswd = '123456', utoken = '') {
     return new Promise((resolve, reject) => {
       this.$im.login(uname, upasswd, utoken, (code, evt) => {
-        return code === 0 ? resolve() : reject(evt);
+        return code === 0 ? resolve({ code, evt }) : reject({ code });
       });
     });
   }
@@ -79,12 +90,47 @@ export default class Client {
   logout() {
     this.$im.logout();
     this.$video.leaveChannelAll();
+    if (this.task) {
+      clearTimeout(this.task);
+    }
+  }
+
+  createChatRoom(uroom) {
+    return new Promise((resolve, reject) => {
+      this.$im.joinChatRoom(uroom, (code, evt) => {
+        if (code !== 0) {
+          return reject({ code });
+        }
+
+        this.task = setTimeout(() => {
+          this.rejectHash.delete(CREATE_ROOM_EVENT);
+          this.resolveHash.delete(CREATE_ROOM_EVENT);
+          // 指定时间内没收到该房间内其他老师的占用声明，则视为该课堂没人占用,可以开课
+          return resolve({ code, evt });
+        }, TASK_INTERVAL_IN_SECOND);
+
+        this.rejectHash.set(CREATE_ROOM_EVENT, reject);
+        this.resolveHash.set(CREATE_ROOM_EVENT, resolve);
+      });
+    });
   }
 
   joinChatRoom(uroom) {
     return new Promise((resolve, reject) => {
       this.$im.joinChatRoom(uroom, (code, evt) => {
-        return code === 0 ? resolve(code) : reject(evt);
+        if (code !== 0) {
+          return reject({ code });
+        }
+
+        this.task = setTimeout(() => {
+          this.rejectHash.delete(JOIN_ROOM_EVENT);
+          this.resolveHash.delete(JOIN_ROOM_EVENT);
+          // 指定时间内没有得到老师响应，则表明该课堂没有开课, 学生不能加入课堂
+          return reject({ code: CLASS_IS_NOT_EXIST });
+        }, TASK_INTERVAL_IN_SECOND);
+
+        this.rejectHash.set(JOIN_ROOM_EVENT, reject);
+        this.resolveHash.set(JOIN_ROOM_EVENT, resolve);
       });
     });
   }
@@ -92,29 +138,29 @@ export default class Client {
   joinVideoRoom(uname: string, uroom: string, roleType: number = 1) {
     return new Promise((resolve, reject) => {
       const code = this.$video.joinChannelSingleMode(uname, uroom, roleType);
-      return code === 0 ? resolve(code) : reject(code);
+      return code === 0 ? resolve({ code }) : reject({ code });
     });
   }
 
   sendTextMessage(recvId: string, chatType: number, text: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.$im.sendTextMessage(recvId, chatType, text, (code, eve) => {
-        return code === 0 ? resolve(eve) : reject(code);
+      this.$im.sendTextMessage(recvId, chatType, text, (code, evt) => {
+        return code === 0 ? resolve({ code, evt }) : reject({ code });
       });
     });
   }
 
-  sendCustomerMessage(recvId: string, chatType: number, content: string): Promise<any> {
+  sendCustomMessage(recvId: string, chatType: number, content: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.$im.sendCustomerMessage(recvId, chatType, content, (code, msg) => {
-        return code === 0 ? resolve(msg) : reject(code);
+      this.$im.sendCustomMessage(recvId, chatType, content, (code, evt) => {
+        return code === 0 ? resolve({ code, evt }) : reject({ code });
       });
     });
   }
 
   signing(recvId: string, chatType: number, content: object): Promise<any> {
     const base64 = btoa(JSON.stringify(content));
-    return this.sendCustomerMessage(recvId, chatType, base64);
+    return this.sendCustomMessage(recvId, chatType, base64);
   }
 
   _bindIMEvents() {
@@ -129,7 +175,7 @@ export default class Client {
         };
         Client.store.dispatch(actions.addOneMessage(formatedMsg));
       } else if (msg.messageType === 2) {  // customer message singing
-        console.log('customer message: ', msg);
+        this._handleSigining(msg);
       }
     });
 
@@ -154,9 +200,12 @@ export default class Client {
       const { channelID, userID } = msg;
       const state = Client.store.getState();
       const { app } = state;
-      const { user, room, region } = state;
-      const cmd = { cmd: 1, data: { teacher: user, region: region } };
-      this.signing(userID, 0, cmd);
+      const { user, room, region } = app;
+      const { id, name, role } = user;
+      if (role === 0) {  // teacher should send a sigining to student
+        const cmd = { cmd: 0, data: { teacher: user, region: region, room: room } };
+        this.signing(userID, 1, cmd);
+      }
     });
 
     this.$im.on('OnLogout', (msg) => {
@@ -183,5 +232,30 @@ export default class Client {
         }
       }
     });
+  }
+
+  _handleSigining(msg) {
+    const content = atob(msg.content);
+    const { cmd, data } = JSON.parse(content);
+
+    switch (cmd) {
+      case 0: {  // teacher init siging
+        this.resolveHash.delete(CREATE_ROOM_EVENT);
+        if (this.rejectHash.has(CREATE_ROOM_EVENT)) {
+          const reject = this.rejectHash.get(CREATE_ROOM_EVENT);
+          this.rejectHash.delete(CREATE_ROOM_EVENT);
+          // 该课堂有其他老师声明课程被占用了, 不能再这个房间再次开课
+          reject({ code: CLASS_IS_EXIST });
+        }
+
+        this.rejectHash.delete(JOIN_ROOM_EVENT);
+        if (this.resolveHash.has(JOIN_ROOM_EVENT)) {
+          const resolve = this.resolveHash.get(JOIN_ROOM_EVENT);
+          // 收到了该课堂老师的回应，学生可以加入到房间
+          resolve({ code: 0, evt: data });
+        }
+        break;
+      }
+    }
   }
 }
