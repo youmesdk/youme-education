@@ -65,8 +65,8 @@
       margin-top: 8px;
 
       &_left {
-        border-radius: 5px;
         flex: 1;
+        border-radius: 5px;
         background: #FFF;
         display: flex;
         position: relative;
@@ -76,10 +76,16 @@
         }
         .docker {
           position: absolute;
-          z-index: 999999;
+          z-index: 999;
           top: 20px;
           margin-left: 50%;
           transform: translateX(-50%);
+        }
+        .scaler {
+          position: absolute;
+          z-index: 999;
+          left: 10px;
+          bottom: 10px;
         }
       }
 

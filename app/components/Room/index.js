@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-07-27 16:16:37
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-12-19 19:27:18
+ * @Last Modified time: 2018-12-19 21:17:36
  *
  * @flow
  *
@@ -21,10 +21,12 @@ import MessageText from './MessageText';
 import ChatBottom from './ChatBottom';
 import * as actions from '../../actions/app';
 import YIMClient, { MAX_NUMBER_MEMBER_IN_ROOM } from '../../utils/client';
-import { isEmpty } from '../../utils/utils';
+import { isEmpty, throttle } from '../../utils/utils';
 import avatarIcon from '../../assets/images/avatar.png';
 import { WHITEBOARD_TOKEN } from '../../config';
 import WhiteBoardDocker from '../commons/WhiteBoardDocker';
+import WhiteBoardScaler from '../commons/WhiteBoardScaler';
+
 
 import type { User, WhiteBoardRoom } from '../../reducers/app';
 
@@ -44,6 +46,7 @@ class Room extends React.Component<Props, State> {
       boardRoom: null,
     };
     this.whiteBoardSDK = new WhiteWebSdk();
+    this.throttledWindowSizeChange = throttle(this.handleWindowSizeChange, 200);
   }
 
   componentDidMount() {
@@ -58,12 +61,14 @@ class Room extends React.Component<Props, State> {
     }
     YIMClient.instance.$video.startCapture();
     this.pollingTask = setInterval(this.doupdate, 50);
+    window.addEventListener('resize', this.throttledWindowSizeChange, false);
   }
 
   componentWillUnmount() {
     if (this.pollingTask) {
       clearInterval(this.pollingTask);
     }
+    window.removeEventListener('resize', this.throttledWindowSizeChange, false);
   }
 
   _createWhiteBoardRoom = (token, room, limit = 5) => {
@@ -146,6 +151,18 @@ class Room extends React.Component<Props, State> {
     const { history } = this.props;
     YIMClient.instance.logout(); // logout
     history.push('/');
+  }
+
+  handleWindowSizeChange = () => {
+    const whiteboard = document.getElementById('whiteboard');
+    const { clientWidth, clientHeight } = whiteboard;
+    const { boardRoom } = this.state;
+    if (boardRoom) {
+      // boardRoom.setViewSize(clientWidth, clientHeight);
+      boardRoom.refreshViewSize(clientWidth, clientHeight);
+    }
+    // boardRoom.setViewSize(clientWidth, clientHeight);
+    console.log(`clientWidth: ${clientWidth}, clientHeight: ${clientHeight}`);
   }
 
   renderListItem = ({ item }) => {
@@ -274,8 +291,15 @@ class Room extends React.Component<Props, State> {
           </section>
 
           <section className={styles.content_main}>
-            <div className={styles.content_main_left}>
-              { boardRoom && <RoomWhiteboard className={styles.whiteboard} room={boardRoom} /> }
+            <div className={styles.content_main_left} id='whiteboard'>
+              {
+                boardRoom &&
+               <RoomWhiteboard
+                 className={styles.whiteboard}
+                 room={boardRoom}
+               />
+              }
+
               <WhiteBoardDocker
                 className={styles.docker}
                 onSelectPress={this.handleWhiteBoardSelectPress}
@@ -285,6 +309,10 @@ class Room extends React.Component<Props, State> {
                 onCirclePress={this.handleWhiteBoardCirclePress}
                 onSquarePress={this.handleWhiteBoardSquarePress}
                 onColorChange={this.handleWhiteBoardColorChange}
+              />
+
+              <WhiteBoardScaler
+                className={styles.scaler}
               />
             </div>
 
