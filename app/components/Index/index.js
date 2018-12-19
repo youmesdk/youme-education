@@ -50,7 +50,7 @@ class Index extends React.Component<null, State> {
     try {
       this.setState({ isLoading: true });
       const { role, name, room } = this.state;
-      const { setRoom, setUser, addOneUser, history } = this.props;
+      const { setRoom, setUser, addOneUser, history, setWhiteBoardRoom } = this.props;
 
       if (isEmpty(name) || isEmpty(room)) {
         return message.warn("username and room name not allow empty");
@@ -72,7 +72,7 @@ class Index extends React.Component<null, State> {
         });
       } else {
         // student join a chat room
-        await YIMClient.instance.joinChatRoom(room).catch(({ code }) => {
+        const res = await YIMClient.instance.joinChatRoom(room).catch(({ code }) => {
           YIMClient.instance.logout();
           if (code === CLASS_IS_NOT_EXIST) {
             throw new Error(`join room error, room is not exist, code=${code}`)
@@ -84,6 +84,11 @@ class Index extends React.Component<null, State> {
 
           throw new Error(`join room error, code=${code}`);
         });
+
+        const { code, evt } = res;
+        const { whiteBoardRoom } = evt;
+        // get whiteboard params and save into redux
+        setWhiteBoardRoom(whiteBoardRoom);
       }
 
       const user = {
@@ -169,6 +174,7 @@ const mapDispatchToProps = (dispatch) => {
     setRoom: bindActionCreators(actions.setRoom, dispatch),
     addOneUser: bindActionCreators(actions.addOneUser, dispatch),
     setUser: bindActionCreators(actions.setUser, dispatch),
+    setWhiteBoardRoom: bindActionCreators(actions.setWhiteBoardRoom, dispatch),
   };
 };
 

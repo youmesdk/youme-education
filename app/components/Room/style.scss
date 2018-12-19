@@ -38,7 +38,7 @@
       display: flex;
       justify-content: flex-start;
       align-items: center;
-      height: 100px;
+      min-height: 100px;
 
       &_item {
         display: inline-block;

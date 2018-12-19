@@ -16,6 +16,7 @@ import {
   REMOVE_ONE_USER,
   ADD_ONE_USER,
   SET_USER,
+  SET_WHITE_BOARD_ROOM,
 } from '../actions/app';
 
 export type AppStateType = {
@@ -23,7 +24,8 @@ export type AppStateType = {
   room: string,
   nickname: string,
   role: Role,
-  users: Array<User>
+  users: Array<User>,
+  whiteBoardRoom: WhiteBoardRoom,
 };
 
 export type Role = 0 | 1;  // 0: teacher; 1 student;
@@ -34,6 +36,11 @@ export type User = {
   role: Role,
 };
 
+export type WhiteBoardRoom = {
+  uuid: string,
+  roomToken: string,
+};
+
 const initialState: AppStateType = {
   messages: [],
   room: '',
@@ -41,6 +48,7 @@ const initialState: AppStateType = {
   role: 0, // 0: teacher 1: student
   users: [],
   user: { id: '', name: '', role: 0 },
+  whiteBoardRoom: { uuid: '', roomToken: '' },
 };
 
 
@@ -107,6 +115,14 @@ export default (state = initialState, action: { type: string }) => {
       return {
         ...state,
         user,
+      };
+    }
+
+    case SET_WHITE_BOARD_ROOM: {
+      const { whiteBoardRoom } = action;
+      return {
+        ...state,
+        whiteBoardRoom,
       };
     }
 

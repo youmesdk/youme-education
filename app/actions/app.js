@@ -7,8 +7,20 @@ export const SET_USER_LIST = 'SET_USER_LIST';
 export const REMOVE_ONE_USER = 'REMOVE_ONE_USER';
 export const ADD_ONE_USER = 'ADD_ONE_USER';
 export const SET_USER = 'SET_USER';
+export const SET_WHITE_BOARD_ROOM = 'SET_WHITE_BOARD_ROOM';
 
-import type { User, Role } from '../reducers/app';
+import type {
+   User,
+   Role,
+   WhiteBoardRoom,
+} from '../reducers/app';
+
+export function setWhiteBoardRoom(room: WhiteBoardRoom) {
+  return {
+    type: SET_WHITE_BOARD_ROOM,
+    whiteBoardRoom: room,
+  };
+}
 
 export function setRoom(room: string) {
   return {

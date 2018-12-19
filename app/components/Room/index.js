@@ -25,7 +25,7 @@ import { isEmpty } from '../../utils/utils';
 import avatarIcon from '../../assets/images/avatar.png';
 import { WHITEBOARD_TOKEN } from '../../config';
 
-import type { User } from '../../reducers/app';
+import type { User, WhiteBoardRoom } from '../../reducers/app';
 
 type Props = {
   history: { push: Function },
@@ -40,13 +40,21 @@ class Room extends React.Component<Props, State> {
     super(props);
     this.state = {
       isWhiteBoardLoading: false,
-      whiteBoardRoom: null,
+      boardRoom: null,
     };
     this.whiteBoardSDK = new WhiteWebSdk();
   }
 
   componentDidMount() {
-    this.joinWhiteBoardRoom();
+    const { user } = this.props;
+    const { role } = user;
+    if (role === 0) {
+      // teacher create a whiteboard room
+      this.createWhiteBoardRoom();
+    } else {
+      // student join a whiteboard room
+      this.joinWhiteBoardRoom();
+    }
     YIMClient.instance.$video.startCapture();
     this.pollingTask = setInterval(this.doupdate, 50);
   }
@@ -69,23 +77,57 @@ class Room extends React.Component<Props, State> {
     });
   }
 
-  joinWhiteBoardRoom = async () => {
+  /**
+   * teacher use this function to create a whiteboard room
+   *
+   * @memberof Room
+   */
+  createWhiteBoardRoom = async () => {
     try {
-      const { room } = this.props;
+      const { room, setWhiteBoardRoom } = this.props;
       this.setState({ isWhiteBoardLoading: true });
       const res = await this._createWhiteBoardRoom(WHITEBOARD_TOKEN, room, MAX_NUMBER_MEMBER_IN_ROOM);
       const { data } = res;
       const { code, msg } = data;
       if (code !== 200) {
-        return message.error('jon whiteboard room error!');
+        return message.error('create whiteboard room error!, please close app and try agian!');
       }
-      const whiteBoardRoom = await this.whiteBoardSDK.joinRoom({
+
+      const boardRoom = await this.whiteBoardSDK.joinRoom({
         uuid: msg.room.uuid,
         roomToken: msg.roomToken,
       });
-      this.setState({ whiteBoardRoom });
+      const whiteBoardRoom: WhiteBoardRoom = {
+        uuid: msg.room.uuid,
+        roomToken: msg.roomToken,
+      };
+
+      // set uuid and roomToken into redux store
+      // uuid and roomToken will send to student when connected
+      setWhiteBoardRoom(whiteBoardRoom);
+      this.setState({ boardRoom: boardRoom });
     } catch(err) {
-      message.error('join whiteboard room error!');
+      message.error('create whiteboard room error!, please close app and try agian!');
+    } finally {
+      this.setState({ isWhiteBoardLoading: false });
+    }
+  }
+
+  /**
+   * student use this function to join a whiteboard room,
+   *
+   * @memberof Room
+   */
+  joinWhiteBoardRoom = async () => {
+    try {
+      this.setState({ isWhiteBoardLoading: true });
+      // whiteBoardRoom contain `uuid` and `roomToken` which is receive from teacher's client
+      const { whiteBoardRoom } = this.props;
+      const { uuid, roomToken } = whiteBoardRoom;
+      const boardRoom = await this.whiteBoardSDK.joinRoom({ uuid, roomToken, });
+      this.setState({ boardRoom });
+    } catch(err) {
+      message.error('join whiteboard room error!, please close app and try agian!');
     } finally {
       this.setState({ isWhiteBoardLoading: false });
     }
@@ -151,7 +193,7 @@ class Room extends React.Component<Props, State> {
 
   render() {
     const { messages, nickname, users } = this.props;
-    const { isWhiteBoardLoading, whiteBoardRoom } = this.state;
+    const { isWhiteBoardLoading, boardRoom } = this.state;
 
     const index = users.findIndex((u) => u.role === 0);
     const teacherId = index !== -1 ? users[index].id : '';
@@ -183,10 +225,10 @@ class Room extends React.Component<Props, State> {
 
           <section className={styles.content_main}>
             <div className={styles.content_main_left}>
-              { whiteBoardRoom &&
+              { boardRoom &&
                 <RoomWhiteboard
-                  style={{ flex: 1, border: '1px solid blue' }}
-                  room={whiteBoardRoom}
+                  style={{ flex: 1 }}
+                  room={boardRoom}
                 />
               }
               { isWhiteBoardLoading && <Spin className={styles.spin} size="large" /> }
@@ -217,14 +259,22 @@ class Room extends React.Component<Props, State> {
 
 const mapStateToProps = (state) => {
   const { app } = state;
-  const { messages, room, users, user } = app;
-  return { messages, room, users, user };
+  const { messages, room, users, user, whiteBoardRoom } = app;
+
+  return {
+    messages,
+    room,
+    users,
+    user,
+    whiteBoardRoom,
+  };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
     addOneMessage: bindActionCreators(actions.addOneMessage, dispatch),
     updateOneMessage: bindActionCreators(actions.updateOneMessage, dispatch),
+    setWhiteBoardRoom: bindActionCreators(actions.setWhiteBoardRoom, dispatch),
   };
 };
 

@@ -201,13 +201,22 @@ export default class Client {
       const { channelID, userID } = msg;
       const state = Client.store.getState();
       const { app } = state;
-      const { user, room, region, users } = app;
+      const { user, room, region, users, whiteBoardRoom } = app;
       const { id, name, role } = user;
+      const { uuid, roomToken } = whiteBoardRoom;
+
       if (role === 0) {  // teacher should send a sigining to student
-        if (users.length > MAX_NUMBER_MEMBER_IN_ROOM) {
-          const cmd = { cmd: 1, data: { max: MAX_NUMBER_MEMBER_IN_ROOM, count: users.length - 1 }};
+        if (users.length <= MAX_NUMBER_MEMBER_IN_ROOM) {
+          const cmd = {
+            cmd: 0,
+            data: { teacher: user, region: region, room: room, whiteBoardRoom: { uuid, roomToken } },
+          };
+          this.signing(userID, 1, cmd);
         } else {
-          const cmd = { cmd: 0, data: { teacher: user, region: region, room: room } };
+          const cmd = {
+            cmd: 1,
+            data: { max: MAX_NUMBER_MEMBER_IN_ROOM, count: users.length - 1 },
+          };
           this.signing(userID, 1, cmd);
         }
       }
@@ -244,6 +253,7 @@ export default class Client {
     const { cmd, data } = JSON.parse(content);
 
     switch (cmd) {
+      // 收到老师房间正常的回应
       case 0: {
         this.resolveHash.delete(CREATE_ROOM_EVENT);
         if (this.rejectHash.has(CREATE_ROOM_EVENT)) {
@@ -262,6 +272,7 @@ export default class Client {
         break;
       }
 
+      // 收到老师端房间超员的回应
       case 1: {
         this.resolveHash.delete(CREATE_ROOM_EVENT);
         if (this.rejectHash.has(CREATE_ROOM_EVENT)) {
@@ -275,7 +286,7 @@ export default class Client {
         if (this.rejectHash.has(JOIN_ROOM_EVENT)) {
           const reject = this.rejectHash.get(JOIN_ROOM_EVENT);
           // 收到了该课堂老师的回应，但是房间超员了，学生也不能进入房间
-          reject({ code: MAX_NUMBER_MEMBER_ERROR });
+          reject({ code: MAX_NUMBER_MEMBER_ERROR, });
         }
         break;
       }

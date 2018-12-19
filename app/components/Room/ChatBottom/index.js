@@ -50,8 +50,9 @@ export default class ChatBottom extends React.Component<Props, State> {
         <Input
           className={styles.input}
           value={text}
-          onChange={this.handleTextChange}
           placeholder='输入文本...'
+          onChange={this.handleTextChange}
+          onPressEnter={this.handleSendBtnClick}
         />
         <Button
           type='ghost'
