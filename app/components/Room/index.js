@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-07-27 16:16:37
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-12-19 16:20:30
+ * @Last Modified time: 2018-12-19 19:27:18
  *
  * @flow
  *
@@ -160,6 +160,55 @@ class Room extends React.Component<Props, State> {
     );
   }
 
+  handleWhiteBoardSelectPress = () => {
+    const { boardRoom } = this.state;
+    if (boardRoom) {
+      boardRoom.setMemberState({ currentApplianceName: 'selector', });
+    }
+  }
+
+  handleWhiteBoardPenPress = () => {
+    const { boardRoom } = this.state;
+    if (boardRoom) {
+      boardRoom.setMemberState({ currentApplianceName: 'pencil', });
+    }
+  }
+
+  handleWhiteBoardTextPress = () => {
+    const { boardRoom } = this.state;
+    if (boardRoom) {
+      boardRoom.setMemberState({ currentApplianceName: 'text', });
+    }
+  }
+
+  handleWhiteBoardEraserPress = () => {
+    const { boardRoom } = this.state;
+    if (boardRoom) {
+      boardRoom.setMemberState({ currentApplianceName: 'eraser', });
+    }
+  }
+
+  handleWhiteBoardCirclePress = () => {
+    const { boardRoom } = this.state;
+    if (boardRoom) {
+      boardRoom.setMemberState({ currentApplianceName: 'ellipse', });
+    }
+  }
+
+  handleWhiteBoardSquarePress = () => {
+    const { boardRoom } = this.state;
+    if (boardRoom) {
+      boardRoom.setMemberState({ currentApplianceName: 'rectangle', });
+    }
+  }
+
+  handleWhiteBoardColorChange = () => {
+    const { boardRoom } = this.state;
+    if (boardRoom) {
+
+    }
+  }
+
   _keyExtractor = ({ item }) => {
   }
 
@@ -226,14 +275,17 @@ class Room extends React.Component<Props, State> {
 
           <section className={styles.content_main}>
             <div className={styles.content_main_left}>
-              { boardRoom &&
-                <RoomWhiteboard
-                  className={styles.whiteboard}
-                  room={boardRoom}
-                />
-              }
-              {/* { isWhiteBoardLoading && <Spin className={styles.spin} size="large" /> } */}
-              <WhiteBoardDocker className={styles.docker}/>
+              { boardRoom && <RoomWhiteboard className={styles.whiteboard} room={boardRoom} /> }
+              <WhiteBoardDocker
+                className={styles.docker}
+                onSelectPress={this.handleWhiteBoardSelectPress}
+                onPenPress={this.handleWhiteBoardPenPress}
+                onTextPress={this.handleWhiteBoardTextPress}
+                onEraserPress={this.handleWhiteBoardEraserPress}
+                onCirclePress={this.handleWhiteBoardCirclePress}
+                onSquarePress={this.handleWhiteBoardSquarePress}
+                onColorChange={this.handleWhiteBoardColorChange}
+              />
             </div>
 
             <div className={styles.content_main_right}>
@@ -247,9 +299,7 @@ class Room extends React.Component<Props, State> {
                   data={messages}
                   renderItem={this.renderListItem}
                 />
-                <ChatBottom
-                  onSendText={this.handleChatBottomSendBtnClick}
-                />
+                <ChatBottom onSendText={this.handleChatBottomSendBtnClick} />
               </div>
             </div>
           </section>
