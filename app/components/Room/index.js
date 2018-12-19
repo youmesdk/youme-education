@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-07-27 16:16:37
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-12-18 22:08:09
+ * @Last Modified time: 2018-12-19 16:20:30
  *
  * @flow
  *
@@ -24,6 +24,7 @@ import YIMClient, { MAX_NUMBER_MEMBER_IN_ROOM } from '../../utils/client';
 import { isEmpty } from '../../utils/utils';
 import avatarIcon from '../../assets/images/avatar.png';
 import { WHITEBOARD_TOKEN } from '../../config';
+import WhiteBoardDocker from '../commons/WhiteBoardDocker';
 
 import type { User, WhiteBoardRoom } from '../../reducers/app';
 
@@ -227,11 +228,12 @@ class Room extends React.Component<Props, State> {
             <div className={styles.content_main_left}>
               { boardRoom &&
                 <RoomWhiteboard
-                  style={{ flex: 1 }}
+                  className={styles.whiteboard}
                   room={boardRoom}
                 />
               }
-              { isWhiteBoardLoading && <Spin className={styles.spin} size="large" /> }
+              {/* { isWhiteBoardLoading && <Spin className={styles.spin} size="large" /> } */}
+              <WhiteBoardDocker className={styles.docker}/>
             </div>
 
             <div className={styles.content_main_right}>

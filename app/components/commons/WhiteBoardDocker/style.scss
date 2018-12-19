@@ -1,0 +1,31 @@
+.container {
+  padding: 2px 8px;
+  background: #E0EEFF;
+  opacity: 0.9;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  .icon {
+    cursor: pointer;
+    color: '#666';
+    &:not(:first-child) {
+      margin-left: 20px;
+    }
+    &:not(:last-child):hover {
+      transform: scale(1.3);
+    }
+  }
+
+  .color_container {
+    position: relative;
+  }
+
+  .color_picker {
+    position: absolute;
+  }
+
+  .selected {
+    transform: scale(1.3);
+    color: '#000'
+  }
+}

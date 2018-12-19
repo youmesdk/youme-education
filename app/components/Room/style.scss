@@ -70,6 +70,17 @@
         background: #FFF;
         display: flex;
         position: relative;
+        .whiteboard {
+          display: flex;
+          flex: 1;
+        }
+        .docker {
+          position: absolute;
+          z-index: 999999;
+          top: 20px;
+          margin-left: 50%;
+          transform: translateX(-50%);
+        }
       }
 
       &_right {
