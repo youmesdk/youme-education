@@ -30,7 +30,7 @@ type State = {
 
 export type Tool = 'pencil' | 'selector' | 'text' | 'eraser' | 'ellipse' | 'rectangle';
 
-const Tools = {
+export const Tools = {
   pencil: 'pencil',
   selector: 'selector',
   text: 'text',
@@ -50,7 +50,7 @@ export default class WhiteBoardTool extends React.Component<Props, State> {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     window.addEventListener('keydown', this.handleKeyboard);
   }
 

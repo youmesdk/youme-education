@@ -42,34 +42,37 @@ type State = {
   isSidePanelShow: boolean,
   zoomScale: number,
   borderRoom: object | null,
+  tool: string,
+  color: string,
 };
 
 class Room extends React.Component<Props, State> {
   constructor(props) {
     super(props);
     this.state = {
-      isWhiteBoardLoading: false,
-      isSidePanelShow: false,
-      boardRoom: null,
-      zoomScale: 1,
+      isWhiteBoardLoading: false,  // is whiteboard is init ?
+      isSidePanelShow: false,      // is right drawer open?
+      boardRoom: null,             // whiteboard room instance
+      zoomScale: 1,                // whiteboard zoom scale
+      tool: 'pencil',              // whiteboard tool, `Tool` type
+      color: '',                   // whiteboard paint color
     };
-    this.whiteBoardSDK = new WhiteWebSdk();
+    this.whiteBoardSDK = new WhiteWebSdk();   // whiteboard sdk instance
     this.throttledWindowSizeChange = throttle(this.handleWindowSizeChange, 200);
-    this.messageList = null;
+    this.messageList = null;       // MessageList ref
   }
 
   componentDidMount() {
     const { user } = this.props;
     const { role } = user;
-    if (role === 0) {
-      // teacher create a whiteboard room
+    if (role === 0) { // teacher create a whiteboard room
       this.createWhiteBoardRoom();
-    } else {
-      // student join a whiteboard room
+    } else { // student join a whiteboard room
       this.joinWhiteBoardRoom();
     }
     YIMClient.instance.$video.startCapture();
     this.pollingTask = setInterval(this.doupdate, 50);  // update video
+    // update whiteboard draw area when window size changed
     window.addEventListener('resize', this.throttledWindowSizeChange, false);
   }
 
@@ -118,7 +121,7 @@ class Room extends React.Component<Props, State> {
         uuid: msg.room.uuid,
         roomToken: msg.roomToken,
       }, {
-        onRoomStateChanged: this.onWhiteBoardStateChange
+        onRoomStateChanged: this.onWhiteBoardStateChange,
       });
       boardRoom.setViewMode('broadcaster');
       const whiteBoardRoom: WhiteBoardRoom = {
@@ -151,7 +154,7 @@ class Room extends React.Component<Props, State> {
       const boardRoom = await this.whiteBoardSDK.joinRoom({
          uuid, roomToken,
       }, {
-        onRoomStateChanged: this.onWhiteBoardStateChange
+        onRoomStateChanged: this.onWhiteBoardStateChange,
       });
       boardRoom.setViewMode('follower');
       this.setState({ boardRoom });
@@ -162,7 +165,7 @@ class Room extends React.Component<Props, State> {
     }
   }
 
-  // 更新视频画面
+  // update all video frames
   doupdate = () => {
     const { users } = this.props;
     users.forEach((user) => {
@@ -251,6 +254,7 @@ class Room extends React.Component<Props, State> {
 
   onWhiteBoardStateChange = (state) => {
     const { memberState, zoomScale } = state;
+    console.log(state, '============================');
     if (zoomScale) {
       this.setState({ zoomScale: zoomScale });
     }
@@ -261,15 +265,15 @@ class Room extends React.Component<Props, State> {
 
   handleZoomScaleDecreasePress = () => {
     const { zoomScale, boardRoom } = this.state;
-    if (boardRoom) {
-      boardRoom.zoomChange(zoomScale - 0.05);
+    if (boardRoom && zoomScale >= 0.01) {
+      boardRoom.zoomChange(zoomScale - 0.01);
     }
   }
 
   handleZoomScaleIncreasePress = () => {
     const { zoomScale, boardRoom } = this.state;
     if (boardRoom) {
-      boardRoom.zoomChange(zoomScale + 0.05);
+      boardRoom.zoomChange(zoomScale + 0.01);
     }
   }
 

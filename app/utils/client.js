@@ -63,21 +63,17 @@ export default class Client {
     this._bindIMEvents();
   }
 
-  initVideo(videoServerRegin?: number, videoReginName?: string) {
-    const serverRegin = videoServerRegin ? videoServerRegin : VIDEO_SERVERE_REGION;
-    const reginName = videoReginName ? videoReginName : VIDEO_REGION_NAME;
-
+  initVideo(videoServerRegin: number, videoReginName: string): Promise<any> {
     // 初始化Video
-    this.$video.init(APP_KEY, APP_SECRET, serverRegin, reginName);
-    this.$video.setExternalInputMode(false);
-    this.$video.setAVStatisticInterval(5000);
-    this.$video.videoEngineModelEnabled(false);
-    this.$video.setVideoLocalResolution(320, 240);
-    this.$video.setVideoNetResolution(320, 240);
-    this.$video.setMixVideoSize(320, 240);
-    this.$video.setVideoCallback("");
-    this.$video.setAutoSendStatus(true);
-    this.$video.setVolume(100);
+    return new Promise((resolve, reject) => {
+      const code = this.$video.init(APP_KEY, APP_SECRET, videoServerRegin, videoReginName, () => {
+        return resolve();
+      });
+
+      if (code !== 0) {
+        return reject(code);
+      }
+    });
   }
 
   login(uname, upasswd = '123456', utoken = '') {

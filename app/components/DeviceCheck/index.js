@@ -17,6 +17,7 @@ import styles from './style.scss';
 import TitleBar from '../commons/TitleBar';
 import logo from '../../assets/images/logo.png';
 import YIMClient from '../../utils/client';
+import { VIDEO_REGION_NAME, VIDEO_SERVERE_REGION } from '../../config';
 
 const { Item: FormItem } = Form
 const { Option } = Select
@@ -25,24 +26,47 @@ class DeviceCheck extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLogouting: false,
+      isLoading: false,
       cameras: [],
       outputVolume: 0
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
+    this.bindEvents();
+    this.initVideo();
+  }
+
+  componentWillUnmount() {
+    this.unbindEvents();
+  }
+
+  initVideo = async () => {
+    this.setState({ isLoading: true });
     const { user, room } = this.props;
     const { id } = user;
     // init video sdk
-    YIMClient.instance.initVideo();
-    YIMClient.instance.joinVideoRoom(id, room).catch(({ code }) => {
+    await YIMClient.instance.initVideo(VIDEO_SERVERE_REGION, VIDEO_REGION_NAME).catch((code) => {
+      message.error(`init video engine error!: ${code}`)
+    });
+
+    // set video engine
+    YIMClient.instance.$video.setExternalInputMode(false);
+    YIMClient.instance.$video.setAVStatisticInterval(5000);
+    YIMClient.instance.$video.videoEngineModelEnabled(false);
+    YIMClient.instance.$video.setVideoLocalResolution(320, 240);
+    YIMClient.instance.$video.setVideoNetResolution(320, 240);
+    YIMClient.instance.$video.setMixVideoSize(320, 240);
+    YIMClient.instance.$video.setVideoCallback("");
+    YIMClient.instance.$video.setAutoSendStatus(true);
+    YIMClient.instance.$video.setVolume(100);
+
+    // join video room
+    await YIMClient.instance.joinVideoRoom(id, room).catch(({ code }) => {
       message.error(`join video room error!: ${code}`);
     });
-  }
 
-  componentDidMount() {
-    this.bindEvents();
+    // get cameras an current volume
     const cameras = [];
     let outputVolume = 0;
     const count = YIMClient.instance.$video.getCameraCount();
@@ -54,10 +78,7 @@ class DeviceCheck extends React.Component {
       outputVolume,
       cameras
     });
-  }
-
-  componentWillUnmount() {
-    this.unbindEvents();
+    this.setState({ isLoading: false });
   }
 
   bindEvents = () => {
@@ -71,7 +92,7 @@ class DeviceCheck extends React.Component {
   // 退出事件监听
   _onLogout = () => {
     this.setState({
-      isLogouting: false
+      isLoading: false
     });
     message.info('logout!');
     this.props.history.push('/');
@@ -79,13 +100,13 @@ class DeviceCheck extends React.Component {
 
   handleLogoutBtn = () => {
     this.setState({
-      isLogouting: true
+      isLoading: true
     });
     YIMClient.instance.logout();
   }
 
   render() {
-    const { cameras, outputVolume } = this.state;
+    const { cameras, outputVolume, isLoading } = this.state;
     return (
       <div className={styles.container}>
         <TitleBar>
@@ -128,9 +149,11 @@ class DeviceCheck extends React.Component {
               <button className={styles.nextBtn}>Next Step</button>
             </Link>
           </section>
+
+          { isLoading && <Spin size='large' className={styles.spin} /> }
         </main>
       </div>
-    )
+    );
   }
 }
 
