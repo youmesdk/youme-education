@@ -47,6 +47,7 @@ class Room extends React.Component<Props, State> {
     };
     this.whiteBoardSDK = new WhiteWebSdk();
     this.throttledWindowSizeChange = throttle(this.handleWindowSizeChange, 200);
+    this.messageList = null;
   }
 
   componentDidMount() {
@@ -62,6 +63,12 @@ class Room extends React.Component<Props, State> {
     YIMClient.instance.$video.startCapture();
     this.pollingTask = setInterval(this.doupdate, 50);
     window.addEventListener('resize', this.throttledWindowSizeChange, false);
+  }
+
+  componentDidUpdate() {
+    if (this.messageList) {
+      this.messageList.scrollToBottom();
+    }
   }
 
   componentWillUnmount() {
@@ -323,6 +330,7 @@ class Room extends React.Component<Props, State> {
 
               <div className={styles.im}>
                 <MessageList
+                  ref={o => this.messageList = o}
                   className={styles.im_list}
                   data={messages}
                   renderItem={this.renderListItem}
