@@ -36,8 +36,12 @@ export default class MessageList extends React.Component<Props> {
     const { data, renderItem, keyExtractor } = this.props;
     const children = data.map((item, index) => {
       const child = renderItem({ item, index });
-      child.key = keyExtractor(item, index);
-      return child;
+      const key = keyExtractor(item, index);
+      return (
+        <div key={key}>
+          {child}
+        </div>
+      );
     });
 
     return (
@@ -52,5 +56,5 @@ export default class MessageList extends React.Component<Props> {
 }
 
 MessageList.defaultProps = {
-  keyExtractor: f => f,
+  keyExtractor: (item, index) => index,
 };

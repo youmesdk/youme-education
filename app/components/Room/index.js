@@ -165,11 +165,8 @@ class Room extends React.Component<Props, State> {
     const { clientWidth, clientHeight } = whiteboard;
     const { boardRoom } = this.state;
     if (boardRoom) {
-      // boardRoom.setViewSize(clientWidth, clientHeight);
       boardRoom.refreshViewSize(clientWidth, clientHeight);
     }
-    // boardRoom.setViewSize(clientWidth, clientHeight);
-    console.log(`clientWidth: ${clientWidth}, clientHeight: ${clientHeight}`);
   }
 
   renderListItem = ({ item }) => {
@@ -233,8 +230,7 @@ class Room extends React.Component<Props, State> {
     }
   }
 
-  _keyExtractor = ({ item }) => {
-  }
+  _keyExtractor = (item) => item.messageId;
 
   handleChatBottomSendBtnClick = (text) => {
     const { addOneMessage, updateOneMessage, room, user } = this.props;
@@ -334,6 +330,7 @@ class Room extends React.Component<Props, State> {
                   className={styles.im_list}
                   data={messages}
                   renderItem={this.renderListItem}
+                  keyExtractor={this._keyExtractor}
                 />
                 <ChatBottom onSendText={this.handleChatBottomSendBtnClick} />
               </div>
