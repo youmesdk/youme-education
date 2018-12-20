@@ -87,6 +87,19 @@
           left: 10px;
           bottom: 10px;
         }
+        .side_panel {
+          position: absolute;
+          z-index: 9999;
+          top: 0;
+          bottom: 0;
+          right: 0;
+        }
+        .shortcut_hover {
+          position: absolute;
+          right: 20px;
+          bottom: 10px;
+          cursor: pointer;
+        }
       }
 
       &_right {

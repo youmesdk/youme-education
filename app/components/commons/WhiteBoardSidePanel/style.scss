@@ -1,0 +1,54 @@
+.container {
+  min-width: 250px;
+  background: #fff;
+  box-shadow: -8px 0px 8px #ccc;
+  padding: 10px 0;
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eeeeee;
+    padding: 5px 16px;
+
+    h1 {
+      font-size: 14px;
+      font-weight: 600;
+      padding: 0;
+      margin: 0;
+    }
+
+    span {
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  }
+
+  .section {
+    padding: 10px 16px 0 16px;
+    h2 {
+      font-size: 12px;
+      margin: 0;
+      padding-bottom: 18px;
+    }
+    .menu_tool_box {
+      display: flex;
+      align-items: center;
+      font-weight: bold;
+      padding: 8px 0;
+      &_left {
+        flex: 1;
+      }
+      &_name {
+        margin-left: 8px;
+      }
+      &_bg {
+        background: #F5F5F5;
+        padding: 4px;
+        border-radius: 3px;
+      }
+    }
+  }
+}

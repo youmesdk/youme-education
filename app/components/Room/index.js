@@ -8,9 +8,10 @@
  *
  */
 import * as React from 'react'
-import { Button, Spin, message } from 'antd';
+import { Button, Spin, message, Tooltip } from 'antd';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import * as Icon from 'react-feather';
 import axios from 'axios';
 import { WhiteWebSdk, RoomWhiteboard } from 'white-react-sdk';
 
@@ -26,6 +27,7 @@ import avatarIcon from '../../assets/images/avatar.png';
 import { WHITEBOARD_TOKEN } from '../../config';
 import WhiteBoardDocker from '../commons/WhiteBoardDocker';
 import WhiteBoardScaler from '../commons/WhiteBoardScaler';
+import WhiteBoardSidePanel from '../commons/WhiteBoardSidePanel';
 
 
 import type { User, WhiteBoardRoom } from '../../reducers/app';
@@ -36,6 +38,7 @@ type Props = {
 
 type State = {
   isWhiteBoardLoading: boolean,
+  isSidePanelShow: boolean,
 };
 
 class Room extends React.Component<Props, State> {
@@ -43,6 +46,7 @@ class Room extends React.Component<Props, State> {
     super(props);
     this.state = {
       isWhiteBoardLoading: false,
+      isSidePanelShow: false,
       boardRoom: null,
     };
     this.whiteBoardSDK = new WhiteWebSdk();
@@ -110,6 +114,7 @@ class Room extends React.Component<Props, State> {
         uuid: msg.room.uuid,
         roomToken: msg.roomToken,
       });
+      boardRoom.setViewMode('broadcaster');
       const whiteBoardRoom: WhiteBoardRoom = {
         uuid: msg.room.uuid,
         roomToken: msg.roomToken,
@@ -138,6 +143,7 @@ class Room extends React.Component<Props, State> {
       const { whiteBoardRoom } = this.props;
       const { uuid, roomToken } = whiteBoardRoom;
       const boardRoom = await this.whiteBoardSDK.joinRoom({ uuid, roomToken, });
+      boardRoom.setViewMode('follower');
       this.setState({ boardRoom });
     } catch(err) {
       message.error('join whiteboard room error!, please close app and try agian!');
@@ -179,6 +185,14 @@ class Room extends React.Component<Props, State> {
         isFromMe={item.isFromMe}
       />
     );
+  }
+
+  openWhiteBoardSidePanel = () => {
+    this.setState({ isSidePanelShow: true });
+  }
+
+  closeWhiteBoardSidePanel = () => {
+    this.setState({ isSidePanelShow: false });
   }
 
   handleWhiteBoardSelectPress = () => {
@@ -263,7 +277,7 @@ class Room extends React.Component<Props, State> {
 
   render() {
     const { messages, nickname, users } = this.props;
-    const { isWhiteBoardLoading, boardRoom } = this.state;
+    const { isWhiteBoardLoading, boardRoom, isSidePanelShow } = this.state;
 
     const index = users.findIndex((u) => u.role === 0);
     const teacherId = index !== -1 ? users[index].id : '';
@@ -314,9 +328,24 @@ class Room extends React.Component<Props, State> {
                 onColorChange={this.handleWhiteBoardColorChange}
               />
 
-              <WhiteBoardScaler
-                className={styles.scaler}
-              />
+              <WhiteBoardScaler className={styles.scaler} />
+
+              {
+                isSidePanelShow &&
+                <WhiteBoardSidePanel
+                  className={styles.side_panel}
+                  onClosePress={this.closeWhiteBoardSidePanel}
+                />
+              }
+
+              <div
+                className={styles.shortcut_hover}
+                onClick={this.openWhiteBoardSidePanel}
+              >
+                <Tooltip title="快捷键说明" mouseEnterDelay={0.8}>
+                  <Icon.Info size={22}/>
+                </Tooltip>
+              </div>
             </div>
 
             <div className={styles.content_main_right}>
@@ -332,7 +361,10 @@ class Room extends React.Component<Props, State> {
                   renderItem={this.renderListItem}
                   keyExtractor={this._keyExtractor}
                 />
-                <ChatBottom onSendText={this.handleChatBottomSendBtnClick} />
+
+                <ChatBottom
+                  onSendText={this.handleChatBottomSendBtnClick}
+                />
               </div>
             </div>
           </section>
