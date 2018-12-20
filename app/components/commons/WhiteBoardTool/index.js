@@ -50,7 +50,21 @@ export default class WhiteBoardTool extends React.Component<Props, State> {
     };
   }
 
+  componentWillMount() {
+    window.addEventListener('keydown', this.handleKeyboard);
+  }
+
+  componentWillUnmount() {
+    window.addEventListener('keydown', this.handleKeyboard);
+  }
+
   handleToolChange = (tool: Tool) => () => {
+    const { onToolChange } = this.props;
+    this.setState({ tool: tool });
+    onToolChange(tool);
+  }
+
+  handleToolChangeByKeyBoard = (tool: Tool) => {
     const { onToolChange } = this.props;
     this.setState({ tool: tool });
     onToolChange(tool);
@@ -65,6 +79,47 @@ export default class WhiteBoardTool extends React.Component<Props, State> {
     this.setState({ color: color.hex });
     const { onColorChange } = this.props;
     onColorChange(color.hex);
+  }
+
+  handleKeyboard = (event: KeyboardEvent) => {
+    const { keyCode } = event;
+    switch (keyCode) {
+      // V ----> Tools.selector
+      case 86: {
+        this.handleToolChangeByKeyBoard(Tools.selector);
+        break;
+      }
+
+      // P ----> Tools.pencil
+      case 80: {
+        this.handleToolChangeByKeyBoard(Tools.pencil);
+        break;
+      }
+
+      // T ----> Tools.text
+      case 84: {
+        this.handleToolChangeByKeyBoard(Tools.text);
+        break;
+      }
+
+      // E ----> Tools.eraser
+      case 69: {
+        this.handleToolChangeByKeyBoard(Tools.eraser);
+        break;
+      }
+
+      // O ----> Tools.ellipse
+      case 79: {
+        this.handleToolChangeByKeyBoard(Tools.ellipse);
+        break;
+      }
+
+      // R ----> Tools.rectangle
+      case 82: {
+        this.handleToolChangeByKeyBoard(Tools.rectangle);
+        break;
+      }
+    }
   }
 
   render() {
