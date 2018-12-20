@@ -20,75 +20,40 @@ type Props = {
   className?: string,
   defaultSelect?: string,
   defaultColor?: string,
-  onSelectPress?: () => void,
-  onPenPress?: () => void,
-  onTextPress?: () => void,
-  onEraserPress?: () => void,
-  onCirclePress?: () => void,
-  onSquarePress?: () => void,
-  onColorChange: (color: string) => void,
+  onColorChange?: (color: string) => void,
+  onToolChange?: (tool: Tool) => void,
 };
 
 type State = {
-  selectIndex: SelectIndex,
+  tool: Tool,
 };
 
-export type SelectIndex = 'pen' | 'select' | 'text' | 'eraser' | 'circle' | 'square';
+export type Tool = 'pencil' | 'selector' | 'text' | 'eraser' | 'ellipse' | 'rectangle';
 
-const Menus = {
-  pen: 'pen',
-  select: 'select',
+const Tools = {
+  pencil: 'pencil',
+  selector: 'selector',
   text: 'text',
   eraser: 'eraser',
-  circle: 'circle',
-  square: 'square',
+  ellipse: 'ellipse',
+  rectangle: 'rectangle',
 };
 
-export default class WhiteBoardDocker extends React.Component<Props, State> {
+export default class WhiteBoardTool extends React.Component<Props, State> {
   constructor(props) {
     super(props);
     const { defaultSelect, defaultColor } = props;
     this.state = {
-      selectIndex: defaultSelect,
+      tool: defaultSelect,
       color: defaultColor,
       isColorPickerShow: false,
     };
   }
 
-  handleSelectSelected = () => {
-    this.setState({ selectIndex: Menus.select });
-    const { onSelectPress } = this.props;
-    onSelectPress();
-  }
-
-  handlePenSelected = () => {
-    this.setState({ selectIndex: Menus.pen });
-    const { onPenPress } = this.props;
-    onPenPress();
-  }
-
-  handleTextSelected = () => {
-    this.setState({ selectIndex: Menus.text });
-    const { onTextPress } = this.props;
-    onTextPress();
-  }
-
-  handleEraserSelected = () => {
-    this.setState({ selectIndex: Menus.eraser });
-    const { onEraserPress } = this.props;
-    onEraserPress();
-  }
-
-  handleCircleSelected = () => {
-    this.setState({ selectIndex: Menus.circle });
-    const { onCirclePress } = this.props;
-    onCirclePress();
-  }
-
-  handleSquareSelected = () => {
-    this.setState({ selectIndex: Menus.square });
-    const { onSquarePress } = this.props;
-    onSquarePress();
+  handleToolChange = (tool: Tool) => () => {
+    const { onToolChange } = this.props;
+    this.setState({ tool: tool });
+    onToolChange(tool);
   }
 
   handleColorSelected = () => {
@@ -104,13 +69,13 @@ export default class WhiteBoardDocker extends React.Component<Props, State> {
 
   render() {
     const { className } = this.props;
-    const { selectIndex, color, isColorPickerShow } = this.state;
+    const { tool, color, isColorPickerShow } = this.state;
 
     return (
       <div className={[styles.container, className].join(' ')}>
         <div
-          className={[styles.icon, selectIndex === Menus.select ? styles.selected : '' ].join(' ')}
-          onClick={this.handleSelectSelected}
+          className={[styles.icon, tool === Tools.selector ? styles.selected : '' ].join(' ')}
+          onClick={this.handleToolChange(Tools.selector)}
         >
           <Tooltip title="选择" mouseEnterDelay={1.0}>
             <Icon.Navigation />
@@ -118,8 +83,8 @@ export default class WhiteBoardDocker extends React.Component<Props, State> {
         </div>
 
         <div
-          className={[styles.icon, selectIndex === Menus.pen ? styles.selected : ''].join(' ')}
-          onClick={this.handlePenSelected}
+          className={[styles.icon, tool === Tools.pencil ? styles.selected : ''].join(' ')}
+          onClick={this.handleToolChange(Tools.pencil)}
         >
           <Tooltip title="自由绘画" mouseEnterDelay={1.0}>
             <Icon.Edit2 />
@@ -127,8 +92,8 @@ export default class WhiteBoardDocker extends React.Component<Props, State> {
         </div>
 
         <div
-          className={[styles.icon, selectIndex === Menus.text ? styles.selected : ''].join(' ')}
-          onClick={this.handleTextSelected}
+          className={[styles.icon, tool === Tools.text ? styles.selected : ''].join(' ')}
+          onClick={this.handleToolChange(Tools.text)}
         >
           <Tooltip title="绘制文字" mouseEnterDelay={1.0}>
             <Icon.Type />
@@ -136,8 +101,8 @@ export default class WhiteBoardDocker extends React.Component<Props, State> {
         </div>
 
         <div
-          className={[styles.icon, selectIndex === Menus.eraser ? styles.selected : ''].join(' ')}
-          onClick={this.handleEraserSelected}
+          className={[styles.icon, tool === Tools.eraser ? styles.selected : ''].join(' ')}
+          onClick={this.handleToolChange(Tools.eraser)}
         >
           <Tooltip title="橡皮擦" mouseEnterDelay={1.0}>
             <Icon.Book />
@@ -145,8 +110,8 @@ export default class WhiteBoardDocker extends React.Component<Props, State> {
         </div>
 
         <div
-          className={[styles.icon, selectIndex === Menus.circle ? styles.selected : ''].join(' ')}
-          onClick={this.handleCircleSelected}
+          className={[styles.icon, tool === Tools.ellipse ? styles.selected : ''].join(' ')}
+          onClick={this.handleToolChange(Tools.ellipse)}
         >
           <Tooltip title="绘制圆形" mouseEnterDelay={1.0}>
             <Icon.Circle />
@@ -154,8 +119,8 @@ export default class WhiteBoardDocker extends React.Component<Props, State> {
         </div>
 
         <div
-          className={[styles.icon, selectIndex === Menus.square ? styles.selected : ''].join(' ')}
-          onClick={this.handleSquareSelected}
+          className={[styles.icon, tool === Tools.rectangle ? styles.selected : ''].join(' ')}
+          onClick={this.handleToolChange(Tools.rectangle)}
         >
           <Tooltip title="绘制矩形" mouseEnterDelay={1.0}>
             <Icon.Square />
@@ -184,15 +149,10 @@ export default class WhiteBoardDocker extends React.Component<Props, State> {
   }
 }
 
-WhiteBoardDocker.defaultProps = {
+WhiteBoardTool.defaultProps = {
   className: '',
-  defaultSelect: Menus.pen,
+  defaultSelect: Tools.pencil,
   defaultColor: '#000',
-  onSelectPress: f => f,
-  onPenPress: f => f,
-  onTextPress: f => f,
-  onEraserPress: f => f,
-  onCirclePress: f => f,
-  onSquarePress: f => f,
   onColorChange: f => f,
+  onToolChange: f => f,
 };

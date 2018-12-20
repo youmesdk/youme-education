@@ -96,6 +96,7 @@
         }
         .shortcut_hover {
           position: absolute;
+          z-index: 999;
           right: 20px;
           bottom: 10px;
           cursor: pointer;

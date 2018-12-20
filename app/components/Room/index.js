@@ -25,7 +25,8 @@ import YIMClient, { MAX_NUMBER_MEMBER_IN_ROOM } from '../../utils/client';
 import { isEmpty, throttle } from '../../utils/utils';
 import avatarIcon from '../../assets/images/avatar.png';
 import { WHITEBOARD_TOKEN } from '../../config';
-import WhiteBoardDocker from '../commons/WhiteBoardDocker';
+import type { Tool } from '../commons/WhiteBoardTool';
+import WhiteBoardTool from '../commons/WhiteBoardTool';
 import WhiteBoardScaler from '../commons/WhiteBoardScaler';
 import WhiteBoardSidePanel from '../commons/WhiteBoardSidePanel';
 
@@ -65,7 +66,7 @@ class Room extends React.Component<Props, State> {
       this.joinWhiteBoardRoom();
     }
     YIMClient.instance.$video.startCapture();
-    this.pollingTask = setInterval(this.doupdate, 50);
+    this.pollingTask = setInterval(this.doupdate, 50);  // update video
     window.addEventListener('resize', this.throttledWindowSizeChange, false);
   }
 
@@ -195,52 +196,16 @@ class Room extends React.Component<Props, State> {
     this.setState({ isSidePanelShow: false });
   }
 
-  handleWhiteBoardSelectPress = () => {
+  handleWhiteBoardToolChange = (tool: Tool) => {
     const { boardRoom } = this.state;
     if (boardRoom) {
-      boardRoom.setMemberState({ currentApplianceName: 'selector', });
-    }
-  }
-
-  handleWhiteBoardPenPress = () => {
-    const { boardRoom } = this.state;
-    if (boardRoom) {
-      boardRoom.setMemberState({ currentApplianceName: 'pencil', });
-    }
-  }
-
-  handleWhiteBoardTextPress = () => {
-    const { boardRoom } = this.state;
-    if (boardRoom) {
-      boardRoom.setMemberState({ currentApplianceName: 'text', });
-    }
-  }
-
-  handleWhiteBoardEraserPress = () => {
-    const { boardRoom } = this.state;
-    if (boardRoom) {
-      boardRoom.setMemberState({ currentApplianceName: 'eraser', });
-    }
-  }
-
-  handleWhiteBoardCirclePress = () => {
-    const { boardRoom } = this.state;
-    if (boardRoom) {
-      boardRoom.setMemberState({ currentApplianceName: 'ellipse', });
-    }
-  }
-
-  handleWhiteBoardSquarePress = () => {
-    const { boardRoom } = this.state;
-    if (boardRoom) {
-      boardRoom.setMemberState({ currentApplianceName: 'rectangle', });
+      boardRoom.setMemberState({ currentApplianceName: tool, });
     }
   }
 
   handleWhiteBoardColorChange = () => {
     const { boardRoom } = this.state;
     if (boardRoom) {
-
     }
   }
 
@@ -273,6 +238,10 @@ class Room extends React.Component<Props, State> {
       msg.status = 2;
       updateOneMessage(msg);
     });
+  }
+
+  componentDidCatch(a, b) {
+    console.log(`error in Room Tool: ${a}, ${b}`)
   }
 
   render() {
@@ -317,19 +286,13 @@ class Room extends React.Component<Props, State> {
                />
               }
 
-              <WhiteBoardDocker
+              <WhiteBoardTool
                 className={styles.docker}
-                onSelectPress={this.handleWhiteBoardSelectPress}
-                onPenPress={this.handleWhiteBoardPenPress}
-                onTextPress={this.handleWhiteBoardTextPress}
-                onEraserPress={this.handleWhiteBoardEraserPress}
-                onCirclePress={this.handleWhiteBoardCirclePress}
-                onSquarePress={this.handleWhiteBoardSquarePress}
+                onToolChange={this.handleWhiteBoardToolChange}
                 onColorChange={this.handleWhiteBoardColorChange}
               />
 
               <WhiteBoardScaler className={styles.scaler} />
-
               {
                 isSidePanelShow &&
                 <WhiteBoardSidePanel
