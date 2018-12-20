@@ -16,47 +16,32 @@ import styles from './style.scss';
 
 type Props = {
   className?: string,
-  defaultScale?: number,
-  onIncreasePress?: (scale: number) => void,
-  onDecreasePress?: (scale: number) => void,
+  scale?: number,
+  onIncreasePress?: () => void,
+  onDecreasePress?: () => void,
 };
 
-type State = {
-};
+export default function WhiteBoardScaler(props: Props) {
+  const { className, scale, onIncreasePress, onDecreasePress } = props;
 
-export default class WhiteBoardScaler extends React.Component<Props, State> {
-  constructor(props) {
-    super(props);
-    const { defaultScale } = props;
+  return (
+    <div className={[styles.container, className].join(' ')}>
+      <span>{`${parseInt(scale * 100, 10)}%`}</span>
 
-    this.state = {
-      scale: defaultScale,
-    };
-  }
+      <span className={styles.icon} onClick={onIncreasePress}>
+        <Icon.Plus size={12} />
+      </span>
 
-  render() {
-    const { className } = this.props;
-    const { scale } = this.state;
-
-    return (
-      <div className={[styles.container, className].join(' ')}>
-        <span>{`${scale * 100}%`}</span>
-
-        <span className={styles.icon}>
-          <Icon.Plus size={12} />
-        </span>
-
-        <span className={styles.icon}>
-          <Icon.Minus size={12} />
-        </span>
-      </div>
-    );
-  }
+      <span className={styles.icon} onClick={onDecreasePress}>
+        <Icon.Minus size={12} />
+      </span>
+    </div>
+  );
 }
 
 WhiteBoardScaler.defaultProps = {
   className: '',
-  defaultScale: 1,
+  scale: 1,
   onIncreasePress: f => f,
   onDecreasePress: f => f,
 };

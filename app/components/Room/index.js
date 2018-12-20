@@ -40,6 +40,8 @@ type Props = {
 type State = {
   isWhiteBoardLoading: boolean,
   isSidePanelShow: boolean,
+  zoomScale: number,
+  borderRoom: object | null,
 };
 
 class Room extends React.Component<Props, State> {
@@ -49,6 +51,7 @@ class Room extends React.Component<Props, State> {
       isWhiteBoardLoading: false,
       isSidePanelShow: false,
       boardRoom: null,
+      zoomScale: 1,
     };
     this.whiteBoardSDK = new WhiteWebSdk();
     this.throttledWindowSizeChange = throttle(this.handleWindowSizeChange, 200);
@@ -114,6 +117,8 @@ class Room extends React.Component<Props, State> {
       const boardRoom = await this.whiteBoardSDK.joinRoom({
         uuid: msg.room.uuid,
         roomToken: msg.roomToken,
+      }, {
+        onRoomStateChanged: this.onWhiteBoardStateChange
       });
       boardRoom.setViewMode('broadcaster');
       const whiteBoardRoom: WhiteBoardRoom = {
@@ -143,7 +148,11 @@ class Room extends React.Component<Props, State> {
       // whiteBoardRoom contain `uuid` and `roomToken` which is receive from teacher's client
       const { whiteBoardRoom } = this.props;
       const { uuid, roomToken } = whiteBoardRoom;
-      const boardRoom = await this.whiteBoardSDK.joinRoom({ uuid, roomToken, });
+      const boardRoom = await this.whiteBoardSDK.joinRoom({
+         uuid, roomToken,
+      }, {
+        onRoomStateChanged: this.onWhiteBoardStateChange
+      });
       boardRoom.setViewMode('follower');
       this.setState({ boardRoom });
     } catch(err) {
@@ -240,13 +249,33 @@ class Room extends React.Component<Props, State> {
     });
   }
 
-  componentDidCatch(a, b) {
-    console.log(`error in Room Tool: ${a}, ${b}`)
+  onWhiteBoardStateChange = (state) => {
+    const { memberState, zoomScale } = state;
+    if (zoomScale) {
+      this.setState({ zoomScale: zoomScale });
+    }
+
+    if (memberState) {
+    }
+  }
+
+  handleZoomScaleDecreasePress = () => {
+    const { zoomScale, boardRoom } = this.state;
+    if (boardRoom) {
+      boardRoom.zoomChange(zoomScale - 0.05);
+    }
+  }
+
+  handleZoomScaleIncreasePress = () => {
+    const { zoomScale, boardRoom } = this.state;
+    if (boardRoom) {
+      boardRoom.zoomChange(zoomScale + 0.05);
+    }
   }
 
   render() {
     const { messages, nickname, users } = this.props;
-    const { isWhiteBoardLoading, boardRoom, isSidePanelShow } = this.state;
+    const { isWhiteBoardLoading, boardRoom, isSidePanelShow, zoomScale } = this.state;
 
     const index = users.findIndex((u) => u.role === 0);
     const teacherId = index !== -1 ? users[index].id : '';
@@ -292,7 +321,12 @@ class Room extends React.Component<Props, State> {
                 onColorChange={this.handleWhiteBoardColorChange}
               />
 
-              <WhiteBoardScaler className={styles.scaler} />
+              <WhiteBoardScaler
+                className={styles.scaler}
+                scale={zoomScale}
+                onDecreasePress={this.handleZoomScaleDecreasePress}
+                onIncreasePress={this.handleZoomScaleIncreasePress}
+              />
               {
                 isSidePanelShow &&
                 <WhiteBoardSidePanel
