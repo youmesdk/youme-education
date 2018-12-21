@@ -18,6 +18,7 @@ import {
 
 import { configureStore } from '../store/configureStore';
 import * as actions from '../actions/app';
+import { message } from 'antd';
 
 const CREATE_ROOM_EVENT = 'CREATE_ROOM_EVENT';
 const JOIN_ROOM_EVENT = 'JOIN_ROOM_EVENT';
@@ -91,6 +92,7 @@ export default class Client {
     if (this.task) {
       clearTimeout(this.task);
     }
+    Client.store.dispatch(actions.setUserList([]));
   }
 
   createChatRoom(uroom) {
@@ -244,6 +246,15 @@ export default class Client {
               role: role,
             };
             Client.store.dispatch(actions.addOneUser(user));
+          }
+        } else {
+          const role = parseInt(userid.split('_')[2], 10);
+          if (role === 0) {  // teacher logout, student need logout too
+            message.info('your teacher close class!');
+            this.logout();
+          } else {
+            const tempUsers = users.filter((u) => u.id !== userid);
+            Client.store.dispatch(actions.setUserList(tempUsers));
           }
         }
       });
