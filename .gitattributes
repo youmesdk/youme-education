@@ -5,3 +5,5 @@
 *.ico binary
 *.icns binary
 *.dll binary
+*.exe binary
+*.dylib binary
