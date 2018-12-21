@@ -67,6 +67,7 @@ export default class Client {
     // 初始化Video
     return new Promise((resolve, reject) => {
       const code = this.$video.init(APP_KEY, APP_SECRET, videoServerRegin, videoReginName, () => {
+        this._bindVideoEvents();
         return resolve();
       });
 
@@ -225,22 +226,25 @@ export default class Client {
 
   _bindVideoEvents() {
     this.$video.on('onMemberChange', ({ memchange }) => {
-      const { isJoin, userid } = memchange;
       const state = Client.store.getState();
       const { app } = state;
       const { users, role } = app;
-      if (isJoin) {
-        const index = users.findIndex((u) => u.id === userid);
-        if (index === -1) {
-          const name = userid.split('_')[1];
-          const user = {
-            id: userid,
-            name: name,
-            role: role === 1, // student,
-          };
-          Client.store.dispatch(actions.addOneUser(user));
+
+      memchange.forEach((item) => {
+        const { isJoin, userid } = item;
+        if (isJoin) {
+          const index = users.findIndex((u) => u.id === userid);
+          if (index === -1) {
+            const name = userid.split('_')[1];
+            const user = {
+              id: userid,
+              name: name,
+              role: 1, // student,
+            };
+            Client.store.dispatch(actions.addOneUser(user));
+          }
         }
-      }
+      });
     });
   }
 
