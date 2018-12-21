@@ -278,7 +278,7 @@ class Room extends React.Component<Props, State> {
   }
 
   render() {
-    const { messages, nickname, users } = this.props;
+    const { messages, nickname, users, room } = this.props;
     const { isWhiteBoardLoading, boardRoom, isSidePanelShow, zoomScale } = this.state;
 
     const index = users.findIndex((u) => u.role === 0);
@@ -288,6 +288,14 @@ class Room extends React.Component<Props, State> {
     return (
       <div className={styles.container}>
         <TitleBar>
+          <div className={styles.info_bar}>
+            <span className={styles.info_bar_item}>
+              房间名称: {room}
+            </span>
+            <span className={styles.info_bar_item}>
+              成员人数: {users.length || 1}
+            </span>
+          </div>
           <Button
             ghost
             icon="logout"

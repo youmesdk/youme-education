@@ -7,6 +7,16 @@
   align-items: stretch;
   overflow: hidden;
 
+  .info_bar {
+    margin-right: 20px;
+    font-size: 16px;
+    color: #FFF;
+    font-weight: bold;
+    &_item {
+      margin-right: 30px;
+    }
+  }
+
   .menu_btn {
     -webkit-app-region: no-drag !important;
     margin: 5px;
