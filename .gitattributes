@@ -4,3 +4,6 @@
 *.jpeg binary
 *.ico binary
 *.icns binary
+*.dll binary
+*.dylib binary
+*.exe binary
