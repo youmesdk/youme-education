@@ -228,18 +228,20 @@ export default class Client {
     this.$video.on('onMemberChange', ({ memchange }) => {
       const state = Client.store.getState();
       const { app } = state;
-      const { users, role } = app;
+      const { users, } = app;
 
       memchange.forEach((item) => {
         const { isJoin, userid } = item;
         if (isJoin) {
           const index = users.findIndex((u) => u.id === userid);
           if (index === -1) {
-            const name = userid.split('_')[1];
+            // userid: name_timestamp_role
+            const name = userid.split('_')[0];
+            const role = parseInt(userid.split('_')[2], 10);
             const user = {
               id: userid,
               name: name,
-              role: 1, // student,
+              role: role,
             };
             Client.store.dispatch(actions.addOneUser(user));
           }

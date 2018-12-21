@@ -92,7 +92,7 @@ class Index extends React.Component<null, State> {
       }
 
       const user = {
-        id: `${name}_${Date.now()}`,
+        id: `${name}_${Date.now()}_${role}`,
         name: name,
         role: role,
       };
