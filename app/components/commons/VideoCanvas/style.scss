@@ -1,0 +1,19 @@
+
+.container {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+
+  .canvas {
+    overflow: hidden;
+  }
+
+  .status_bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;;
+    height: 30px;
+    background: blanchedalmond;
+  }
+}

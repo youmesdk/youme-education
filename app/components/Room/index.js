@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-07-27 16:16:37
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-12-19 21:17:36
+ * @Last Modified time: 2018-12-21 21:20:55
  *
  * @flow
  *
@@ -29,6 +29,7 @@ import type { Tool } from '../commons/WhiteBoardTool';
 import WhiteBoardTool from '../commons/WhiteBoardTool';
 import WhiteBoardScaler from '../commons/WhiteBoardScaler';
 import WhiteBoardSidePanel from '../commons/WhiteBoardSidePanel';
+import VideoCanvas from '../commons/VideoCanvas';
 
 
 import type { User, WhiteBoardRoom } from '../../reducers/app';
@@ -254,12 +255,8 @@ class Room extends React.Component<Props, State> {
 
   onWhiteBoardStateChange = (state) => {
     const { memberState, zoomScale } = state;
-    console.log(state, '============================');
     if (zoomScale) {
       this.setState({ zoomScale: zoomScale });
-    }
-
-    if (memberState) {
     }
   }
 
@@ -309,9 +306,11 @@ class Room extends React.Component<Props, State> {
             {
               students.map((s) => {
                 return (
-                  <canvas className={styles.content_header_item} id={`canvas-${s.id}`} key={s.id}>
-                    <Spin className={styles.spin} size="small" />
-                  </canvas>
+                  <VideoCanvas
+                    id={`canvas-${s.id}`}
+                    key={s.id}
+                    className={styles.content_header_item}
+                  />
                 );
               })
             }
@@ -358,9 +357,10 @@ class Room extends React.Component<Props, State> {
             </div>
 
             <div className={styles.content_main_right}>
-              <canvas id={`canvas-${teacherId}`} className={styles.video}>
-                <Spin className={styles.spin} size="large" />
-              </canvas>
+              <VideoCanvas
+                className={styles.video}
+                id={`canvas-${teacherId}`}
+              />
 
               <div className={styles.im}>
                 <MessageList

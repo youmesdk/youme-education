@@ -222,7 +222,11 @@ export default class Client {
     });
 
     this.$im.on('OnLogout', (msg) => {
-      console.log('OnLogout');
+      this.$video.leaveChannelAll();
+      Client.store.dispatch(actions.resetAppState());
+      const state = Client.store.getState();
+      const { history } = state;
+      history.push('/');
     });
   }
 
