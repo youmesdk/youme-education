@@ -9,6 +9,7 @@
  */
 
 import {
+  SET_MESSAGES,
   PUSH_MESSAGE,
   UPDATE_MESSAGE,
   SET_ROOM,
@@ -17,6 +18,7 @@ import {
   ADD_ONE_USER,
   SET_USER,
   SET_WHITE_BOARD_ROOM,
+  RESET_APP_STATE,
 } from '../actions/app';
 
 export type AppStateType = {
@@ -54,6 +56,15 @@ const initialState: AppStateType = {
 
 export default (state = initialState, action: { type: string }) => {
   switch(action.type) {
+    case SET_MESSAGES: {
+      const { messages } = action;
+
+      return {
+        ...state,
+        messages,
+      };
+    }
+
     // append new message
     case PUSH_MESSAGE: {
       return {
@@ -124,6 +135,11 @@ export default (state = initialState, action: { type: string }) => {
         ...state,
         whiteBoardRoom,
       };
+    }
+
+    // reset all state
+    case RESET_APP_STATE: {
+      return initialState;
     }
 
     default: {

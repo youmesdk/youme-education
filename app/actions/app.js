@@ -1,5 +1,6 @@
 // @flow
 
+export const SET_MESSAGES = 'SET_MESSAGES';
 export const PUSH_MESSAGE = 'PUSH_MESSAGE';
 export const UPDATE_MESSAGE = 'UPDATE_MESSAGE';
 export const SET_ROOM = 'SET_ROOM';
@@ -8,6 +9,7 @@ export const REMOVE_ONE_USER = 'REMOVE_ONE_USER';
 export const ADD_ONE_USER = 'ADD_ONE_USER';
 export const SET_USER = 'SET_USER';
 export const SET_WHITE_BOARD_ROOM = 'SET_WHITE_BOARD_ROOM';
+export const RESET_APP_STATE = 'RESET_APP_STATE';
 
 import type {
    User,
@@ -26,6 +28,13 @@ export function setRoom(room: string) {
   return {
     type: SET_ROOM,
     room,
+  };
+}
+
+export function setMessages(messages: Array) {
+  return {
+    type: SET_MESSAGES,
+    messages,
   };
 }
 
@@ -68,5 +77,11 @@ export function addOneUser(user: User) {
   return {
     type: ADD_ONE_USER,
     user,
+  };
+}
+
+export function resetAppState() {
+  return {
+    type: RESET_APP_STATE,
   };
 }

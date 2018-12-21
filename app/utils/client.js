@@ -92,7 +92,7 @@ export default class Client {
     if (this.task) {
       clearTimeout(this.task);
     }
-    Client.store.dispatch(actions.setUserList([]));
+    Client.store.dispatch(actions.resetAppState());
   }
 
   createChatRoom(uroom) {
@@ -230,7 +230,7 @@ export default class Client {
     this.$video.on('onMemberChange', ({ memchange }) => {
       const state = Client.store.getState();
       const { app } = state;
-      const { users, } = app;
+      const { users, history } = app;
 
       memchange.forEach((item) => {
         const { isJoin, userid } = item;
@@ -252,6 +252,7 @@ export default class Client {
           if (role === 0) {  // teacher logout, student need logout too
             message.info('your teacher close class!');
             this.logout();
+            history.push('/');
           } else {
             const tempUsers = users.filter((u) => u.id !== userid);
             Client.store.dispatch(actions.setUserList(tempUsers));
