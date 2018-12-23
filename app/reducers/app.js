@@ -130,7 +130,7 @@ export default (state = initialState, action: { type: string }) => {
       users.splice(index, 1, user);
       return {
         ...state,
-        users: users,
+        users: [...users],
       };
     }
 
