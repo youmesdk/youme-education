@@ -60,12 +60,14 @@ class DeviceCheck extends React.Component {
     YIMClient.instance.$video.setVideoCallback("");
     YIMClient.instance.$video.setAutoSendStatus(true);
     YIMClient.instance.$video.setVolume(100);
-    YIMClient.instance.$video.setMicrophoneMute(false);
 
     // join video room
     await YIMClient.instance.joinVideoRoom(id, room).catch(({ code }) => {
       message.error(`join video room error!: ${code}`);
     });
+
+    // join video room success, and open microphtone
+    YIMClient.instance.$video.setMicrophoneMute(false);
 
     // get cameras an current volume
     const cameras = [];
