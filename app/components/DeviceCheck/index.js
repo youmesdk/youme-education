@@ -113,7 +113,8 @@ class DeviceCheck extends React.Component {
   }
 
   handleVolumeChange = (value: number) => {
-    YIMClient.instance.$video.setVolume(value);
+    // disable it, avoid someone set low volume
+    // YIMClient.instance.$video.setVolume(value);
     this.setState({ outputVolume: value });
   }
 

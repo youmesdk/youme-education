@@ -10,4 +10,24 @@ export const APP_KEY = 'YOUMEBC2B3171A7A165DC10918A7B50A4B939F2A187D0';
 export const APP_SECRET = 'r1+ih9rvMEDD3jUoU+nj8C7VljQr7Tuk4TtcByIdyAqjdl5lhlESU0D+SoRZ30sopoaOBg9EsiIMdc8R16WpJPNwLYx2WDT5hI/HsLl1NJjQfa9ZPuz7c/xVb8GHJlMf/wtmuog3bHCpuninqsm3DRWiZZugBTEj2ryrhK7oZncBAAE=';
 export const WHITEBOARD_TOKEN = 'WHITEcGFydG5lcl9pZD1uVUcwRUFmaGpkRzZLd1BScWdqSnBjblRDbE0zUDYycm1Vc0Imc2lnPTYwYmY2MDE0NWZmYTM5MjllYjZjZmJiNGEyYmU2YTZmMDAwNmM4ZDQ6YWRtaW5JZD02NiZyb2xlPW1pbmkmZXhwaXJlX3RpbWU9MTU3NjY5NDg0NSZhaz1uVUcwRUFmaGpkRzZLd1BScWdqSnBjblRDbE0zUDYycm1Vc0ImY3JlYXRlX3RpbWU9MTU0NTEzNzg5MyZub25jZT0xNTQ1MTM3ODkyNTAyMDA';
 export const VIDEO_SERVERE_REGION = 0; // 服务器区域
-export const VIDEO_REGION_NAME = 'cn'; // 服务器区域地址
+export const VIDEO_REGION_NAME = 'RTC_CN_SERVER'; // 服务器区域地址
+
+export const REGION_MAP = {
+  0: { name: 'RTC_CN_SERVER', label: 'China' },   // 中国
+  1: { name: 'RTC_HK_SERVER', label: 'Hong Kong' },  // 香港
+  2: { name: 'RTC_US_SERVER', label: 'U.S.A' },  // 美国
+  3: { name: 'RTC_SG_SERVER', label: 'Singapore' },  // 新加坡
+  4: { name: 'RTC_KR_SERVER', label: 'Korea' },  // 韩国
+  5: { name: 'RTC_AU_SERVER', label: 'Australia' }, // 澳大利亚
+  6: { name: 'RTC_DE_SERVER', label: 'Germany' },  // 德国
+  7: { name: 'RTC_BR_SERVER', label: 'Brazil' },  // 巴西
+  8: { name: 'RTC_IN_SERVER', label: 'India' },  // 印度
+  9: { name: 'RTC_JP_SERVER', label: 'Japan' },  // 日本
+  10: { name: 'RTC_IE_SERVER', label: 'Ireland' },  // 爱尔兰
+  11: { name: 'RTC_USW_SERVER', label: 'Western United States' }, // 美国西部
+  12: { name: 'RTC_USM_SERVER', label: 'Central United States' }, // 美国中部
+  13: { name: 'RTC_CA_SERVER',  label: 'Canada' }, // 加拿大
+  14: { name: 'RTC_LON_SERVER', label: 'London' }, // 伦敦
+  15: { name: 'RTC_FRA_SERVER', label: 'Frankfurt' }, // 法兰克福
+  16: { name: 'RTC_DXB_SERVER', label: 'Dubai' }, // 迪拜
+};

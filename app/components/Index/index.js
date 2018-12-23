@@ -10,7 +10,7 @@
  */
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Radio, message, Spin } from 'antd';
+import { Radio, message, Spin, Select } from 'antd';
 import { bindActionCreators } from 'redux';
 
 import logo from '../../assets/images/logo.png';
@@ -19,12 +19,14 @@ import { connect } from 'react-redux';
 import TitleBar from '../commons/TitleBar';
 import styles from './style.scss';
 import { isEmpty } from '../../utils/utils';
+
 import YIMClient, {
    CLASS_IS_EXIST,
    CLASS_IS_NOT_EXIST,
    MAX_NUMBER_MEMBER_ERROR,
 } from '../../utils/client';
 import * as actions from '../../actions/app';
+import { VIDEO_REGION_NAME, VIDEO_SERVERE_REGION, REGION_MAP } from '../../config';
 
 const { Group: RadioGroup } = Radio;
 
@@ -42,7 +44,9 @@ class Index extends React.Component<null, State> {
       role: 1,
       name: '',
       room: '',
-      isLoading: false
+      regionName: VIDEO_REGION_NAME,
+      region: VIDEO_SERVERE_REGION,
+      isLoading: false,
     };
   }
 
