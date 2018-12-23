@@ -247,15 +247,14 @@ export default class Client {
       this.$video.leaveChannelAll();
       Client.store.dispatch(actions.resetAppState());
       const state = Client.store.getState();
-      const { history } = state;
-      history.push('/');
+      window.location.hash = '';
     });
   }
 
   _bindVideoEvents() {
     this.$video.on('onMemberChange', ({ memchange }) => {
       const state = Client.store.getState();
-      const { app, history } = state;
+      const { app, } = state;
       const { users, user } = app;
 
       memchange.forEach((item) => {
@@ -282,6 +281,7 @@ export default class Client {
               message.info('your teacher close class!');
               this.logout();
               history.push('/');
+              window.location.hash = '';
             } else {
               Client.store.dispatch(actions.removeOneOtherUser(userid));
             }

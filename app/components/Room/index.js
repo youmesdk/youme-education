@@ -168,10 +168,13 @@ class Room extends React.Component<Props, State> {
 
   // update all video frames
   doupdate = () => {
-    const { users } = this.props;
-    users.forEach((user) => {
+    const { users, user } = this.props;
+    users.forEach((user) => {  // update other video
       YIMClient.instance.$video.updateCanvas(user.id, `canvas-${user.id}`);
     });
+
+    // update myself video
+    YIMClient.instance.$video.updateCanvas(user.id, `canvas-${user.id}`);
   }
 
   handleStopBtn = () => {
@@ -320,7 +323,7 @@ class Room extends React.Component<Props, State> {
               房间名称: {room}
             </span>
             <span className={styles.info_bar_item}>
-              成员人数: {users.length || 1}
+              成员人数: {users.length + 1}
             </span>
           </div>
           <Button
