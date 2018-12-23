@@ -27,8 +27,7 @@ import {
 export type AppStateType = {
   messages: Array<Object>,
   room: string,
-  nickname: string,
-  role: Role,
+  user: User,
   users: Array<User>,
   whiteBoardRoom: WhiteBoardRoom,
 };
@@ -51,8 +50,6 @@ export type WhiteBoardRoom = {
 const initialState: AppStateType = {
   messages: [],
   room: '',
-  nickname: '',
-  role: 0, // 0: teacher 1: student
   users: [],
   user: { id: '', name: '', role: 0, isMicOn: true, isCameraOn: true },
   whiteBoardRoom: { uuid: '', roomToken: '' },

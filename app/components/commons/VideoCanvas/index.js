@@ -20,8 +20,8 @@ type Props = {
   id: string,
   className?: string,
   user: User,
-  onMicPress?: (id: string) => void,
-  onCameraPress?: (id: string) => void,
+  onMicPress?: (user: User) => void,
+  onCameraPress?: (user: User) => void,
 };
 
 export default function VideoCanvas(props: Props) {

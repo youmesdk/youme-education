@@ -274,27 +274,31 @@ class Room extends React.Component<Props, State> {
     }
   }
 
-  handleMicBtnPress = (userId: string) => {
-    const { user } = this.props;
-    const { id, isMicOn } = user;
-    if (id !== userId) {
+  handleMicBtnPress = (u: User) => {
+    const { user: me, setUser } = this.props;
+    const { id, isMicOn} = me;
+    if (u.id !== id) {
       return message.info('you can not operate other microphone!');
     }
     YIMClient.instance.setMicrophoneMute(!isMicOn).then(() => {
       message.info('change microphone status success!');
+      const tempUser = Object.assign({}, me, { isMicOn: !isMicOn });
+      setUser(tempUser);
     }).catch((code) => {
       message.error(`change microphone status fail!, code=${code}`);
     });
   }
 
-  handleCameraBtnPress = (userId: string) => {
-    const { user } = this.props;
-    const { id, isCameraOn } = user;
-    if (id !== userId) {
+  handleCameraBtnPress = (u: User) => {
+    const { user: me, setUser } = this.props;
+    const { id, isCameraOn } = me;
+    if (u.id !== id) {
       return message.info('you can not operate other camera!');
     }
     YIMClient.instance.setCameraOpen(!isCameraOn).then(() => {
       message.info('change camera status success!');
+      const tempUser = Object.assign({}, me, { isCameraOn: !isCameraOn });
+      setUser(tempUser);
     }).catch((code) => {
       message.error(`change camera status fail!, code=${code}`);
     });
@@ -336,6 +340,8 @@ class Room extends React.Component<Props, State> {
                   id={`canvas-${user.id}`}
                   user={user}
                   className={styles.content_header_item}
+                  onCameraPress={this.handleCameraBtnPress}
+                  onMicPress={this.handleMicBtnPress}
                 />
               )
             }
@@ -400,7 +406,9 @@ class Room extends React.Component<Props, State> {
               <VideoCanvas
                 id={`canvas-${teacher.id}`}
                 className={styles.video}
-                user={user}
+                user={teacher}
+                onCameraPress={this.handleCameraBtnPress}
+                onMicPress={this.handleMicBtnPress}
               />
 
               <div className={styles.im}>
@@ -442,6 +450,7 @@ const mapDispatchToProps = (dispatch) => {
     addOneMessage: bindActionCreators(actions.addOneMessage, dispatch),
     updateOneMessage: bindActionCreators(actions.updateOneMessage, dispatch),
     setWhiteBoardRoom: bindActionCreators(actions.setWhiteBoardRoom, dispatch),
+    setUser: bindActionCreators(actions.setUser, dispatch),
   };
 };
 
