@@ -13,9 +13,12 @@ import {
   PUSH_MESSAGE,
   UPDATE_MESSAGE,
   SET_ROOM,
-  SET_USER_LIST,
-  REMOVE_ONE_USER,
-  ADD_ONE_USER,
+
+  SET_OTHER_USER_LIST,
+  REMOVE_ONE_OTHER_USER,
+  ADD_ONE_OTHER_USER,
+  UPDATE_ONE_OTHER_USER,
+
   SET_USER,
   SET_WHITE_BOARD_ROOM,
   RESET_APP_STATE,
@@ -36,6 +39,8 @@ export type User = {
   id: string,       // user id
   name: string,     // user name
   role: Role,
+  isMicOn: boolean,
+  isCameraOn: boolean,
 };
 
 export type WhiteBoardRoom = {
@@ -49,7 +54,7 @@ const initialState: AppStateType = {
   nickname: '',
   role: 0, // 0: teacher 1: student
   users: [],
-  user: { id: '', name: '', role: 0 },
+  user: { id: '', name: '', role: 0, isMicOn: true, isCameraOn: true },
   whiteBoardRoom: { uuid: '', roomToken: '' },
 };
 
@@ -94,7 +99,7 @@ export default (state = initialState, action: { type: string }) => {
       };
     }
 
-    case SET_USER_LIST: {
+    case SET_OTHER_USER_LIST: {
       const { users } = action;
       return {
         ...state,
@@ -102,22 +107,33 @@ export default (state = initialState, action: { type: string }) => {
       };
     }
 
-    case REMOVE_ONE_USER: {
-      const { user } = action;
+    case REMOVE_ONE_OTHER_USER: {
+      const { id } = action;
       const { users } = state;
-      const result = users.filter((item) => item.name !== user.name);
+      const result = users.filter((item) => item.id !== user.id);
       return {
         ...state,
         users: result,
       };
     }
 
-    case ADD_ONE_USER: {
+    case ADD_ONE_OTHER_USER: {
       const { user } = action;
       const { users } = state;
       return {
         ...state,
         users: [...users, user],
+      };
+    }
+
+    case UPDATE_ONE_OTHER_USER: {
+      const { user } = action;
+      const { users } = state;
+      const index = users.findIndex((u) => u.id === user.id);
+      users.splice(index, 1, user);
+      return {
+        ...state,
+        users: users,
       };
     }
 

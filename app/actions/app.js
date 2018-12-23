@@ -3,10 +3,13 @@
 export const SET_MESSAGES = 'SET_MESSAGES';
 export const PUSH_MESSAGE = 'PUSH_MESSAGE';
 export const UPDATE_MESSAGE = 'UPDATE_MESSAGE';
+
 export const SET_ROOM = 'SET_ROOM';
-export const SET_USER_LIST = 'SET_USER_LIST';
-export const REMOVE_ONE_USER = 'REMOVE_ONE_USER';
-export const ADD_ONE_USER = 'ADD_ONE_USER';
+export const SET_OTHER_USER_LIST = 'SET_OTHER_USER_LIST';
+export const REMOVE_ONE_OTHER_USER = 'REMOVE_ONE_OTHER_USER';
+export const ADD_ONE_OTHER_USER = 'ADD_ONE_OTHER_USER';
+export const UPDATE_ONE_OTHER_USER = 'UPDATE_ONE_OTHER_USER';
+
 export const SET_USER = 'SET_USER';
 export const SET_WHITE_BOARD_ROOM = 'SET_WHITE_BOARD_ROOM';
 export const RESET_APP_STATE = 'RESET_APP_STATE';
@@ -59,23 +62,30 @@ export function setUser(user: User) {
   };
 }
 
-export function setUserList(users: Array<User>) {
+export function setOtherUserList(users: Array<User>) {
   return {
-    type: SET_USER_LIST,
+    type: SET_OTHER_USER_LIST,
     users,
   };
 }
 
-export function removeOneUser(user: User) {
+export function removeOneOtherUser(id: string) {
   return {
-    type: REMOVE_ONE_USER,
+    type: REMOVE_ONE_OTHER_USER,
+    id,
+  };
+}
+
+export function addOneOtherUser(user: User) {
+  return {
+    type: ADD_ONE_OTHER_USER,
     user,
   };
 }
 
-export function addOneUser(user: User) {
+export function updateOneOtherUser(user: User) {
   return {
-    type: ADD_ONE_USER,
+    type: UPDATE_ONE_OTHER_USER,
     user,
   };
 }

@@ -14,27 +14,29 @@ import * as React from "react";
 import * as Icon from "react-feather";
 
 import styles from "./style.scss";
+import type { User } from '../../../reducers/app';
 
 type Props = {
   id: string,
   className?: string,
-  name: string,
-  isMicOn?: boolean,
-  isCameraOn?: boolean,
-  onMicPress?: () => void,
-  onCameraPress?: () => void
+  user: User,
+  onMicPress?: (id: string) => void,
+  onCameraPress?: (id: string) => void
 };
 
 export default function VideoCanvas(props: Props) {
-  const {
-    className,
-    id,
-    isMicOn,
-    isCameraOn,
-    name,
-    onMicPress,
-    onCameraPress
-  } = props;
+  const { className, id, user, onMicPress, onCameraPress, } = props;
+  const { name, isMicOn, isCameraOn } = user;
+
+  const handleMicPress = (user: User) => () => {
+    const { onMicPress } = props;
+    onMicPress(user);
+  }
+
+  const handleCameraPress = (user: User) => () => {
+    const { onCameraPress } = props;
+    onCameraPress(user);
+  }
 
   return (
     <div className={[styles.container, className].join(" ")}>
@@ -42,11 +44,17 @@ export default function VideoCanvas(props: Props) {
 
       <div className={styles.status_bar}>
         <span className={styles.name}>{name}</span>
-        <span onClick={onMicPress} className={styles.op_icon}>
+        <span
+          onClick={this.handleMicPress(id)}
+          className={styles.op_icon}
+        >
           {isMicOn ? <Icon.Mic size={20} /> : <Icon.MicOff size={20} />}
         </span>
 
-        <span onClick={onCameraPress} className={styles.op_icon}>
+        <span
+          onClick={this.handleCameraPress(id)}
+          className={styles.op_icon}
+        >
           {isCameraOn ? <Icon.Camera size={20} /> : <Icon.CameraOff size={20} /> }
         </span>
       </div>
@@ -56,8 +64,6 @@ export default function VideoCanvas(props: Props) {
 
 VideoCanvas.defaultProps = {
   className: "",
-  isMicOn: true,
-  isCameraOn: true,
   onMicPress: f => f,
   onCameraPress: f => f
 };

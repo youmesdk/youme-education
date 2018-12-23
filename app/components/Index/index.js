@@ -50,7 +50,7 @@ class Index extends React.Component<null, State> {
     try {
       this.setState({ isLoading: true });
       const { role, name, room } = this.state;
-      const { setRoom, setUser, addOneUser, history, setWhiteBoardRoom } = this.props;
+      const { setRoom, setUser, history, setWhiteBoardRoom } = this.props;
 
       if (isEmpty(name) || isEmpty(room)) {
         return message.warn("username and room name not allow empty");
@@ -95,12 +95,13 @@ class Index extends React.Component<null, State> {
         id: `${name}_${Date.now()}_${role}`,
         name: name,
         role: role,
+        isMicOn: true,
+        isCameraOn: true,
       };
 
       // save room and nickname into redux
       setRoom(room);
       setUser(user)
-      addOneUser(user);
 
       message.info('login success!');
       this.setState({ isLoading: false });
@@ -172,7 +173,6 @@ class Index extends React.Component<null, State> {
 const mapDispatchToProps = (dispatch) => {
   return {
     setRoom: bindActionCreators(actions.setRoom, dispatch),
-    addOneUser: bindActionCreators(actions.addOneUser, dispatch),
     setUser: bindActionCreators(actions.setUser, dispatch),
     setWhiteBoardRoom: bindActionCreators(actions.setWhiteBoardRoom, dispatch),
   };

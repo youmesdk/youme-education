@@ -274,15 +274,39 @@ class Room extends React.Component<Props, State> {
     }
   }
 
+  handleMicBtnPress = (userId: string) => {
+    const { user } = this.props;
+    const { id, isMicOn } = user;
+    if (id !== userId) {
+      return message.info('you can not operate other microphone!');
+    }
+    YIMClient.instance.setMicrophoneMute(!isMicOn).then(() => {
+      message.info('change microphone status success!');
+    }).catch((code) => {
+      message.error(`change microphone status fail!, code=${code}`);
+    });
+  }
+
+  handleCameraBtnPress = (userId: string) => {
+    const { user } = this.props;
+    const { id, isCameraOn } = user;
+    if (id !== userId) {
+      return message.info('you can not operate other camera!');
+    }
+    YIMClient.instance.setCameraOpen(!isCameraOn).then(() => {
+      message.info('change camera status success!');
+    }).catch((code) => {
+      message.error(`change camera status fail!, code=${code}`);
+    });
+  }
+
+
   render() {
-    const { messages, nickname, users, room } = this.props;
+    const { messages, nickname, users, room, user } = this.props;
     const { isWhiteBoardLoading, boardRoom, isSidePanelShow, zoomScale } = this.state;
 
-    const index = users.findIndex((u) => u.role === 0);
-    const teacherId = index !== -1 ? users[index].id : '';
-    const teacherName = index !== -1 ? users[index].name : '';
-
-    const students = users.filter((u) => u.role === 1);
+    const teacher = users.find(u => u.role == 0) || user;
+    const otherStudents = users.filter((u) => u.role === 1);
 
     return (
       <div className={styles.container}>
@@ -305,14 +329,27 @@ class Room extends React.Component<Props, State> {
 
         <main className={styles.content}>
           <section className={styles.content_header}>
+            {/* myself */}
             {
-              students.map((s) => {
+              user.role !== 0 && (
+                <VideoCanvas
+                  id={`canvas-${user.id}`}
+                  user={user}
+                  className={styles.content_header_item}
+                />
+              )
+            }
+
+            {/* other student */}
+            {
+              otherStudents.map((s) => {
                 return (
                   <VideoCanvas
                     id={`canvas-${s.id}`}
-                    key={s.id}
+                    user={s}
                     className={styles.content_header_item}
-                    name={s.name}
+                    onCameraPress={this.handleCameraBtnPress}
+                    onMicPress={this.handleMicBtnPress}
                   />
                 );
               })
@@ -361,9 +398,9 @@ class Room extends React.Component<Props, State> {
 
             <div className={styles.content_main_right}>
               <VideoCanvas
+                id={`canvas-${teacher.id}`}
                 className={styles.video}
-                id={`canvas-${teacherId}`}
-                name={teacherName}
+                user={user}
               />
 
               <div className={styles.im}>

@@ -142,6 +142,28 @@ export default class Client {
     });
   }
 
+  setMicrophoneMute(isOpen: boolean): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.$video.setMicrophoneMute(isOpen, (code, evt) => {
+        return code === 0 ? resolve({ code, evt }) : reject({ code, evt });
+      });
+    })
+  };
+
+  setCameraOpen(isOpen: boolean): Promise<any> {
+    return new Promise((resolve, reject) => {
+      if (isOpen) {
+        this.$video.startCapture((code, evt) => {
+          return code === 0 ? resolve({ code, evt }) : reject({ code, evt });
+        });
+      } else {
+        this.$video.stopCapture((code, evt) => {
+          return code === 0 ? resolve({ code, evt }) : reject({ code, evt });
+        })
+      }
+    });
+  }
+
   sendTextMessage(recvId: string, chatType: number, text: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.$im.sendTextMessage(recvId, chatType, text, (code, evt) => {
@@ -233,14 +255,14 @@ export default class Client {
   _bindVideoEvents() {
     this.$video.on('onMemberChange', ({ memchange }) => {
       const state = Client.store.getState();
-      const { app } = state;
-      const { users, history } = app;
+      const { app, history } = state;
+      const { users, user } = app;
 
       memchange.forEach((item) => {
         const { isJoin, userid } = item;
         if (isJoin) {
           const index = users.findIndex((u) => u.id === userid);
-          if (index === -1) {
+          if (index === -1 && user.id !== userid) {
             // userid: name_timestamp_role
             const name = userid.split('_')[0];
             const role = parseInt(userid.split('_')[2], 10);
@@ -248,22 +270,47 @@ export default class Client {
               id: userid,
               name: name,
               role: role,
+              isMicOn: true,
+              isCameraOn: true,
             };
-            Client.store.dispatch(actions.addOneUser(user));
+            Client.store.dispatch(actions.addOneOtherUser(user));
           }
         } else {
-          const role = parseInt(userid.split('_')[2], 10);
-          if (role === 0) {  // teacher logout, student need logout too
-            message.info('your teacher close class!');
-            this.logout();
-            history.push('/');
-          } else {
-            const tempUsers = users.filter((u) => u.id !== userid);
-            Client.store.dispatch(actions.setUserList(tempUsers));
+          if (user.id !== userid) {
+            const role = parseInt(userid.split('_')[2], 10);
+            if (role === 0) {  // teacher logout, student need logout too
+              message.info('your teacher close class!');
+              this.logout();
+              history.push('/');
+            } else {
+              Client.store.dispatch(actions.removeOneOtherUser(userid));
+            }
           }
         }
       });
     });
+
+    // other open mic
+    this.$video.on('YOUME_EVENT_OTHERS_MIC_ON', (evt) => {
+      console.log('YOUME_EVENT_OTHERS_MIC_ON', evt);
+    });
+
+    // other close mic
+    this.$video.on('YOUME_EVENT_OTHERS_MIC_OFF', (evt) => {
+      console.log('YOUME_EVENT_OTHERS_MIC_OFF');
+    });
+
+    // other open camera
+    this.$video.on('YOUME_EVENT_OTHERS_VIDEO_INPUT_START', (evt) => {
+      console.log('YOUME_EVENT_OTHERS_VIDEO_INPUT_START', evt);
+    });
+
+    // other close camare
+    this.$video.on('YOUME_EVENT_OTHERS_VIDEO_INPUT_STOP', (evt) => {
+      console.log('YOUME_EVENT_OTHERS_VIDEO_INPUT_STOP', evt);
+    });
+
+
   }
 
   _handleSigining(msg) {
