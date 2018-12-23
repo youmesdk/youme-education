@@ -66,8 +66,9 @@ class DeviceCheck extends React.Component {
       message.error(`join video room error!: ${code}`);
     });
 
-    // join video room success, and open microphtone
+    // join video room success, open microphtone and speacker;
     YIMClient.instance.$video.setMicrophoneMute(false);
+    YIMClient.instance.$video.setSpeakerMute(false);
 
     // get cameras an current volume
     const cameras = [];
