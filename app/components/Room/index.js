@@ -283,7 +283,7 @@ class Room extends React.Component<Props, State> {
     if (u.id !== id) {
       return message.info('you can not operate other microphone!');
     }
-    YIMClient.instance.setMicrophoneMute(!isMicOn).then(() => {
+    YIMClient.instance.setMicrophoneMute(isMicOn).then(() => {
       message.info('change microphone status success!');
       const tempUser = Object.assign({}, me, { isMicOn: !isMicOn });
       setUser(tempUser);
