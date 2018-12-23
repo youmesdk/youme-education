@@ -26,7 +26,7 @@ type Props = {
 
 export default function VideoCanvas(props: Props) {
   const { className, id, user, onMicPress, onCameraPress, } = props;
-  const { name, isMicOn, isCameraOn } = user;
+  const { name, isMicOn, isCameraOn, role } = user;
 
   const handleMicPress = (user: User) => () => {
     const { onMicPress } = props;
@@ -43,7 +43,7 @@ export default function VideoCanvas(props: Props) {
       <canvas id={id} className={styles.canvas} />
 
       <div className={styles.status_bar}>
-        <span className={styles.name}>{name}</span>
+        <span className={styles.name}>{role === 1 ? name.substring(0, 4) + '...' : name}</span>
         <span
           onClick={handleMicPress(user)}
           className={styles.op_icon}

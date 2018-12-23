@@ -182,7 +182,7 @@ export default class WhiteBoardTool extends React.Component<Props, State> {
           </Tooltip>
         </div>
 
-        <div
+        {/* <div
           className={[styles.icon, styles.color_container].join(' ')}
           onClick={this.handleColorSelected}
         >
@@ -198,7 +198,7 @@ export default class WhiteBoardTool extends React.Component<Props, State> {
              onChange={f => f}
            />
           }
-        </div>
+        </div> */}
       </div>
     );
   }

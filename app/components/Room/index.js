@@ -43,8 +43,6 @@ type State = {
   isSidePanelShow: boolean,
   zoomScale: number,
   borderRoom: object | null,
-  tool: string,
-  color: string,
 };
 
 class Room extends React.Component<Props, State> {
@@ -55,8 +53,6 @@ class Room extends React.Component<Props, State> {
       isSidePanelShow: false,      // is right drawer open?
       boardRoom: null,             // whiteboard room instance
       zoomScale: 1,                // whiteboard zoom scale
-      tool: 'pencil',              // whiteboard tool, `Tool` type
-      color: '',                   // whiteboard paint color
     };
     this.whiteBoardSDK = new WhiteWebSdk();   // whiteboard sdk instance
     this.throttledWindowSizeChange = throttle(this.handleWindowSizeChange, 200);
@@ -219,12 +215,6 @@ class Room extends React.Component<Props, State> {
     }
   }
 
-  handleWhiteBoardColorChange = () => {
-    const { boardRoom } = this.state;
-    if (boardRoom) {
-    }
-  }
-
   _keyExtractor = (item) => item.messageId;
 
   handleChatBottomSendBtnClick = (text) => {
@@ -375,11 +365,7 @@ class Room extends React.Component<Props, State> {
                />
               }
 
-              <WhiteBoardTool
-                className={styles.docker}
-                onToolChange={this.handleWhiteBoardToolChange}
-                onColorChange={this.handleWhiteBoardColorChange}
-              />
+              <WhiteBoardTool className={styles.docker} onToolChange={this.handleWhiteBoardToolChange} />
 
               <WhiteBoardScaler
                 className={styles.scaler}
