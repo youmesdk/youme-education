@@ -107,7 +107,7 @@ export default (state = initialState, action: { type: string }) => {
     case REMOVE_ONE_OTHER_USER: {
       const { id } = action;
       const { users } = state;
-      const result = users.filter((item) => item.id !== user.id);
+      const result = users.filter((item) => item.id !== id);
       return {
         ...state,
         users: result,
