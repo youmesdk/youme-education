@@ -8,7 +8,7 @@
  */
 
 import * as React from 'react';
-import { Form, Select, Button, message, Spin } from 'antd';
+import { Form, Select, Button, message, Spin, Slider } from 'antd';
 import { Link } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -112,6 +112,11 @@ class DeviceCheck extends React.Component {
     history.push('/room');
   }
 
+  handleVolumeChange = (value: number) => {
+    YIMClient.instance.$video.setVolume(value);
+    this.setState({ outputVolume: value });
+  }
+
   render() {
     const { cameras, outputVolume, isLoading } = this.state;
 
@@ -133,7 +138,7 @@ class DeviceCheck extends React.Component {
           <section className={styles.devices}>
             <Form>
               <FormItem label="Camera" colon={false}>
-                <Select defaultValue={cameras[0]}>
+                <Select defaultValue={cameras[0]} value={cameras[0]}>
                 {
                   cameras.map((item, index) => {
                     return (
@@ -144,11 +149,14 @@ class DeviceCheck extends React.Component {
                 </Select>
               </FormItem>
 
-              <FormItem label="Microphone" colon={false}>
-                <Select defaultValue="mic1">
-                  <Option value="mic1">麦克风(2-USB2.0 MIC)</Option>
-                </Select>
+              <FormItem label="Volume" colon={false}>
+                <Slider
+                  defaultValue={outputVolume}
+                  value={outputVolume}
+                  onChange={this.handleVolumeChange}
+                />
               </FormItem>
+
             </Form>
           </section>
 
