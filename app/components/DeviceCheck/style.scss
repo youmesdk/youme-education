@@ -77,6 +77,10 @@
         display: none;
       }
 
+      &:disabled {
+        cursor: not-allowed;
+      }
+
       &:active::before {
         display: inline-block;
       }

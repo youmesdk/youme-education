@@ -48,13 +48,22 @@ class Index extends React.Component<null, State> {
 
   handleSubmit = async () => {
     try {
-      this.setState({ isLoading: true });
       const { role, name, room } = this.state;
       const { setRoom, setUser, history, setWhiteBoardRoom } = this.props;
 
       if (isEmpty(name) || isEmpty(room)) {
         return message.warn("username and room name not allow empty");
       }
+
+      if (!/^[0-9a-zA-Z]+$/.test(name)) {
+        return message.error('name can only consist a-z | A-Z | 0-9!');
+      }
+
+      if (!/^[0-9a-zA-Z]+$/.test(room)) {
+        return message.error('room can only consist a-z | A-Z | 0-9!');
+      }
+
+      this.setState({ isLoading: true });
 
       // login
       await YIMClient.instance.login(name).catch(({ code }) => {
@@ -160,8 +169,9 @@ class Index extends React.Component<null, State> {
             <button
               className={styles.submit_btn}
               onClick={this.handleSubmit}
+              disabled={isLoading}
             >
-              Join
+              { role === 0 ? 'create room' : 'Join' }
             </button>
           </section>
         </main>

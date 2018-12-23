@@ -55,7 +55,7 @@ export default class WhiteBoardTool extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
-    window.addEventListener('keydown', this.handleKeyboard);
+    window.removeEventListener('keydown', this.handleKeyboard);
   }
 
   handleToolChange = (tool: Tool) => () => {

@@ -103,14 +103,18 @@ class DeviceCheck extends React.Component {
   }
 
   handleLogoutBtn = () => {
-    this.setState({
-      isLoading: true
-    });
+    this.setState({ isLoading: true });
     YIMClient.instance.logout();
+  }
+
+  handleNextBtnPress = () => {
+    const { history } = this.props;
+    history.push('/room');
   }
 
   render() {
     const { cameras, outputVolume, isLoading } = this.state;
+
     return (
       <div className={styles.container}>
         <TitleBar>
@@ -149,9 +153,13 @@ class DeviceCheck extends React.Component {
           </section>
 
           <section>
-            <Link to="/room">
-              <button className={styles.nextBtn}>Next Step</button>
-            </Link>
+            <button
+              className={styles.nextBtn}
+              onClick={this.handleNextBtnPress}
+              disabled={isLoading}
+            >
+              Next Step
+            </button>
           </section>
 
           { isLoading && <Spin size='large' className={styles.spin} /> }
