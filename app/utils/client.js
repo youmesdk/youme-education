@@ -280,7 +280,6 @@ export default class Client {
             if (role === 0) {  // teacher logout, student need logout too
               message.info('your teacher close class!');
               this.logout();
-              history.push('/');
               window.location.hash = '';
             } else {
               Client.store.dispatch(actions.removeOneOtherUser(userid));
@@ -292,25 +291,59 @@ export default class Client {
 
     // other open mic
     this.$video.on('YOUME_EVENT_OTHERS_MIC_ON', (evt) => {
-      console.log('YOUME_EVENT_OTHERS_MIC_ON', evt);
+      const { param: userId } = evt;
+      const state = Client.store.getState();
+      const { users } = state.app;
+
+      const prevUser = users.find((item) => item.id === userId);
+      console.log('Other mic on: ', evt);
+      if (prevUser) {
+        const nextUser = Object.assign({}, prevUser, { isMicOn: true });
+        Client.store.dispatch(actions.updateOneOtherUser(nextUser));
+      }
     });
 
     // other close mic
     this.$video.on('YOUME_EVENT_OTHERS_MIC_OFF', (evt) => {
-      console.log('YOUME_EVENT_OTHERS_MIC_OFF');
+      const { param: userId } = evt;
+      const state = Client.store.getState();
+      const { users } = state.app;
+
+      const prevUser = users.find((item) => item.id === userId);
+      console.log('Other mic off: ', evt);
+      if (prevUser) {
+        const nextUser = Object.assign({}, prevUser, { isMicOn: false });
+        Client.store.dispatch(actions.updateOneOtherUser(nextUser));
+      }
     });
 
     // other open camera
     this.$video.on('YOUME_EVENT_OTHERS_VIDEO_INPUT_START', (evt) => {
-      console.log('YOUME_EVENT_OTHERS_VIDEO_INPUT_START', evt);
+      const { param: userId } = evt;
+      const state = Client.store.getState();
+      const { users } = state.app;
+
+      const prevUser = users.find((item) => item.id === userId);
+      console.log('Other video on: ', evt);
+      if (prevUser) {
+        const nextUser = Object.assign({}, prevUser, { isCameraOn: true });
+        Client.store.dispatch(actions.updateOneOtherUser(nextUser));
+      }
     });
 
     // other close camare
     this.$video.on('YOUME_EVENT_OTHERS_VIDEO_INPUT_STOP', (evt) => {
-      console.log('YOUME_EVENT_OTHERS_VIDEO_INPUT_STOP', evt);
+      const { param: userId } = evt;
+      const state = Client.store.getState();
+      const { users } = state.app;
+
+      const prevUser = users.find((item) => item.id === userId);
+      console.log('Other video off: ', evt);
+      if (prevUser) {
+        const nextUser = Object.assign({}, prevUser, { isCameraOn: false });
+        Client.store.dispatch(actions.updateOneOtherUser(nextUser));
+      }
     });
-
-
   }
 
   _handleSigining(msg) {
