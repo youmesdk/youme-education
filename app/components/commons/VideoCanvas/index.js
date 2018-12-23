@@ -10,29 +10,54 @@
  * video component for render video stream
  */
 
-import * as React from 'react';
-import styles from './style.scss';
+import * as React from "react";
+import * as Icon from "react-feather";
+
+import styles from "./style.scss";
 
 type Props = {
   id: string,
   className?: string,
+  name: string,
+  isMicOn?: boolean,
+  isCameraOn?: boolean,
+  onMicPress?: () => void,
+  onCameraPress?: () => void
 };
 
 export default function VideoCanvas(props: Props) {
-  const { className, id, key } = props;
+  const {
+    className,
+    id,
+    isMicOn,
+    isCameraOn,
+    name,
+    onMicPress,
+    onCameraPress
+  } = props;
 
   return (
-    <div className={[styles.container, className].join(' ')}>
+    <div className={[styles.container, className].join(" ")}>
       <canvas id={id} className={styles.canvas} />
 
       <div className={styles.status_bar}>
-        <span></span>
-        <span></span>
+        <span className={styles.name}>{name}</span>
+        <span onClick={onMicPress} className={styles.op_icon}>
+          {isMicOn ? <Icon.Mic size={20} /> : <Icon.MicOff size={20} />}
+        </span>
+
+        <span onClick={onCameraPress} className={styles.op_icon}>
+          {isCameraOn ? <Icon.Camera size={20} /> : <Icon.CameraOff size={20} /> }
+        </span>
       </div>
     </div>
   );
 }
 
 VideoCanvas.defaultProps = {
-  className: '',
+  className: "",
+  isMicOn: true,
+  isCameraOn: true,
+  onMicPress: f => f,
+  onCameraPress: f => f
 };

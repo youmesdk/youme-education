@@ -280,6 +280,8 @@ class Room extends React.Component<Props, State> {
 
     const index = users.findIndex((u) => u.role === 0);
     const teacherId = index !== -1 ? users[index].id : '';
+    const teacherName = index !== -1 ? users[index].name : '';
+
     const students = users.filter((u) => u.role === 1);
 
     return (
@@ -310,6 +312,7 @@ class Room extends React.Component<Props, State> {
                     id={`canvas-${s.id}`}
                     key={s.id}
                     className={styles.content_header_item}
+                    name={s.name}
                   />
                 );
               })
@@ -360,6 +363,7 @@ class Room extends React.Component<Props, State> {
               <VideoCanvas
                 className={styles.video}
                 id={`canvas-${teacherId}`}
+                name={teacherName}
               />
 
               <div className={styles.im}>

@@ -1,11 +1,11 @@
 
 .container {
   position: relative;
-  display: flex;
   overflow: hidden;
 
   .canvas {
-    overflow: hidden;
+    height: 100%;
+    width: 100%;
   }
 
   .status_bar {
@@ -13,7 +13,17 @@
     bottom: 0;
     left: 0;
     right: 0;;
-    height: 30px;
-    background: blanchedalmond;
+    color: #CCC;
+    display: flex;
+    align-items: center;
+    .name {
+      flex: 1;
+      margin-left: 8px;
+    }
+
+    .op_icon {
+      cursor: pointer;
+      margin-right: 12px;
+    }
   }
 }
