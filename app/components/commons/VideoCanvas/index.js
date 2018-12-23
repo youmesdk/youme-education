@@ -45,14 +45,14 @@ export default function VideoCanvas(props: Props) {
       <div className={styles.status_bar}>
         <span className={styles.name}>{name}</span>
         <span
-          onClick={this.handleMicPress(id)}
+          onClick={handleMicPress(user)}
           className={styles.op_icon}
         >
           {isMicOn ? <Icon.Mic size={20} /> : <Icon.MicOff size={20} />}
         </span>
 
         <span
-          onClick={this.handleCameraPress(id)}
+          onClick={handleCameraPress(user)}
           className={styles.op_icon}
         >
           {isCameraOn ? <Icon.Camera size={20} /> : <Icon.CameraOff size={20} /> }
