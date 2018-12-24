@@ -56,7 +56,7 @@ class Index extends React.Component<null, State> {
   handleSubmit = async () => {
     try {
       const { role, name, room } = this.state;
-      const { setRoom, setUser, history, setWhiteBoardRoom } = this.props;
+      const { setRoom, setUser, history, setWhiteBoardRoom, setRegionCode, setRegionName } = this.props;
 
       if (isEmpty(name) || isEmpty(room)) {
         return message.warn("username and room name not allow empty");
