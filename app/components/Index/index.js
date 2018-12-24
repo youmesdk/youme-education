@@ -141,7 +141,7 @@ class Index extends React.Component<null, State> {
 
   onRegionChange = (value: string) => {
     const temp = value.split('-');
-    const code = temp[0];
+    const code = parseInt(temp[0], 10);
     const name = temp[1];
     this.setState({ regionCode: code, regionName: name });
 
