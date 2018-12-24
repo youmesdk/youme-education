@@ -9,10 +9,11 @@
 
 import * as React from 'react';
 import { Button, Modal } from 'antd';
+
 import styles from './style.scss';
 
 const { confirm } = Modal;
-const { ipcRenderer } = require('electron');
+const { ipcRenderer, shell } = require('electron');
 
 type Props = {
   children?: React.Node
@@ -28,7 +29,8 @@ class TitleBar extends React.Component<Props, State> {
     children: null
   }
   state = {
-    isFullScreen: false
+    isFullScreen: false,
+    isInfoModalShow: false,
   }
 
   handleMax = () => {
@@ -61,13 +63,34 @@ class TitleBar extends React.Component<Props, State> {
     ipcRenderer.send('hide-window');
   }
 
+  showInfoModal = () => {
+    this.setState({ isInfoModalShow: true });
+  }
+
+  hideInfoModal = () => {
+    this.setState({ isInfoModalShow: false });
+  }
+
+  openHomePage = (e) => {
+    e.preventDefault();
+    shell.openExternal('https://youme.im/');
+  }
+
   render() {
+    const { isFullScreen, isInfoModalShow } = this.state;
+
     // max/shrink button
-    const btnIcon = this.state.isFullScreen ? 'shrink' : 'arrows-alt';
+    const btnIcon = isFullScreen ? 'shrink' : 'arrows-alt';
 
     return (
       <div className={styles['btn-group']}>
         {this.props && this.props.children}
+        <Button
+          className={styles.btn}
+          ghost
+          icon="question-circle"
+          onClick={this.showInfoModal}
+        />
         <Button
           className={styles.btn}
           ghost
@@ -86,6 +109,19 @@ class TitleBar extends React.Component<Props, State> {
           icon="close"
           onClick={this.handleClose}
         />
+
+        {/* info modal */}
+        <Modal
+          title="About"
+          visible={isInfoModalShow}
+          onOk={this.hideInfoModal}
+          onCancel={this.hideInfoModal}
+        >
+          <span>
+            游密通讯云 for education demo, 涵盖IM、实时视频、实时白板功能。官网：
+            <a onClick={this.openHomePage}>https://www.youme.im/</a>
+          </span>
+        </Modal>
       </div>
     )
   }
