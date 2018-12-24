@@ -55,8 +55,8 @@ class DeviceCheck extends React.Component {
     YIMClient.instance.$video.setAVStatisticInterval(5000);
     YIMClient.instance.$video.videoEngineModelEnabled(false);
     YIMClient.instance.$video.setVideoLocalResolution(640, 480);
-    YIMClient.instance.$video.setVideoNetResolution(320, 320);
-    YIMClient.instance.$video.setMixVideoSize(320, 320);
+    YIMClient.instance.$video.setVideoNetResolution(640, 480);
+    YIMClient.instance.$video.setMixVideoSize(640, 480);
     YIMClient.instance.$video.setVideoCallback("");
     YIMClient.instance.$video.setAutoSendStatus(true);
     YIMClient.instance.$video.setVolume(100);

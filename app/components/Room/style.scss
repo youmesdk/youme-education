@@ -48,14 +48,14 @@
       display: flex;
       justify-content: flex-start;
       align-items: center;
-      min-height: 100px;
+      min-width: 120px;
 
       &_item {
         display: inline-block;
         background: #000;
         border-radius: 5px;
         width: 120px;
-        height: 120px;
+        height: 90px;
         position: relative;
         cursor: pointer;
 
@@ -121,7 +121,8 @@
         .video {
           border-radius: 10px;
           background: #000;
-          height: 250px;
+          width: 240px;
+          height: 180px;
           position: relative;
         }
         .im {
