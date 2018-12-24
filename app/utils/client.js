@@ -222,7 +222,7 @@ export default class Client {
       const { channelID, userID } = msg;
       const state = Client.store.getState();
       const { app } = state;
-      const { user, room, region, users, whiteBoardRoom } = app;
+      const { user, room, regionCode, regionName, users, whiteBoardRoom } = app;
       const { id, name, role } = user;
       const { uuid, roomToken } = whiteBoardRoom;
 
@@ -230,8 +230,16 @@ export default class Client {
         if (users.length <= MAX_NUMBER_MEMBER_IN_ROOM) {
           const cmd = {
             cmd: 0,
-            data: { teacher: user, region: region, room: room, whiteBoardRoom: { uuid, roomToken } },
+            data: {
+              regionCode: regionCode,
+              regionName: regionName,
+              whiteBoardRoom: {
+                 uuid,
+                 roomToken
+                }
+              },
           };
+
           this.signing(userID, 1, cmd);
         } else {
           const cmd = {

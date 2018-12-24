@@ -43,10 +43,10 @@ class DeviceCheck extends React.Component {
 
   initVideo = async () => {
     this.setState({ isLoading: true });
-    const { user, room } = this.props;
+    const { user, room, regionCode, regionName } = this.props;
     const { id } = user;
     // init video sdk
-    await YIMClient.instance.initVideo(VIDEO_SERVERE_REGION, VIDEO_REGION_NAME).catch((code) => {
+    await YIMClient.instance.initVideo(regionCode, regionName).catch((code) => {
       message.error(`init video engine error!: ${code}`)
     });
 
@@ -180,8 +180,8 @@ class DeviceCheck extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   const { app } = state;
-  const { room, user } = app;
-  return { room, user };
+  const { room, user, regionCode, regionName } = app;
+  return { room, user, regionCode, regionName };
 }
 
 export default connect(mapStateToProps, null)(DeviceCheck);

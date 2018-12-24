@@ -29,12 +29,15 @@ import * as actions from '../../actions/app';
 import { VIDEO_REGION_NAME, VIDEO_SERVERE_REGION, REGION_MAP } from '../../config';
 
 const { Group: RadioGroup } = Radio;
+const Option = Select.Option;
 
 type State = {
   role: 0 | 1,   // 0: teacher 1: student;
   name: string,
   room: string,
   isLoading: boolean,
+  regionCode: string,
+  regionName: string,
 };
 
 class Index extends React.Component<null, State> {
@@ -44,8 +47,8 @@ class Index extends React.Component<null, State> {
       role: 1,
       name: '',
       room: '',
-      regionName: VIDEO_REGION_NAME,
-      region: VIDEO_SERVERE_REGION,
+      regionCode: REGION_MAP[0].code,
+      regionName: REGION_MAP[0].name,
       isLoading: false,
     };
   }
@@ -99,9 +102,11 @@ class Index extends React.Component<null, State> {
         });
 
         const { code, evt } = res;
-        const { whiteBoardRoom } = evt;
+        const { whiteBoardRoom, regionCode, regionName } = evt;
         // get whiteboard params and save into redux
         setWhiteBoardRoom(whiteBoardRoom);
+        setRegionCode(regionCode);
+        setRegionName(regionName);
       }
 
       const user = {
@@ -134,8 +139,19 @@ class Index extends React.Component<null, State> {
     this.setState({ role: e.target.value });
   }
 
+  onRegionChange = (value: string) => {
+    const temp = value.split['-'];
+    const code = temp[0];
+    const name = temp[1];
+    this.setState({ regionCode: code, regionName: name });
+
+    const { setRegionCode, setRegionName } = this.props;
+    setRegionCode(code);
+    setRegionName(name);
+  }
+
   render() {
-    const { isLoading, role } = this.state;
+    const { isLoading, role, regionCode, regionName } = this.state;
 
     return (
       <div className={styles.container}>
@@ -159,6 +175,27 @@ class Index extends React.Component<null, State> {
               onChange={this.onInputChange}
             />
           </section>
+
+          { role === 0 && (
+            <Select
+              defaultValue={`${regionCode}-${regionName}`}
+              className={styles.region}
+              onChange={this.onRegionChange}
+            >
+              {
+                REGION_MAP.map((region) => {
+                  return (
+                    <Option
+                      key={region.code}
+                      value={`${region.code}-${region.name}`}
+                    >
+                      {region.label}
+                    </Option>
+                  );
+                })
+              }
+            </Select>)
+          }
 
           <RadioGroup
             className={styles.roles}
@@ -189,6 +226,8 @@ const mapDispatchToProps = (dispatch) => {
     setRoom: bindActionCreators(actions.setRoom, dispatch),
     setUser: bindActionCreators(actions.setUser, dispatch),
     setWhiteBoardRoom: bindActionCreators(actions.setWhiteBoardRoom, dispatch),
+    setRegionName: bindActionCreators(actions.setRegionName, dispatch),
+    setRegionCode: bindActionCreators(actions.setRegionCode, dispatch),
   };
 };
 
