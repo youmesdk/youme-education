@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-07-27 16:16:37
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-07 17:42:20
+ * @Last Modified time: 2019-01-07 21:59:56
  *
  * @flow
  *
@@ -271,6 +271,10 @@ class Room extends React.Component<Props, State> {
     });
   }
 
+  handlePanelRoleChange = (role: number) => {
+    this.setState({ currentPanelRole: role });
+  }
+
 
   render() {
     const { messages, nickname, users, room, user } = this.props;
@@ -330,6 +334,31 @@ class Room extends React.Component<Props, State> {
                 />
               );
             })}
+          </section>
+
+          {/* 切换面板角色 */}
+          <section className={styles.content_menus}>
+            <div
+              onClick={() => this.handlePanelRoleChange(0)}
+              className={[
+                  styles.content_menus_item,
+                  currentPanelRole === 0 ? styles.content_menus_active : '',
+                ].join(' ')}
+            >
+              白板
+            </div>
+
+            <span className={styles.content_menus_divider}>/</span>
+
+            <div
+              onClick={() => this.handlePanelRoleChange(1)}
+              className={[
+                  styles.content_menus_item,
+                  currentPanelRole === 1 ? styles.content_menus_active : '',
+                ].join(' ')}
+              >
+              录屏
+            </div>
           </section>
 
           <section className={styles.content_main}>

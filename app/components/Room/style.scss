@@ -45,6 +45,7 @@
     align-items: stretch;
     padding: 20px;
 
+    // 头部区域，小视频列表
     &_header {
       display: flex;
       justify-content: flex-start;
@@ -70,6 +71,26 @@
       }
     }
 
+    &_menus {
+      font-size: 18px;
+      margin: 0 10px;
+
+      &_item {
+        display: inline-block;
+        cursor: pointer;
+      }
+
+      &_divider {
+        margin: 0 10px;
+      }
+
+      &_active {
+        font-weight: bold;
+        font-size: 22px;
+      }
+    }
+
+    // 主内容区
     &_main {
       flex: 1;
       display: flex;
