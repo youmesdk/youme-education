@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2019-01-07 16:01:26
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-07 20:33:03
+ * @Last Modified time: 2019-01-07 21:10:51
  *
  * @flow
  *
@@ -11,7 +11,7 @@
 
 import * as React from 'react';
 import { Switch, Icon } from 'antd';
-import 'video.js';
+import videojs from 'video.js';
 
 
 import styles from './style.scss';
@@ -36,6 +36,51 @@ export default class ScreenRecordPanel extends React.Component<Props, State> {
   constructor(props) {
     super(props);
     this.fakeUrl = 'http://pili-live-rtmp.youme.im/youmetest/953853.m3u8';
+    this.player = null;
+  }
+
+  componentDidMount() {
+    this.initVideoPlayer();
+  }
+
+  initVideoPlayer = () => {
+    const options = {
+      bigPlayButton: false,
+      textTrackDisplay: false,
+      controBar: true,
+      errorDisplay: false,
+      posterImage: false,
+    };
+
+    const self = this;
+    this.player = videojs('video-player', options, function() {
+      // 'this' is videojs
+
+      this.on('loadedmetadata', () => {
+        // 加载元数据后开始播放视频
+        self.startVideo();
+      });
+
+      this.on('ended', () => {
+        console.log('ended');
+      });
+
+      this.on('firstplay', () => {
+        console.log('firstplay');
+      });
+
+      this.on('loadstart', () => {
+        // 开始加载
+        console.log('loadstart');
+      });
+    });
+  }
+
+  startVideo = () => {
+    if (!this.player) {
+      return;
+    }
+    this.player.play();
   }
 
   handleRecordSwitchChange = (checked: boolean) => {
@@ -56,8 +101,7 @@ export default class ScreenRecordPanel extends React.Component<Props, State> {
           id="video-player"
           className={["video-js", styles.video].join(' ')}
           controls
-          // preload="auto"
-          preload="none"
+          preload="auto"
           data-setup="{}"
           autoPlay
         >
