@@ -2,6 +2,12 @@
   padding: 6px;
   border: 1px solid #ECECEC;
   border-radius: 18px;
+
+  .text {
+    user-select: none;
+    cursor: default;
+  }
+
   .icon {
     margin-left: 12px;
     cursor: pointer;

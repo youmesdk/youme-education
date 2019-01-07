@@ -26,7 +26,7 @@ export default function WhiteBoardScaler(props: Props) {
 
   return (
     <div className={[styles.container, className].join(' ')}>
-      <span>{`${parseInt(scale * 100, 10)}%`}</span>
+      <span className={styles.text}>{`${parseInt(scale * 100, 10)}%`}</span>
 
       <span className={styles.icon} onClick={onIncreasePress}>
         <Icon.Plus size={12} />

@@ -11,6 +11,7 @@ export const APP_SECRET = 'r1+ih9rvMEDD3jUoU+nj8C7VljQr7Tuk4TtcByIdyAqjdl5lhlESU
 export const WHITEBOARD_TOKEN = 'WHITEcGFydG5lcl9pZD1uVUcwRUFmaGpkRzZLd1BScWdqSnBjblRDbE0zUDYycm1Vc0Imc2lnPTYwYmY2MDE0NWZmYTM5MjllYjZjZmJiNGEyYmU2YTZmMDAwNmM4ZDQ6YWRtaW5JZD02NiZyb2xlPW1pbmkmZXhwaXJlX3RpbWU9MTU3NjY5NDg0NSZhaz1uVUcwRUFmaGpkRzZLd1BScWdqSnBjblRDbE0zUDYycm1Vc0ImY3JlYXRlX3RpbWU9MTU0NTEzNzg5MyZub25jZT0xNTQ1MTM3ODkyNTAyMDA';
 export const VIDEO_SERVERE_REGION = 0; // 服务器区域
 export const VIDEO_REGION_NAME = 'RTC_CN_SERVER'; // 服务器区域地址
+export const SCREEN_SERVER_URL = 'http://localhost:3000/';  // 录屏服务器地址
 
 export const REGION_MAP = [
   { code: 0, name: 'RTC_CN_SERVER', label: 'China' },   // 中国

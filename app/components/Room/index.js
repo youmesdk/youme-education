@@ -2,11 +2,12 @@
  * @Author: fan.li
  * @Date: 2018-07-27 16:16:37
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-12-21 21:20:55
+ * @Last Modified time: 2019-01-07 17:23:56
  *
  * @flow
  *
  */
+
 import * as React from 'react'
 import { Button, Spin, message, Tooltip } from 'antd';
 import { bindActionCreators } from 'redux';
@@ -22,17 +23,16 @@ import MessageText from './MessageText';
 import ChatBottom from './ChatBottom';
 import * as actions from '../../actions/app';
 import YIMClient, { MAX_NUMBER_MEMBER_IN_ROOM } from '../../utils/client';
-import { isEmpty, throttle } from '../../utils/utils';
+import { isEmpty } from '../../utils/utils';
 import avatarIcon from '../../assets/images/avatar.png';
 import { WHITEBOARD_TOKEN } from '../../config';
-import type { Tool } from '../commons/WhiteBoardTool';
-import WhiteBoardTool from '../commons/WhiteBoardTool';
-import WhiteBoardScaler from '../commons/WhiteBoardScaler';
-import WhiteBoardSidePanel from '../commons/WhiteBoardSidePanel';
-import VideoCanvas from '../commons/VideoCanvas';
 
+import VideoCanvas from '../commons/VideoCanvas';
+import WhiteBoardPanel from './WhiteBoardPanel';
 
 import type { User, WhiteBoardRoom } from '../../reducers/app';
+
+type PanelRole = 0 | 1;  // 0 - whiteboard, 1 - screen share
 
 type Props = {
   history: { push: Function },
@@ -40,22 +40,23 @@ type Props = {
 
 type State = {
   isWhiteBoardLoading: boolean,
-  isSidePanelShow: boolean,
   zoomScale: number,
   borderRoom: object | null,
+  currentPanelRole: PanelRole,
 };
+
 
 class Room extends React.Component<Props, State> {
   constructor(props) {
     super(props);
     this.state = {
       isWhiteBoardLoading: false,  // is whiteboard is init ?
-      isSidePanelShow: false,      // is right drawer open?
       boardRoom: null,             // whiteboard room instance
       zoomScale: 1,                // whiteboard zoom scale
+      currentPanelRole: 0,         // current main panel's role
     };
+
     this.whiteBoardSDK = new WhiteWebSdk();   // whiteboard sdk instance
-    this.throttledWindowSizeChange = throttle(this.handleWindowSizeChange, 200);
     this.messageList = null;       // MessageList ref
   }
 
@@ -69,8 +70,6 @@ class Room extends React.Component<Props, State> {
     }
     YIMClient.instance.$video.startCapture();
     this.pollingTask = setInterval(this.doupdate, 50);  // update video
-    // update whiteboard draw area when window size changed
-    window.addEventListener('resize', this.throttledWindowSizeChange, false);
   }
 
   componentDidUpdate() {
@@ -83,7 +82,6 @@ class Room extends React.Component<Props, State> {
     if (this.pollingTask) {
       clearInterval(this.pollingTask);
     }
-    window.removeEventListener('resize', this.throttledWindowSizeChange, false);
   }
 
   _createWhiteBoardRoom = (token, room, limit = 5) => {
@@ -168,7 +166,6 @@ class Room extends React.Component<Props, State> {
     users.forEach((user) => {  // update other video
       YIMClient.instance.$video.updateCanvas(user.id, `canvas-${user.id}`);
     });
-
     // update myself video
     YIMClient.instance.$video.updateCanvas(user.id, `canvas-${user.id}`);
   }
@@ -177,15 +174,6 @@ class Room extends React.Component<Props, State> {
     const { history } = this.props;
     YIMClient.instance.logout(); // logout
     history.push('/');
-  }
-
-  handleWindowSizeChange = () => {
-    const whiteboard = document.getElementById('whiteboard');
-    const { clientWidth, clientHeight } = whiteboard;
-    const { boardRoom } = this.state;
-    if (boardRoom) {
-      boardRoom.refreshViewSize(clientWidth, clientHeight);
-    }
   }
 
   renderListItem = ({ item }) => {
@@ -198,21 +186,6 @@ class Room extends React.Component<Props, State> {
         isFromMe={item.isFromMe}
       />
     );
-  }
-
-  openWhiteBoardSidePanel = () => {
-    this.setState({ isSidePanelShow: true });
-  }
-
-  closeWhiteBoardSidePanel = () => {
-    this.setState({ isSidePanelShow: false });
-  }
-
-  handleWhiteBoardToolChange = (tool: Tool) => {
-    const { boardRoom } = this.state;
-    if (boardRoom) {
-      boardRoom.setMemberState({ currentApplianceName: tool, });
-    }
   }
 
   _keyExtractor = (item) => item.messageId;
@@ -300,7 +273,12 @@ class Room extends React.Component<Props, State> {
 
   render() {
     const { messages, nickname, users, room, user } = this.props;
-    const { isWhiteBoardLoading, boardRoom, isSidePanelShow, zoomScale } = this.state;
+    const {
+      isWhiteBoardLoading,
+      boardRoom,
+      zoomScale,
+      currentPanelRole,
+    } = this.state;
 
     const teacher = users.find(u => u.role == 0) || user;
     const otherStudents = users.filter((u) => u.role === 1);
@@ -326,69 +304,49 @@ class Room extends React.Component<Props, State> {
 
         <main className={styles.content}>
           <section className={styles.content_header}>
-            {/* myself */}
-            {
-              user.role !== 0 && (
+            {/* myself video */}
+
+            {user.role !== 0 && (
+              <VideoCanvas
+                id={`canvas-${user.id}`}
+                user={user}
+                className={styles.content_header_item}
+                onCameraPress={this.handleCameraBtnPress}
+                onMicPress={this.handleMicBtnPress}
+              />
+            )}
+
+            {/* other student */}
+
+            {otherStudents.map((s) => {
+              return (
                 <VideoCanvas
-                  id={`canvas-${user.id}`}
-                  user={user}
+                  id={`canvas-${s.id}`}
+                  user={s}
                   className={styles.content_header_item}
                   onCameraPress={this.handleCameraBtnPress}
                   onMicPress={this.handleMicBtnPress}
                 />
-              )
-            }
-
-            {/* other student */}
-            {
-              otherStudents.map((s) => {
-                return (
-                  <VideoCanvas
-                    id={`canvas-${s.id}`}
-                    user={s}
-                    className={styles.content_header_item}
-                    onCameraPress={this.handleCameraBtnPress}
-                    onMicPress={this.handleMicBtnPress}
-                  />
-                );
-              })
-            }
+              );
+            })}
           </section>
 
           <section className={styles.content_main}>
-            <div className={styles.content_main_left} id='whiteboard'>
-              {
-                boardRoom &&
-               <RoomWhiteboard
-                 className={styles.whiteboard}
-                 room={boardRoom}
-               />
-              }
-
-              <WhiteBoardTool className={styles.docker} onToolChange={this.handleWhiteBoardToolChange} />
-
-              <WhiteBoardScaler
-                className={styles.scaler}
-                scale={zoomScale}
-                onDecreasePress={this.handleZoomScaleDecreasePress}
-                onIncreasePress={this.handleZoomScaleIncreasePress}
-              />
-              {
-                isSidePanelShow &&
-                <WhiteBoardSidePanel
-                  className={styles.side_panel}
-                  onClosePress={this.closeWhiteBoardSidePanel}
+            <div className={styles.content_main_left}>
+              {currentPanelRole === 0 && !!boardRoom && (
+                <WhiteBoardPanel
+                  boardRoom={boardRoom}
+                  zoomScale={zoomScale}
+                  onZoomScaleDecrease={this.handleZoomScaleDecreasePress}
+                  onZoomScaleIncrease={this.handleZoomScaleIncreasePress}
                 />
-              }
+              )}
 
-              <div
-                className={styles.shortcut_hover}
-                onClick={this.openWhiteBoardSidePanel}
-              >
-                <Tooltip title="快捷键说明" mouseEnterDelay={0.8}>
-                  <Icon.Info size={22}/>
-                </Tooltip>
-              </div>
+              {currentPanelRole === 1 && (
+                <div>
+                  这里是录屏显示...
+                </div>
+              )}
             </div>
 
             <div className={styles.content_main_right}>

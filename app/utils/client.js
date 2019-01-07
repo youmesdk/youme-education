@@ -45,6 +45,7 @@ export default class Client {
 
     this.$video = window.YoumeVideoSDK.getInstance();
     this.$im = window.YoumeIMSDK.getInstance();
+    this.$screen = window.YoumeScreenSDK;
     this.initIM();
 
     return Client._instance = this;
