@@ -5,12 +5,15 @@
   border-radius: 18px;
   display: flex;
   align-items: center;
+
   .icon {
     cursor: pointer;
     color: '#666';
+
     &:not(:first-child) {
       margin-left: 20px;
     }
+
     &:not(:last-child):hover {
       transform: scale(1.3);
     }

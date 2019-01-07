@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-07-27 16:16:37
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-07 17:23:56
+ * @Last Modified time: 2019-01-07 17:42:20
  *
  * @flow
  *
@@ -29,6 +29,7 @@ import { WHITEBOARD_TOKEN } from '../../config';
 
 import VideoCanvas from '../commons/VideoCanvas';
 import WhiteBoardPanel from './WhiteBoardPanel';
+import ScreenBoardPanel from './ScreenRecordPanel';
 
 import type { User, WhiteBoardRoom } from '../../reducers/app';
 
@@ -53,7 +54,7 @@ class Room extends React.Component<Props, State> {
       isWhiteBoardLoading: false,  // is whiteboard is init ?
       boardRoom: null,             // whiteboard room instance
       zoomScale: 1,                // whiteboard zoom scale
-      currentPanelRole: 0,         // current main panel's role
+      currentPanelRole: 1,         // current main panel's role
     };
 
     this.whiteBoardSDK = new WhiteWebSdk();   // whiteboard sdk instance
@@ -343,9 +344,8 @@ class Room extends React.Component<Props, State> {
               )}
 
               {currentPanelRole === 1 && (
-                <div>
-                  这里是录屏显示...
-                </div>
+                <ScreenBoardPanel
+                />
               )}
             </div>
 
