@@ -369,15 +369,19 @@ class Room extends React.Component<Props, State> {
               WhiteBoard
             </div>
             <span className={styles.content_menus_divider}>/</span>
-            <div
-              onClick={() => this.handlePanelRoleChange(1)}
-              className={[
-                  styles.content_menus_item,
-                  currentPanelRole === 1 ? styles.content_menus_active : '',
-                ].join(' ')}
-              >
-                Screen share
-            </div>
+
+            {/* only student can go to share screen */}
+            {user && user.role == 1 && (
+              <div
+                onClick={() => this.handlePanelRoleChange(1)}
+                className={[
+                    styles.content_menus_item,
+                    currentPanelRole === 1 ? styles.content_menus_active : '',
+                  ].join(' ')}
+                >
+                  Screen share
+              </div>
+            )}
 
             {/* only teacher can share screen */}
             {user && user.role === 0 && (

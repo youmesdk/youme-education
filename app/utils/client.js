@@ -30,7 +30,7 @@ export const CLASS_IS_NOT_EXIST = -100001;
 export const MAX_NUMBER_MEMBER_ERROR = -100002;
 
 export const MAX_NUMBER_MEMBER_IN_ROOM = 5;        // 房间最多允许多少人加入
-export const TASK_INTERVAL_IN_SECOND = 1000 * 6;  // 定时器时间间隔（以秒为单位）
+export const TASK_INTERVAL_IN_SECOND = 1000 * 2;  // 定时器时间间隔（以秒为单位）
 
 
 export default class Client {
@@ -45,11 +45,13 @@ export default class Client {
     this.task = null;
 
     this.$video = window.YoumeVideoSDK.getInstance();
+
     this.$im = window.YoumeIMSDK.getInstance();
     this.$screen = window.YoumeScreenSDK;
+    this.$screen.setParam(1, false, 15, true);
 
     const logDir = path.join(__dirname, 'logs');
-
+    console.log(logDir);
     this.$screen.yimlog.configure({
       appenders: {
         file: {
@@ -74,7 +76,7 @@ export default class Client {
       },
       categories: {
         default: { appenders: ["file", "dateFile", "out"], level: 'info' },
-        ymscreenrecord: { appenders: ["file", "out"], level: 'info' }
+        ymscreenrecord: { appenders: ["file", "out", "dateFile"], level: 'info' }
       }
     });
 

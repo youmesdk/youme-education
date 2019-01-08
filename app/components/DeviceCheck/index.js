@@ -12,85 +12,55 @@ import { Form, Select, Button, message, Spin, Slider } from 'antd';
 import { Link } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import DetectRTC from 'detectrtc';
 
 import styles from './style.scss';
 import TitleBar from '../commons/TitleBar';
 import logo from '../../assets/images/logo.png';
 import YIMClient from '../../utils/client';
-import { VIDEO_REGION_NAME, VIDEO_SERVERE_REGION } from '../../config';
 
 const { Item: FormItem } = Form
 const { Option } = Select
 
-class DeviceCheck extends React.Component {
+type Props = {};
+
+type State = {
+  isLoading: boolean,
+  cameras: Array<object>,
+  speakers: Array<object>,
+  microphones: Array<object>,
+};
+
+class DeviceCheck extends React.Component<Props, State> {
+
   constructor(props) {
     super(props);
     this.state = {
       isLoading: false,
       cameras: [],
-      outputVolume: 0
+      speakers: [],
+      microphones: [],
     };
   }
 
   componentDidMount() {
-    this.bindEvents();
-    this.initVideo();
+    this.detectDeviceInfo();
   }
 
-  componentWillUnmount() {
-    this.unbindEvents();
-  }
-
-  initVideo = async () => {
+  detectDeviceInfo = () => {
     this.setState({ isLoading: true });
-    const { user, room, regionCode, regionName } = this.props;
-    const { id } = user;
-    // init video sdk
-    await YIMClient.instance.initVideo(regionCode, regionName).catch((code) => {
-      message.error(`init video engine error!: ${code}`)
+    DetectRTC.load(() => {
+      const microphones = DetectRTC.audioInputDevices;
+      const speakers = DetectRTC.audioOutputDevices;
+      const cameras = DetectRTC.videoInputDevices;
+
+      this.setState({
+        isLoading: false,
+        cameras,
+        speakers,
+        microphones,
+      });
     });
-
-    // set video engine
-    YIMClient.instance.$video.setExternalInputMode(false);
-    YIMClient.instance.$video.setAVStatisticInterval(5000);
-    YIMClient.instance.$video.videoEngineModelEnabled(false);
-    YIMClient.instance.$video.setVideoLocalResolution(640, 480);
-    YIMClient.instance.$video.setVideoNetResolution(640, 480);
-    // YIMClient.instance.$video.setMixVideoSize(320, 240);
-    YIMClient.instance.$video.setVideoCallback("");
-    YIMClient.instance.$video.setAutoSendStatus(true);
-    YIMClient.instance.$video.setVolume(100);
-
-    // join video room
-    await YIMClient.instance.joinVideoRoom(id, room).catch(({ code }) => {
-      message.error(`join video room error!: ${code}`);
-    });
-
-    // join video room success, open microphtone and speacker;
-    YIMClient.instance.$video.setMicrophoneMute(false);
-    YIMClient.instance.$video.setSpeakerMute(false);
-
-    // get cameras an current volume
-    const cameras = [];
-    let outputVolume = 0;
-    const count = YIMClient.instance.$video.getCameraCount();
-    for (let i = 0; i < count; i++) {
-      cameras.push(YIMClient.instance.$video.getCameraName(i));
-    }
-    outputVolume = YIMClient.instance.$video.getVolume();
-    this.setState({
-      outputVolume,
-      cameras
-    });
-    this.setState({ isLoading: false });
-  }
-
-  bindEvents = () => {
-    YIMClient.instance.$im.emitter.on('OnLogout', this._onLogout);
-  }
-
-  unbindEvents = () => {
-    YIMClient.instance.$im.emitter.removeListener('OnLogout', this._onLogout);
   }
 
   // 退出事件监听
@@ -112,14 +82,8 @@ class DeviceCheck extends React.Component {
     history.push('/room');
   }
 
-  handleVolumeChange = (value: number) => {
-    // disable it, avoid someone set low volume
-    // YIMClient.instance.$video.setVolume(value);
-    this.setState({ outputVolume: value });
-  }
-
   render() {
-    const { cameras, outputVolume, isLoading } = this.state;
+    const { cameras, isLoading, speakers, microphones, } = this.state;
 
     return (
       <div className={styles.container}>
@@ -139,25 +103,40 @@ class DeviceCheck extends React.Component {
           <section className={styles.devices}>
             <Form>
               <FormItem label="Camera" colon={false}>
-                <Select defaultValue={cameras[0]} value={cameras[0]}>
+                <Select value={cameras[cameras.length - 1] ? cameras[cameras.length - 1].deviceId : ''}>
                 {
-                  cameras.map((item, index) => {
+                  cameras.map((item) => {
                     return (
-                      <Option value={item} key={index}>{item}</Option>
+                      <Option value={item.deviceId} key={item.deviceId}>{item.label}</Option>
                     );
                   })
                 }
                 </Select>
               </FormItem>
 
-              <FormItem label="Volume" colon={false}>
-                <Slider
-                  defaultValue={outputVolume}
-                  value={outputVolume}
-                  onChange={this.handleVolumeChange}
-                />
+              <FormItem label="Microphones" colon={false}>
+                <Select value={microphones[microphones.length - 1] ? microphones[microphones.length - 1].deviceId : ''}>
+                  {
+                    microphones.map((item) => {
+                      return (
+                        <Option value={item.deviceId} key={item.deviceId}>{item.label}</Option>
+                      );
+                    })
+                  }
+                </Select>
               </FormItem>
 
+              <FormItem label="Speakers" colon={false}>
+                <Select value={speakers[speakers.length - 1] ? speakers[speakers.length - 1].deviceId : ''}>
+                  {
+                    speakers.map((item) => {
+                      return (
+                        <Option value={item.deviceId} key={item.deviceId}>{item.label}</Option>
+                      );
+                    })
+                  }
+                </Select>
+              </FormItem>
             </Form>
           </section>
 
@@ -171,7 +150,9 @@ class DeviceCheck extends React.Component {
             </button>
           </section>
 
-          { isLoading && <Spin size='large' className={styles.spin} /> }
+          {isLoading && (
+            <Spin size='large' className={styles.spin} />
+          )}
         </main>
       </div>
     );
@@ -180,8 +161,8 @@ class DeviceCheck extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   const { app } = state;
-  const { room, user, regionCode, regionName } = app;
-  return { room, user, regionCode, regionName };
+  const { room, user, } = app;
+  return { room, user, };
 }
 
 export default connect(mapStateToProps, null)(DeviceCheck);

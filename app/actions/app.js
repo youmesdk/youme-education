@@ -14,9 +14,6 @@ export const SET_USER = 'SET_USER';
 export const SET_WHITE_BOARD_ROOM = 'SET_WHITE_BOARD_ROOM';
 export const RESET_APP_STATE = 'RESET_APP_STATE';
 
-export const SET_REGION_CODE = 'SET_REGION_CODE';
-export const SET_REGION_NAME = 'SET_REGION_NAME';
-
 import type {
    User,
    Role,
@@ -96,19 +93,5 @@ export function updateOneOtherUser(user: User) {
 export function resetAppState() {
   return {
     type: RESET_APP_STATE,
-  };
-}
-
-export function setRegionCode(code: number) {
-  return {
-    type: SET_REGION_CODE,
-    code,
-  };
-}
-
-export function setRegionName(name: string) {
-  return {
-    type: SET_REGION_NAME,
-    name,
   };
 }

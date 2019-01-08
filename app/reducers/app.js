@@ -22,12 +22,7 @@ import {
   SET_USER,
   SET_WHITE_BOARD_ROOM,
   RESET_APP_STATE,
-
-  SET_REGION_CODE,
-  SET_REGION_NAME,
 } from '../actions/app';
-
-import { REGION_MAP } from '../config';
 
 export type AppStateType = {
   messages: Array<Object>,
@@ -35,8 +30,6 @@ export type AppStateType = {
   user: User,
   users: Array<User>,
   whiteBoardRoom: WhiteBoardRoom,
-  regionCode: number,
-  regionName: string,
 };
 
 export type Role = 0 | 1;  // 0: teacher; 1 student;
@@ -60,8 +53,6 @@ const initialState: AppStateType = {
   users: [],
   user: { id: '', name: '', role: 0, isMicOn: true, isCameraOn: true },
   whiteBoardRoom: { uuid: '', roomToken: '' },
-  regionCode: REGION_MAP[0].code,
-  regionName: REGION_MAP[0].name,
 };
 
 
@@ -162,22 +153,6 @@ export default (state = initialState, action: { type: string }) => {
     // reset all state
     case RESET_APP_STATE: {
       return initialState;
-    }
-
-    case SET_REGION_CODE: {
-      const { code } = action;
-      return {
-        ...state,
-        regionCode: code,
-      };
-    }
-
-    case SET_REGION_NAME: {
-      const { name } = action;
-      return {
-        ...state,
-        regionName: name,
-      };
     }
 
     default: {
