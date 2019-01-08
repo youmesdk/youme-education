@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-11-11 15:36:30
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-12-18 21:19:15
+ * @Last Modified time: 2019-01-08 14:36:26
  *
  * @flow
  *
@@ -19,6 +19,7 @@ import {
 import { configureStore } from '../store/configureStore';
 import * as actions from '../actions/app';
 import { message } from 'antd';
+import path from 'path';
 
 const CREATE_ROOM_EVENT = 'CREATE_ROOM_EVENT';
 const JOIN_ROOM_EVENT = 'JOIN_ROOM_EVENT';
@@ -46,8 +47,38 @@ export default class Client {
     this.$video = window.YoumeVideoSDK.getInstance();
     this.$im = window.YoumeIMSDK.getInstance();
     this.$screen = window.YoumeScreenSDK;
-    this.initIM();
 
+    const logDir = path.join(__dirname, 'logs');
+
+    this.$screen.yimlog.configure({
+      appenders: {
+        file: {
+          type: "file",
+          filename: path.join(logDir, "ym-screenrecord.txt"),
+          maxLogSize: 10 * 1024 * 1024, // = 10Mb
+          numBackups: 3, // keep five backup files
+          compress: true, // compress the backups
+          encoding: "utf-8",
+          mode: 0o0640,
+          flags: "w+"
+        },
+        dateFile: {
+          type: "dateFile",
+          filename: path.join(logDir, "more-ym-screenrecord.txt"),
+          pattern: "yyyy-MM-dd-hh",
+          compress: true
+        },
+        out: {
+          type: "stdout"
+        }
+      },
+      categories: {
+        default: { appenders: ["file", "dateFile", "out"], level: 'info' },
+        ymscreenrecord: { appenders: ["file", "out"], level: 'info' }
+      }
+    });
+
+    this.initIM();
     return Client._instance = this;
   }
 

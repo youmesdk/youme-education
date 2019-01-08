@@ -2,14 +2,14 @@
  * @Author: fan.li
  * @Date: 2018-07-27 16:16:37
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-07 21:59:56
+ * @Last Modified time: 2019-01-08 14:41:48
  *
  * @flow
  *
  */
 
 import * as React from 'react'
-import { Button, Spin, message, Tooltip } from 'antd';
+import { Button, Spin, message, Tooltip, Switch } from 'antd';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as Icon from 'react-feather';
@@ -40,25 +40,29 @@ type Props = {
 };
 
 type State = {
-  isWhiteBoardLoading: boolean,
-  zoomScale: number,
-  borderRoom: object | null,
-  currentPanelRole: PanelRole,
+  isWhiteBoardLoading: boolean,     // is whiteboard loading?
+  isScreenRecording: boolean,       // is screen recording?
+  zoomScale: number,                // whiteboard canvas zoom scale
+  boardRoom: object | null,         // whiteboard room params
+  currentPanelRole: PanelRole,      // 0 - Whiteboard 1 - Screen share
 };
 
 
 class Room extends React.Component<Props, State> {
   constructor(props) {
     super(props);
+
     this.state = {
-      isWhiteBoardLoading: false,  // is whiteboard is init ?
-      boardRoom: null,             // whiteboard room instance
-      zoomScale: 1,                // whiteboard zoom scale
-      currentPanelRole: 1,         // current main panel's role
+      isWhiteBoardLoading: false,
+      isScreenRecording: false,
+      boardRoom: null,
+      zoomScale: 1.0,
+      currentPanelRole: 0,
     };
 
     this.whiteBoardSDK = new WhiteWebSdk();   // whiteboard sdk instance
-    this.messageList = null;       // MessageList ref
+    this.messageList = null;                  // MessageList ref
+    this.fakePublishUrl = 'rtmp://pili-publish.youme.im/youmetest/953853?token=ypDnZRsbZWX_OADwfpAPc-syJNme9j_U_rg2VVAN:f9NJlmKFhSctm7AwjI52AYKnAH8=';
   }
 
   componentDidMount() {
@@ -275,11 +279,29 @@ class Room extends React.Component<Props, State> {
     this.setState({ currentPanelRole: role });
   }
 
+  handleScreenRecordSwitchChange = (checked: boolean) => {
+    if (checked) {  // need start
+      this.setState({ isScreenRecording: true });
+      YIMClient.instance.$screen.start(this.fakePublishUrl, (code) => {
+        if (code === 0) {
+          message.success('Stop share screen success');
+        } else {
+          message.error('Screen share exit with error!');
+        }
+        this.setState({ isScreenRecording: false });
+      });
+    } else {  // need stop
+      YIMClient.instance.$screen.stop();
+      this.setState({ isScreenRecording: false });
+    }
+  }
+
 
   render() {
     const { messages, nickname, users, room, user } = this.props;
     const {
       isWhiteBoardLoading,
+      isScreenRecording,
       boardRoom,
       zoomScale,
       currentPanelRole,
@@ -309,8 +331,8 @@ class Room extends React.Component<Props, State> {
 
         <main className={styles.content}>
           <section className={styles.content_header}>
-            {/* myself video */}
 
+            {/* myself video */}
             {user.role !== 0 && (
               <VideoCanvas
                 id={`canvas-${user.id}`}
@@ -322,7 +344,6 @@ class Room extends React.Component<Props, State> {
             )}
 
             {/* other student */}
-
             {otherStudents.map((s) => {
               return (
                 <VideoCanvas
@@ -345,11 +366,9 @@ class Room extends React.Component<Props, State> {
                   currentPanelRole === 0 ? styles.content_menus_active : '',
                 ].join(' ')}
             >
-              白板
+              WhiteBoard
             </div>
-
             <span className={styles.content_menus_divider}>/</span>
-
             <div
               onClick={() => this.handlePanelRoleChange(1)}
               className={[
@@ -357,8 +376,21 @@ class Room extends React.Component<Props, State> {
                   currentPanelRole === 1 ? styles.content_menus_active : '',
                 ].join(' ')}
               >
-              录屏
+                Screen share
             </div>
+
+            {/* only teacher can share screen */}
+            {user && user.role === 0 && (
+              <Switch
+                className={styles.content_menus_switch}
+                loading={false}
+                checkedChildren="Stop share screen"
+                unCheckedChildren="Start share screen"
+                checked={isScreenRecording}
+                defaultChecked={false}
+                onChange={this.handleScreenRecordSwitchChange}
+              />
+            )}
           </section>
 
           <section className={styles.content_main}>
@@ -373,8 +405,7 @@ class Room extends React.Component<Props, State> {
               )}
 
               {currentPanelRole === 1 && (
-                <ScreenBoardPanel
-                />
+                <ScreenBoardPanel />
               )}
             </div>
 

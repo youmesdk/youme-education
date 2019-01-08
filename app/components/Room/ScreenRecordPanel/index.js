@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2019-01-07 16:01:26
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-08 10:29:24
+ * @Last Modified time: 2019-01-08 11:40:21
  *
  * @flow
  *
@@ -17,21 +17,12 @@ import videojs from 'video.js';
 import styles from './style.scss';
 
 type Props = {
-  isRecordStatusLoading?: boolean,    // 当前是否正在开启/关闭 录屏
-  onStartRecordClick?: () => void,    // 开始录屏被点击
-  onStopRecordClick?: () => void,     // 停止录屏被点击
 };
 
 type State = {
 };
 
 export default class ScreenRecordPanel extends React.Component<Props, State> {
-
-  static defaultProps = {
-    isRecordStatusLoading: false,
-    onStartRecordClick: f => f,   // noop function
-    onStopRecordClick: f => f,
-  };
 
   constructor(props) {
     super(props);
@@ -87,15 +78,6 @@ export default class ScreenRecordPanel extends React.Component<Props, State> {
     this.player.play();
   }
 
-  handleRecordSwitchChange = (checked: boolean) => {
-    const { onStartRecordClick, onStopRecordClick } = this.props;
-    if (checked) {
-      onStartRecordClick();
-    } else {
-      onStopRecordClick();
-    }
-  }
-
   render() {
     const { isRecordStatusLoading } = this.props;
 
@@ -111,17 +93,6 @@ export default class ScreenRecordPanel extends React.Component<Props, State> {
         >
           <source src={this.fakeUrl} type="application/x-mpegURL" />
         </video>
-
-        {/* 开启/关闭录屏 */}
-
-        <Switch
-          className={styles.switch_wrap}
-          loading={isRecordStatusLoading}
-          checkedChildren="停止录屏"
-          unCheckedChildren="开始录屏"
-          defaultChecked={false}
-          onChange={this.handleRecordSwitchChange}
-        />
       </div>
     );
   }

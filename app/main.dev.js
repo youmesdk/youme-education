@@ -11,9 +11,16 @@
  * @flow
  */
 import { app, BrowserWindow, ipcMain } from 'electron'
+import os from 'os';
+
 import MenuBuilder from './menu'
 
 let mainWindow: any = null
+
+if (os.platform() === 'win32') {
+  //app.disableHardwareAcceleration();
+  app.commandLine.appendSwitch('disable-direct-composition')
+}
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support')

@@ -71,6 +71,7 @@
       }
     }
 
+    // 白板/录屏 录屏开关等菜单
     &_menus {
       font-size: 18px;
       margin-top: 22px;
@@ -87,6 +88,10 @@
       &_active {
         font-weight: bold;
         font-size: 22px;
+      }
+
+      &_switch {
+        margin-left: 30px;
       }
     }
 
