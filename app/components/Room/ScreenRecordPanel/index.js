@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2019-01-07 16:01:26
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-07 21:10:51
+ * @Last Modified time: 2019-01-08 10:29:24
  *
  * @flow
  *
@@ -41,6 +41,10 @@ export default class ScreenRecordPanel extends React.Component<Props, State> {
 
   componentDidMount() {
     this.initVideoPlayer();
+  }
+
+  componentWillUnmount() {
+    this.player.dispose();
   }
 
   initVideoPlayer = () => {
