@@ -9,17 +9,21 @@
  * 游密SDK 工具
  */
 
+import path from 'path';
+import { message } from 'antd';
+import crypto from 'crypto';
+
 import {
   APP_KEY,
   APP_SECRET,
+  API_SECRET,
   VIDEO_SERVERE_REGION,
   VIDEO_REGION_NAME
 } from '../config';
 
 import { configureStore } from '../store/configureStore';
 import * as actions from '../actions/app';
-import { message } from 'antd';
-import path from 'path';
+import YMRTC from '../YouMeSDK/Webrtc/ymrtc';
 
 const CREATE_ROOM_EVENT = 'CREATE_ROOM_EVENT';
 const JOIN_ROOM_EVENT = 'JOIN_ROOM_EVENT';
@@ -40,18 +44,38 @@ export default class Client {
     if (Client._instance !== null) {
       return Client._instance;
     }
+
     this.resolveHash = new Map();
     this.rejectHash = new Map();
     this.task = null;
 
     this.$video = window.YoumeVideoSDK.getInstance();
-
     this.$im = window.YoumeIMSDK.getInstance();
     this.$screen = window.YoumeScreenSDK;
-    this.$screen.setParam(1, false, 15, true);
+    this.$ymrtc = new YMRTC({ appKey: APP_KEY, video: true, debug: true, dev: false });
 
+    this.initIM();
+    this.initScreenRecord();
+    this.bindRTCEvents();
+    return Client._instance = this;
+  }
+
+  static get instance() {
+    return Client._instance || (Client._instance = new Client());
+  }
+
+  static injectStore(store) {
+    Client.store = store;
+  }
+
+  initIM() {
+    this.$im.init(APP_KEY, APP_SECRET);
+    this.bindIMEvents();
+  }
+
+  initScreenRecord() {
+    this.$screen.setParam(1, false, 15, true);
     const logDir = path.join(__dirname, 'logs');
-    console.log(logDir);
     this.$screen.yimlog.configure({
       appenders: {
         file: {
@@ -79,30 +103,13 @@ export default class Client {
         ymscreenrecord: { appenders: ["file", "out", "dateFile"], level: 'info' }
       }
     });
-
-    this.initIM();
-    return Client._instance = this;
-  }
-
-  static get instance() {
-    return Client._instance || (Client._instance = new Client());
-  }
-
-  static injectStore(store) {
-    Client.store = store;
-  }
-
-  initIM() {
-    // 初始化IM
-    this.$im.init(APP_KEY, APP_SECRET);
-    this._bindIMEvents();
   }
 
   initVideo(videoServerRegin: number, videoReginName: string): Promise<any> {
     // 初始化Video
     return new Promise((resolve, reject) => {
       const code = this.$video.init(APP_KEY, APP_SECRET, videoServerRegin, videoReginName, () => {
-        this._bindVideoEvents();
+        this.bindVideoEvents();
         return resolve();
       });
 
@@ -112,20 +119,27 @@ export default class Client {
     });
   }
 
-  login(uname, upasswd = '123456', utoken = '') {
-    return new Promise((resolve, reject) => {
+  login(uname, upasswd = '123456', utoken = ''): Promise<any> {
+    const encodeSrc = APP_KEY + API_SECRET + uname;
+    const sha1 = crypto.createHash('sha1');
+    sha1.update(encodeSrc);
+    const token = sha1.digest('hex');
+    const rtcLoginPromise = this.$ymrtc.login(uname, token);
+
+    const imLoginPromise = new Promise((resolve, reject) => {
       this.$im.login(uname, upasswd, utoken, (code, evt) => {
         return code === 0 ? resolve({ code, evt }) : reject({ code });
       });
     });
+
+    return Promise.all([imLoginPromise, rtcLoginPromise]);
   }
 
   logout() {
     this.$im.logout();
-    this.$video.leaveChannelAll();
-    if (this.task) {
-      clearTimeout(this.task);
-    }
+    this.$ymrtc.logout();
+    this.$ymrtc.stopLocalMedia();
+
     Client.store.dispatch(actions.resetAppState());
   }
 
@@ -219,7 +233,7 @@ export default class Client {
     return this.sendCustomMessage(recvId, chatType, base64);
   }
 
-  _bindIMEvents() {
+  bindIMEvents() {
     this.$im.on('OnRecvMessage', (msg) => {
       if (msg.messageType === 1) { // 文本消息
         const formatedMsg = {
@@ -231,20 +245,12 @@ export default class Client {
         };
         Client.store.dispatch(actions.addOneMessage(formatedMsg));
       } else if (msg.messageType === 2) {  // customer message singing
-        this._handleSigining(msg);
+        this.handleSigining(msg);
       }
     });
 
     this.$im.on('OnKickOff', (msg) => {
       console.log('OnKickOf:', msg);
-    });
-
-    this.$im.on('OnRecvReconnectResult', (msg) => {
-      console.log('OnRecvReconnectResult:', msg);
-    });
-
-    this.$im.on('OnStartReconnect', (msg) => {
-      console.log('OnStartReconnect:', msg);
     });
 
     this.$im.on('OnUserLeaveChatRoom', (msg) => {
@@ -293,7 +299,48 @@ export default class Client {
     });
   }
 
-  _bindVideoEvents() {
+  bindRTCEvents() {
+    this.$ymrtc.on('room.member-join:*', (eventFullName, roomId, memberId) => {
+      console.warn(`eventFullName: ${eventFullName}, roomId: ${roomId}, memberId: ${memberId}`);
+      const name = memberId.split('_')[0];
+      const role = parseInt(memberId.split('_')[2], 10);
+      const user = {
+        id: memberId,
+        name: name,
+        role: role,
+        isMicOn: true,
+        isCameraOn: true,
+      };
+      Client.store.dispatch(actions.addOneOtherUser(user));
+    });
+
+    this.$ymrtc.on('room.member-leave:*', (eventFullName, roomId, memberId) => {
+      console.warn(`eventFullName: ${eventFullName}, roomId: ${roomId}, memberId: ${memberId}`);
+      const name = memberId.split('_')[0];
+      const role = parseInt(memberId.split('_')[2], 10);
+      if (role === 0) {  // teacher logout, student should leave room
+        message.info('you teacher close class room!');
+        this.logout();
+        window.location.hash = '';
+        return;
+      }
+
+      Client.store.dispatch(actions.removeOneOtherUser(memberId));
+    });
+
+    this.$ymrtc.on('local-media.has-stream', (stream: MediaStream) => {
+      const state = Client.store.getState();
+      const { app } = state;
+      const { user } = app;
+      this.$ymrtc.setLocalAudioVolumeGain(0.1);
+      const videoDom: HTMLVideoElement = document.getElementById(`canvas-${user.id}`);
+      if (videoDom) {
+        videoDom.srcObject = stream;
+      }
+    });
+  }
+
+  bindVideoEvents() {
     this.$video.on('onMemberChange', ({ memchange }) => {
       const state = Client.store.getState();
       const { app, } = state;
@@ -388,7 +435,7 @@ export default class Client {
     });
   }
 
-  _handleSigining(msg) {
+  handleSigining(msg) {
     const content = atob(msg.content);
     const { cmd, data } = JSON.parse(content);
 

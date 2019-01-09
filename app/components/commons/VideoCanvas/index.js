@@ -40,7 +40,12 @@ export default function VideoCanvas(props: Props) {
 
   return (
     <div className={[styles.container, className].join(" ")}>
-      <canvas id={id} className={styles.canvas} />
+      <video
+        id={id}
+        className={styles.canvas}
+        autoPlay
+        playsInline
+      />
 
       <div className={styles.status_bar}>
         <span className={styles.name}>{role === 1 ? name.substring(0, 4) + '...' : name}</span>

@@ -4,7 +4,6 @@ import { AppContainer } from 'react-hot-loader'
 import Root from './containers/Root'
 import { configureStore, history } from './store/configureStore'
 import './app.global.scss'
-import { APP_KEY, APP_SECRET } from './config';
 import YIMClient from './utils/client';
 
 // for video.js

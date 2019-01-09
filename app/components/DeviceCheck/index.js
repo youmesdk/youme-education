@@ -4,6 +4,8 @@
  * @Last Modified by: fan.li
  * @Last Modified time: 2018-10-22 10:43:08
  *
+ * @flow
+ *
  * 设备检测
  */
 

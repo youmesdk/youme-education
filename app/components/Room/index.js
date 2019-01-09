@@ -68,13 +68,14 @@ class Room extends React.Component<Props, State> {
   componentDidMount() {
     const { user } = this.props;
     const { role } = user;
+
     if (role === 0) { // teacher create a whiteboard room
       this.createWhiteBoardRoom();
     } else { // student join a whiteboard room
       this.joinWhiteBoardRoom();
     }
-    YIMClient.instance.$video.startCapture();
-    this.pollingTask = setInterval(this.doupdate, 50);  // update video
+
+    this.joinRTCRoom();
   }
 
   componentDidUpdate() {
@@ -84,9 +85,9 @@ class Room extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
-    if (this.pollingTask) {
-      clearInterval(this.pollingTask);
-    }
+  }
+
+  bindRTCEvents = () => {
   }
 
   _createWhiteBoardRoom = (token, room, limit = 5) => {
@@ -101,11 +102,7 @@ class Room extends React.Component<Props, State> {
     });
   }
 
-  /**
-   * teacher use this function to create a whiteboard room
-   *
-   * @memberof Room
-   */
+  // teacher use this function to create a whiteboard room
   createWhiteBoardRoom = async () => {
     try {
       const { room, setWhiteBoardRoom } = this.props;
@@ -140,11 +137,7 @@ class Room extends React.Component<Props, State> {
     }
   }
 
-  /**
-   * student use this function to join a whiteboard room,
-   *
-   * @memberof Room
-   */
+  // student use this function to join a whiteboard room,
   joinWhiteBoardRoom = async () => {
     try {
       this.setState({ isWhiteBoardLoading: true });
@@ -165,32 +158,31 @@ class Room extends React.Component<Props, State> {
     }
   }
 
-  // update all video frames
-  doupdate = () => {
-    const { users, user } = this.props;
-    users.forEach((user) => {  // update other video
-      YIMClient.instance.$video.updateCanvas(user.id, `canvas-${user.id}`);
+  joinRTCRoom = async () => {
+    const { room } = this.props;
+    await YIMClient.instance.$ymrtc.joinRoom(room).catch((err) => {
+      message.error('Join video chat room fail!, please close app and try again!' + JSON.stringify(err));
     });
-    // update myself video
-    YIMClient.instance.$video.updateCanvas(user.id, `canvas-${user.id}`);
+
+    const status = YIMClient.instance.$ymrtc.getLocalMediaStatus();
+    if (status === 'stop' || status === 'failed') {
+      await YIMClient.instance.$ymrtc.startLocalMedia({ video: 'stdres' }).catch((err) => {
+        if (err.name === 'NotAllowedError') {
+          message.error('Access Error, Your should allow app use camera!');
+        } else if (err.name === 'NotFoundError') {
+          message.error('Not find camera or microphone de, make sure your devices is working');
+        } else {
+          console.log(err);
+          message.error(err.name);
+        }
+      });
+    }
   }
 
   handleStopBtn = () => {
     const { history } = this.props;
     YIMClient.instance.logout(); // logout
     history.push('/');
-  }
-
-  renderListItem = ({ item }) => {
-    return (
-      <MessageText
-        key={item.messageId}
-        avatar={item.avatar}
-        nickname={item.nickname}
-        content={item.content}
-        isFromMe={item.isFromMe}
-      />
-    );
   }
 
   _keyExtractor = (item) => item.messageId;
@@ -296,6 +288,17 @@ class Room extends React.Component<Props, State> {
     }
   }
 
+  renderListItem = ({ item }) => {
+    return (
+      <MessageText
+        key={item.messageId}
+        avatar={item.avatar}
+        nickname={item.nickname}
+        content={item.content}
+        isFromMe={item.isFromMe}
+      />
+    );
+  }
 
   render() {
     const { messages, nickname, users, room, user } = this.props;

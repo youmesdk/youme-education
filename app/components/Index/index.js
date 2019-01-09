@@ -8,25 +8,24 @@
  *
  *  主页，登录页
  */
+
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Radio, message, Spin, Select } from 'antd';
 import { bindActionCreators } from 'redux';
-
-import logo from '../../assets/images/logo.png';
 import { connect } from 'react-redux';
 
 import TitleBar from '../commons/TitleBar';
-import styles from './style.scss';
+import logo from '../../assets/images/logo.png';
 import { isEmpty } from '../../utils/utils';
-
+import styles from './style.scss';
+import * as actions from '../../actions/app';
 import YIMClient, {
    CLASS_IS_EXIST,
    CLASS_IS_NOT_EXIST,
    MAX_NUMBER_MEMBER_ERROR,
 } from '../../utils/client';
-import * as actions from '../../actions/app';
-import { VIDEO_REGION_NAME, VIDEO_SERVERE_REGION } from '../../config';
+
 
 const { Group: RadioGroup } = Radio;
 const Option = Select.Option;
@@ -52,7 +51,7 @@ class Index extends React.Component<null, State> {
   handleSubmit = async () => {
     try {
       const { role, name, room } = this.state;
-      const { setRoom, setUser, history, setWhiteBoardRoom, setRegionCode, setRegionName } = this.props;
+      const { setRoom, setUser, history, setWhiteBoardRoom, } = this.props;
 
       if (isEmpty(name) || isEmpty(room)) {
         return message.warn("username and room name not allow empty");
@@ -72,6 +71,7 @@ class Index extends React.Component<null, State> {
       await YIMClient.instance.login(name).catch(({ code }) => {
         throw new Error(`login fail, code=${code}`);
       });
+
 
       if (role === 0) {
         // teacher create a chat room
