@@ -138,7 +138,16 @@ export default class Client {
   logout() {
     this.$im.logout();
     this.$ymrtc.logout();
-    this.$ymrtc.stopLocalMedia();
+
+    const rtcStatus = this.$ymrtc.getLocalMediaStatus();
+    if (rtcStatus !== 'stop' && rtcStatus !== 'failed') {
+      this.$ymrtc.stopLocalMedia();
+    }
+
+    const screenStatus = this.$screen.is_runing();
+    if (screenStatus) {
+      this.$screen.stop();
+    }
 
     Client.store.dispatch(actions.resetAppState());
   }

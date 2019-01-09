@@ -9,11 +9,12 @@
 
 import * as React from 'react';
 import { Button, Modal } from 'antd';
+import { ipcRenderer, shell } from 'electron';
 
 import styles from './style.scss';
+import YIMClient from '../../../utils/client';
 
 const { confirm } = Modal;
-const { ipcRenderer, shell } = require('electron');
 
 type Props = {
   children?: React.Node
@@ -54,9 +55,10 @@ class TitleBar extends React.Component<Props, State> {
       okText: '确定',
       cancelText: '取消',
       onOk: () => {
+        YIMClient.instance.logout();
         ipcRenderer.send('close-window')
       }
-    })
+    });
   }
 
   handleMin = () => {

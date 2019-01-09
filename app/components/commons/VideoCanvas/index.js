@@ -20,7 +20,7 @@ type Props = {
   id: string,          // HTMLElement id
   className?: string,  // css class
   user: User,          // User
-  isMySelf?: false,    // is me?
+  isMySelf?: boolean,  // is me?
   onMicPress?: (user: User) => void,
   onCameraPress?: (user: User) => void,
 };

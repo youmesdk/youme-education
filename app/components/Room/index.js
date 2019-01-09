@@ -62,7 +62,7 @@ class Room extends React.Component<Props, State> {
 
     this.whiteBoardSDK = new WhiteWebSdk();   // whiteboard sdk instance
     this.messageList = null;                  // MessageList ref
-    this.fakePublishUrl = 'rtmp://pili-publish.youme.im/youmetest/953853?token=ypDnZRsbZWX_OADwfpAPc-syJNme9j_U_rg2VVAN:f9NJlmKFhSctm7AwjI52AYKnAH8=';
+    this.fakePublishUrl = 'rtmp://pili-publish.youme.im/youmetest/953853';
   }
 
   componentDidMount() {
@@ -310,6 +310,7 @@ class Room extends React.Component<Props, State> {
     } = this.state;
 
     const teacher = users.find(u => u.role == 0) || user;
+    const isTeacherIsMySelf = teacher.id === user.id;
     const otherStudents = users.filter((u) => u.role === 1);
 
     return (
@@ -339,6 +340,7 @@ class Room extends React.Component<Props, State> {
               <VideoCanvas
                 id={`canvas-${user.id}`}
                 user={user}
+                isMySelf={true}
                 className={styles.content_header_item}
                 onCameraPress={this.handleCameraBtnPress}
                 onMicPress={this.handleMicBtnPress}
@@ -351,6 +353,7 @@ class Room extends React.Component<Props, State> {
                 <VideoCanvas
                   id={`canvas-${s.id}`}
                   user={s}
+                  isMySelf={false}
                   className={styles.content_header_item}
                   onCameraPress={this.handleCameraBtnPress}
                   onMicPress={this.handleMicBtnPress}
@@ -420,6 +423,7 @@ class Room extends React.Component<Props, State> {
                 id={`canvas-${teacher.id}`}
                 className={styles.video}
                 user={teacher}
+                isMySelf={isTeacherIsMySelf}
                 onCameraPress={this.handleCameraBtnPress}
                 onMicPress={this.handleMicBtnPress}
               />
