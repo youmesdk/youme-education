@@ -25,6 +25,8 @@ import { configureStore } from '../store/configureStore';
 import * as actions from '../actions/app';
 import YMRTC from '../YouMeSDK/Webrtc/ymrtc';
 
+import type { User } from '../reducers/app'
+
 const CREATE_ROOM_EVENT = 'CREATE_ROOM_EVENT';
 const JOIN_ROOM_EVENT = 'JOIN_ROOM_EVENT';
 
@@ -185,26 +187,46 @@ export default class Client {
     });
   }
 
-  setMicrophoneMute(isOpen: boolean): Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.$video.setMicrophoneMute(isOpen, (code, evt) => {
-        return code === 0 ? resolve({ code, evt }) : reject({ code, evt });
-      });
-    })
+  setMicrophoneMute(memberId: string, isOpen: boolean): void {
+    const state = Client.store.getState();
+    const { users, user, room } = state.app;
+    if (memberId === user.id) { // change myself microphone
+      if (isOpen && this.$ymrtc.isLocalAudioPaused()) {
+        this.$ymrtc.resumeLocalAudio();
+      }
+      if (!isOpen && !this.$ymrtc.isLocalAudioPaused()) {
+        this.$ymrtc.pauseLocalAudio();
+      }
+    } else {
+      const oldUser = users.find((item: User) => item.id === memberId);
+      const newUser = Object.assign({}, oldUser, { isMicOn: isOpen });
+      Client.store.dispatch(actions.updateOneOtherUser(newUser));
+    }
+
+    // notify other in room
+    const cmd = { cmd: 2, data: { userId: memberId, isMicOn: isOpen }};
+    this.signing(room, 2, cmd);
   };
 
-  setCameraOpen(isOpen: boolean): Promise<any> {
-    return new Promise((resolve, reject) => {
-      if (isOpen) {
-        this.$video.startCapture((code, evt) => {
-          return code === 0 ? resolve({ code, evt }) : reject({ code, evt });
-        });
-      } else {
-        this.$video.stopCapture((code, evt) => {
-          return code === 0 ? resolve({ code, evt }) : reject({ code, evt });
-        })
+  setCameraOpen(memberId: string, isOpen: boolean): void {
+    const state = Client.store.getState();
+    const { users, user, room } = state.app;
+    if (memberId === user.id) {
+      if (isOpen && this.$ymrtc.isLocalVideoPaused()) {
+        this.$ymrtc.resumeLocalVideo();
       }
-    });
+      if (!isOpen && !this.$ymrtc.isLocalVideoPaused()) {
+        this.$ymrtc.pauseLocalVideo();
+      }
+    } else {
+      const oldUser = users.find((item: User) => item.id === memberId);
+      const newUser = Object.assign({}, oldUser, { isCameraOn: isOpen });
+      Client.store.dispatch(actions.updateOneOtherUser(newUser));
+    }
+
+    // notify other in room
+    const cmd = { cmd: 3, data: { userId: memberId, isCameraOn: isOpen }};
+    this.signing(room, 2, cmd);
   }
 
   sendTextMessage(recvId: string, chatType: number, text: string): Promise<any> {
@@ -280,7 +302,6 @@ export default class Client {
     });
 
     this.$im.on('OnLogout', (msg) => {
-      this.$video.leaveChannelAll();
       Client.store.dispatch(actions.resetAppState());
       const state = Client.store.getState();
       window.location.hash = '';
@@ -299,9 +320,10 @@ export default class Client {
         isMicOn: true,
         isCameraOn: true,
       };
+
       Client.store.dispatch(actions.addOneOtherUser(user));
       this.$ymrtc.requestUserStream(memberId).then((stream: MediaStream) => {
-        // TODO: maybe have some problem，
+        // hack: 获取存在些问题，不一定更改Redux后就能立马渲染出Dom
         const videoDom = document.getElementById(`canvas-${memberId}`);
         if (videoDom) {
           videoDom.srcObject = stream;
@@ -333,62 +355,40 @@ export default class Client {
         videoDom.srcObject = stream;
       }
     });
-  }
 
-  bindVideoEvents() {
-    // other open mic
-    this.$video.on('YOUME_EVENT_OTHERS_MIC_ON', (evt) => {
-      const { param: userId } = evt;
-      const state = Client.store.getState();
-      const { users } = state.app;
-
-      const prevUser = users.find((item) => item.id === userId);
-      if (prevUser) {
-        const nextUser = Object.assign({}, prevUser, { isMicOn: true });
-        Client.store.dispatch(actions.updateOneOtherUser(nextUser));
+    this.$ymrtc.on('user.update-stream:', (memberId: string, stream: MediaStream) => {
+      const videoDom: HTMLVideoElement = document.getElementById(`canvas-${memberId}`);
+      if (videoDom) {
+        videoDom.srcObject = stream;
       }
     });
 
-    // other close mic
-    this.$video.on('YOUME_EVENT_OTHERS_MIC_OFF', (evt) => {
-      const { param: userId } = evt;
+    this.$ymrtc.on('local-media.pause-audio', () => {
       const state = Client.store.getState();
-      const { users } = state.app;
-
-      const prevUser = users.find((item) => item.id === userId);
-      console.log('Other mic off: ', evt);
-      if (prevUser) {
-        const nextUser = Object.assign({}, prevUser, { isMicOn: false });
-        Client.store.dispatch(actions.updateOneOtherUser(nextUser));
-      }
+      const { user } = state.app;
+      const tempUser = Object.assign({}, user, { isMicOn: false });
+      Client.store.dispatch(actions.setUser(tempUser));
     });
 
-    // other open camera
-    this.$video.on('YOUME_EVENT_OTHERS_VIDEO_INPUT_START', (evt) => {
-      const { param: userId } = evt;
+    this.$ymrtc.on('local-media.pause-video', () => {
       const state = Client.store.getState();
-      const { users } = state.app;
-
-      const prevUser = users.find((item) => item.id === userId);
-      console.log('Other video on: ', evt);
-      if (prevUser) {
-        const nextUser = Object.assign({}, prevUser, { isCameraOn: true });
-        Client.store.dispatch(actions.updateOneOtherUser(nextUser));
-      }
+      const { user } = state.app;
+      const tempUser = Object.assign({}, user, { isCameraOn: false });
+      Client.store.dispatch(actions.setUser(tempUser));
     });
 
-    // other close camare
-    this.$video.on('YOUME_EVENT_OTHERS_VIDEO_INPUT_STOP', (evt) => {
-      const { param: userId } = evt;
+    this.$ymrtc.on('local-media.resume-audio', () => {
       const state = Client.store.getState();
-      const { users } = state.app;
+      const { user } = state.app;
+      const tempUser = Object.assign({}, user, { isMicOn: true });
+      Client.store.dispatch(actions.setUser(tempUser));
+    });
 
-      const prevUser = users.find((item) => item.id === userId);
-      console.log('Other video off: ', evt);
-      if (prevUser) {
-        const nextUser = Object.assign({}, prevUser, { isCameraOn: false });
-        Client.store.dispatch(actions.updateOneOtherUser(nextUser));
-      }
+    this.$ymrtc.on('local-media.resume-video', () => {
+      const state = Client.store.getState();
+      const { user } = state.app;
+      const tempUser = Object.assign({}, user, { isCameraOn: true });
+      Client.store.dispatch(actions.setUser(tempUser));
     });
   }
 
@@ -431,6 +431,40 @@ export default class Client {
           const reject = this.rejectHash.get(JOIN_ROOM_EVENT);
           // 收到了该课堂老师的回应，但是房间超员了，学生也不能进入房间
           reject({ code: MAX_NUMBER_MEMBER_ERROR, });
+        }
+        break;
+      }
+
+      // 远端用户麦克风状态改变 （开/关）
+      case 2: {
+        const state = Client.store.getState();
+        const { user } = state.app;
+        const { memberId, isMicOn } = data;
+        if (memberId === user.id) {  // teacher change my microphone status
+          if (isMicOn && this.$ymrtc.isLocalAudioPaused()) {
+            this.$ymrtc.resumeLocalAudio();
+          }
+
+          if (!isMicOn && !this.$ymrtc.isLocalAudioPaused()) {
+            this.$ymrtc.pauseLocalAudio();
+          }
+        }
+        break;
+      }
+
+      // 远端用户视频状态改变（开/关）
+      case 3: {
+        const state = Client.store.getState();
+        const { user } = state.app;
+        const { memberId, isCameraOn } = data;
+        if (memberId === user.id) { // teacher change my camera status
+          if (isCameraOn && this.$ymrtc.isLocalVideoPaused()) {
+            this.$ymrtc.resumeLocalVideo();
+          }
+
+          if (!isCameraOn && !this.$ymrtc.isLocalVideoPaused()) {
+            this.$ymrtc.resumeLocalVideo();
+          }
         }
         break;
       }

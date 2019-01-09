@@ -230,33 +230,19 @@ class Room extends React.Component<Props, State> {
   }
 
   handleMicBtnPress = (u: User) => {
-    const { user: me, setUser } = this.props;
-    const { id, isMicOn} = me;
-    if (u.id !== id) {
-      return message.info('you can not operate other microphone!');
+    const { user: me } = this.props;
+    if (me.role !== 0) {
+      return message.info('only teacher can operate!');
     }
-    YIMClient.instance.setMicrophoneMute(isMicOn).then(() => {
-      message.info('change microphone status success!');
-      const tempUser = Object.assign({}, me, { isMicOn: !isMicOn });
-      setUser(tempUser);
-    }).catch((code) => {
-      message.error(`change microphone status fail!, code=${code}`);
-    });
+    YIMClient.instance.setMicrophoneMute(u.id, !u.isMicOn);
   }
 
   handleCameraBtnPress = (u: User) => {
-    const { user: me, setUser } = this.props;
-    const { id, isCameraOn } = me;
-    if (u.id !== id) {
-      return message.info('you can not operate other camera!');
+    const { user: me } = this.props;
+    if (me.role !== 0) {
+      return message.info('only teacher can operate!');
     }
-    YIMClient.instance.setCameraOpen(!isCameraOn).then(() => {
-      message.info('change camera status success!');
-      const tempUser = Object.assign({}, me, { isCameraOn: !isCameraOn });
-      setUser(tempUser);
-    }).catch((code) => {
-      message.error(`change camera status fail!, code=${code}`);
-    });
+    YIMClient.instance.setCameraOpen(u.id, !u.isCameraOn)
   }
 
   handlePanelRoleChange = (role: number) => {
@@ -346,6 +332,7 @@ class Room extends React.Component<Props, State> {
             {otherStudents.map((s) => {
               return (
                 <VideoCanvas
+                  key={s.id}
                   id={`canvas-${s.id}`}
                   user={s}
                   isMySelf={false}
