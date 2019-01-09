@@ -13,10 +13,11 @@ import * as React from 'react';
 import { Switch, Icon } from 'antd';
 import videojs from 'video.js';
 
-
+import YIMClient from '../../../utils/client';
 import styles from './style.scss';
 
 type Props = {
+  roomId: string,
 };
 
 type State = {
@@ -26,7 +27,6 @@ export default class ScreenRecordPanel extends React.Component<Props, State> {
 
   constructor(props) {
     super(props);
-    this.fakeUrl = 'http://pili-live-rtmp.youme.im/youmetest/953853.m3u8';
     this.player = null;
   }
 
@@ -79,7 +79,8 @@ export default class ScreenRecordPanel extends React.Component<Props, State> {
   }
 
   render() {
-    const { isRecordStatusLoading } = this.props;
+    const { roomId } = this.props;
+    const pullStreamUrl = YIMClient.getPullStreamUrl(roomId);
 
     return (
       <div className={styles.container}>
@@ -91,7 +92,7 @@ export default class ScreenRecordPanel extends React.Component<Props, State> {
           data-setup="{}"
           autoPlay
         >
-          <source src={this.fakeUrl} type="application/x-mpegURL" />
+          <source src={pullStreamUrl} type="application/x-mpegURL" />
         </video>
       </div>
     );

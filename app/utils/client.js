@@ -17,8 +17,8 @@ import {
   APP_KEY,
   APP_SECRET,
   API_SECRET,
-  VIDEO_SERVERE_REGION,
-  VIDEO_REGION_NAME
+  PUSH_STREAM_BASE_URL,
+  PULL_STREAM_BASE_URL,
 } from '../config';
 
 import { configureStore } from '../store/configureStore';
@@ -67,6 +67,14 @@ export default class Client {
     Client.store = store;
   }
 
+  static getPushStreamUrl(room: string) {
+    return PUSH_STREAM_BASE_URL + room;
+  }
+
+  static getPullStreamUrl(room: string) {
+    return PULL_STREAM_BASE_URL + room + '.m3u8';
+  }
+
   initIM() {
     this.$im.init(APP_KEY, APP_SECRET);
     this.bindIMEvents();
@@ -100,20 +108,6 @@ export default class Client {
       categories: {
         default: { appenders: ["file", "dateFile", "out"], level: 'info' },
         ymscreenrecord: { appenders: ["file", "out", "dateFile"], level: 'info' }
-      }
-    });
-  }
-
-  initVideo(videoServerRegin: number, videoReginName: string): Promise<any> {
-    // 初始化Video
-    return new Promise((resolve, reject) => {
-      const code = this.$video.init(APP_KEY, APP_SECRET, videoServerRegin, videoReginName, () => {
-        this.bindVideoEvents();
-        return resolve();
-      });
-
-      if (code !== 0) {
-        return reject(code);
       }
     });
   }
@@ -188,13 +182,6 @@ export default class Client {
         this.rejectHash.set(JOIN_ROOM_EVENT, reject);
         this.resolveHash.set(JOIN_ROOM_EVENT, resolve);
       });
-    });
-  }
-
-  joinVideoRoom(uname: string, uroom: string, roleType: number = 1) {
-    return new Promise((resolve, reject) => {
-      const code = this.$video.joinChannelSingleMode(uname, uroom, roleType);
-      return code === 0 ? resolve({ code }) : reject({ code });
     });
   }
 

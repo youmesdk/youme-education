@@ -62,7 +62,6 @@ class Room extends React.Component<Props, State> {
 
     this.whiteBoardSDK = new WhiteWebSdk();   // whiteboard sdk instance
     this.messageList = null;                  // MessageList ref
-    this.fakePublishUrl = 'rtmp://pili-publish.youme.im/youmetest/953853';
   }
 
   componentDidMount() {
@@ -82,12 +81,6 @@ class Room extends React.Component<Props, State> {
     if (this.messageList) {
       this.messageList.scrollToBottom();
     }
-  }
-
-  componentWillUnmount() {
-  }
-
-  bindRTCEvents = () => {
   }
 
   _createWhiteBoardRoom = (token, room, limit = 5) => {
@@ -272,8 +265,10 @@ class Room extends React.Component<Props, State> {
 
   handleScreenRecordSwitchChange = (checked: boolean) => {
     if (checked) {  // need start
+      const { room } = this.props;
       this.setState({ isScreenRecording: true });
-      YIMClient.instance.$screen.start(this.fakePublishUrl, (code) => {
+      const pushStreamUrl = YIMClient.getPushStreamUrl(room);
+      YIMClient.instance.$screen.start(pushStreamUrl, (code) => {
         if (code === 0) {
           message.success('Stop share screen success');
         } else {
@@ -414,7 +409,7 @@ class Room extends React.Component<Props, State> {
               )}
 
               {currentPanelRole === 1 && (
-                <ScreenBoardPanel />
+                <ScreenBoardPanel roomId={room} />
               )}
             </div>
 
