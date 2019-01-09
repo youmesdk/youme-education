@@ -67,8 +67,16 @@ class Index extends React.Component<null, State> {
 
       this.setState({ isLoading: true });
 
+      const user = {
+        id: `${name}_${Date.now()}_${role}`,
+        name: name,
+        role: role,
+        isMicOn: true,
+        isCameraOn: true,
+      };
+
       // login
-      await YIMClient.instance.login(name).catch(({ code }) => {
+      await YIMClient.instance.login(user.id).catch(({ code }) => {
         throw new Error(`login fail, code=${code}`);
       });
 
@@ -102,14 +110,6 @@ class Index extends React.Component<null, State> {
         // get whiteboard params and save into redux
         setWhiteBoardRoom(whiteBoardRoom);
       }
-
-      const user = {
-        id: `${name}_${Date.now()}_${role}`,
-        name: name,
-        role: role,
-        isMicOn: true,
-        isCameraOn: true,
-      };
 
       // save room and nickname into redux
       setRoom(room);

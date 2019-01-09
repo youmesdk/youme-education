@@ -238,7 +238,7 @@ export default class Client {
       if (msg.messageType === 1) { // 文本消息
         const formatedMsg = {
           messageId: msg.serial,
-          nickname: msg.senderID,
+          nickname: msg.senderID.split('_')[0],
           content: msg.content,
           isFromMe: false,
           avatar: require('../assets/images/avatar.png')
@@ -262,7 +262,7 @@ export default class Client {
       const { channelID, userID } = msg;
       const state = Client.store.getState();
       const { app } = state;
-      const { user, room, regionCode, regionName, users, whiteBoardRoom } = app;
+      const { user, room, users, whiteBoardRoom } = app;
       const { id, name, role } = user;
       const { uuid, roomToken } = whiteBoardRoom;
 
@@ -270,14 +270,7 @@ export default class Client {
         if (users.length <= MAX_NUMBER_MEMBER_IN_ROOM) {
           const cmd = {
             cmd: 0,
-            data: {
-              regionCode: regionCode,
-              regionName: regionName,
-              whiteBoardRoom: {
-                 uuid,
-                 roomToken
-                }
-              },
+            data: { whiteBoardRoom: { uuid, roomToken } }
           };
 
           this.signing(userID, 1, cmd);
@@ -312,6 +305,13 @@ export default class Client {
         isCameraOn: true,
       };
       Client.store.dispatch(actions.addOneOtherUser(user));
+      this.$ymrtc.requestUserStream(memberId).then((stream: MediaStream) => {
+        // TODO: maybe have some problem，
+        const videoDom = document.getElementById(`canvas-${memberId}`);
+        if (videoDom) {
+          videoDom.srcObject = stream;
+        }
+      });
     });
 
     this.$ymrtc.on('room.member-leave:*', (eventFullName, roomId, memberId) => {
@@ -341,43 +341,6 @@ export default class Client {
   }
 
   bindVideoEvents() {
-    this.$video.on('onMemberChange', ({ memchange }) => {
-      const state = Client.store.getState();
-      const { app, } = state;
-      const { users, user } = app;
-
-      memchange.forEach((item) => {
-        const { isJoin, userid } = item;
-        if (isJoin) {
-          const index = users.findIndex((u) => u.id === userid);
-          if (index === -1 && user.id !== userid) {
-            // userid: name_timestamp_role
-            const name = userid.split('_')[0];
-            const role = parseInt(userid.split('_')[2], 10);
-            const user = {
-              id: userid,
-              name: name,
-              role: role,
-              isMicOn: true,
-              isCameraOn: true,
-            };
-            Client.store.dispatch(actions.addOneOtherUser(user));
-          }
-        } else {
-          if (user.id !== userid) {
-            const role = parseInt(userid.split('_')[2], 10);
-            if (role === 0) {  // teacher logout, student need logout too
-              message.info('your teacher close class!');
-              this.logout();
-              window.location.hash = '';
-            } else {
-              Client.store.dispatch(actions.removeOneOtherUser(userid));
-            }
-          }
-        }
-      });
-    });
-
     // other open mic
     this.$video.on('YOUME_EVENT_OTHERS_MIC_ON', (evt) => {
       const { param: userId } = evt;
@@ -385,7 +348,6 @@ export default class Client {
       const { users } = state.app;
 
       const prevUser = users.find((item) => item.id === userId);
-      console.log('Other mic on: ', evt);
       if (prevUser) {
         const nextUser = Object.assign({}, prevUser, { isMicOn: true });
         Client.store.dispatch(actions.updateOneOtherUser(nextUser));

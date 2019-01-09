@@ -17,15 +17,16 @@ import styles from "./style.scss";
 import type { User } from '../../../reducers/app';
 
 type Props = {
-  id: string,
-  className?: string,
-  user: User,
+  id: string,          // HTMLElement id
+  className?: string,  // css class
+  user: User,          // User
+  isMySelf?: false,    // is me?
   onMicPress?: (user: User) => void,
   onCameraPress?: (user: User) => void,
 };
 
 export default function VideoCanvas(props: Props) {
-  const { className, id, user, onMicPress, onCameraPress, } = props;
+  const { className, id, user, onMicPress, onCameraPress, isMySelf} = props;
   const { name, isMicOn, isCameraOn, role } = user;
 
   const handleMicPress = (user: User) => () => {
@@ -38,13 +39,21 @@ export default function VideoCanvas(props: Props) {
     onCameraPress(user);
   }
 
+  const handleVideoElementClick = (e) => {
+    if (e.target.requestFullScreen) {
+      e.target.requestFullScreen();
+    }
+  }
+
   return (
     <div className={[styles.container, className].join(" ")}>
       <video
         id={id}
-        className={styles.canvas}
         autoPlay
+        onClick={handleVideoElementClick}
         playsInline
+        className={styles.canvas}
+        muted={isMySelf}   // local video media stream should muted
       />
 
       <div className={styles.status_bar}>
@@ -57,10 +66,10 @@ export default function VideoCanvas(props: Props) {
         </span>
 
         <span
-          onClick={handleCameraPress(user)}
           className={styles.op_icon}
+          onClick={handleCameraPress(user)}
         >
-          {isCameraOn ? <Icon.Camera size={20} /> : <Icon.CameraOff size={20} /> }
+          {isCameraOn ? (<Icon.Camera size={20} />) : (<Icon.CameraOff size={20} />)}
         </span>
       </div>
     </div>
@@ -69,6 +78,7 @@ export default function VideoCanvas(props: Props) {
 
 VideoCanvas.defaultProps = {
   className: "",
+  isMySelf: false,
   onMicPress: f => f,
   onCameraPress: f => f
 };

@@ -172,7 +172,6 @@ class Room extends React.Component<Props, State> {
         } else if (err.name === 'NotFoundError') {
           message.error('Not find camera or microphone de, make sure your devices is working');
         } else {
-          console.log(err);
           message.error(err.name);
         }
       });
