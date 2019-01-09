@@ -49,7 +49,6 @@ export default class Client {
     this.rejectHash = new Map();
     this.task = null;
 
-    this.$video = window.YoumeVideoSDK.getInstance();
     this.$im = window.YoumeIMSDK.getInstance();
     this.$screen = window.YoumeScreenSDK;
     this.$ymrtc = new YMRTC({ appKey: APP_KEY, video: true, debug: true, dev: false });
