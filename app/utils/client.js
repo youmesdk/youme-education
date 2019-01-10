@@ -285,17 +285,10 @@ export default class Client {
 
       if (role === 0) {  // teacher should send a sigining to student
         if (users.length <= MAX_NUMBER_MEMBER_IN_ROOM) {
-          const cmd = {
-            cmd: 0,
-            data: { whiteBoardRoom: { uuid, roomToken } }
-          };
-
+          const cmd = {cmd: 0, data: { whiteBoardRoom: { uuid, roomToken } }};
           this.signing(userID, 1, cmd);
         } else {
-          const cmd = {
-            cmd: 1,
-            data: { max: MAX_NUMBER_MEMBER_IN_ROOM, count: users.length - 1 },
-          };
+          const cmd = {cmd: 1, data: { max: MAX_NUMBER_MEMBER_IN_ROOM, count: users.length - 1 }};
           this.signing(userID, 1, cmd);
         }
       }
@@ -395,6 +388,7 @@ export default class Client {
   handleSigining(msg) {
     const content = atob(msg.content);
     const { cmd, data } = JSON.parse(content);
+    console.log(JSON.parse(content), '======================================================');
 
     switch (cmd) {
       // 收到老师房间正常的回应
@@ -438,16 +432,19 @@ export default class Client {
       // 远端用户麦克风状态改变 （开/关）
       case 2: {
         const state = Client.store.getState();
-        const { user } = state.app;
-        const { memberId, isMicOn } = data;
-        if (memberId === user.id) {  // teacher change my microphone status
+        const { user, users } = state.app;
+        const { userId, isMicOn } = data;
+        if (userId === user.id) {  // teacher change my microphone status
           if (isMicOn && this.$ymrtc.isLocalAudioPaused()) {
             this.$ymrtc.resumeLocalAudio();
           }
-
           if (!isMicOn && !this.$ymrtc.isLocalAudioPaused()) {
             this.$ymrtc.pauseLocalAudio();
           }
+        } else { // teacher change other student's microphone status
+          const oldOther = users.find((item: User) => item.id === userId);
+          const newOther = Object.assign({}, oldOther, { isMicOn: isMicOn });
+          Client.store.dispatch(actions.updateOneOtherUser(newOther));
         }
         break;
       }
@@ -455,16 +452,19 @@ export default class Client {
       // 远端用户视频状态改变（开/关）
       case 3: {
         const state = Client.store.getState();
-        const { user } = state.app;
-        const { memberId, isCameraOn } = data;
-        if (memberId === user.id) { // teacher change my camera status
+        const { user, users } = state.app;
+        const { userId, isCameraOn } = data;
+        if (userId === user.id) { // teacher change my camera status
           if (isCameraOn && this.$ymrtc.isLocalVideoPaused()) {
             this.$ymrtc.resumeLocalVideo();
           }
-
           if (!isCameraOn && !this.$ymrtc.isLocalVideoPaused()) {
             this.$ymrtc.resumeLocalVideo();
           }
+        } else { // teacher change other student's camera status
+          const oldOther = users.find((item: User) => item.id === userId);
+          const newOther = Object.assign({}, oldOther, { isCameraOn: isCameraOn });
+          Client.store.dispatch(actions.updateOneOtherUser(newOther));
         }
         break;
       }
