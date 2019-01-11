@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-07-27 16:16:37
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-11 18:19:17
+ * @Last Modified time: 2019-01-11 18:35:14
  *
  * @flow
  *
@@ -250,6 +250,11 @@ class Room extends React.Component<Props, State> {
   handleScreenRecordSwitchChange = (checked: boolean) => {
     if (checked) {  // need start
       const { room } = this.props;
+      setTimeout(() => {
+        const cmd = { cmd: 5 };
+        YIMClient.instance.signing(room, 2, cmd);
+      }, 2500); // delay some time to send sigin to students
+
       this.setState({ isScreenRecording: true });
       const pushStreamUrl = YIMClient.getPushStreamUrl(room);
       YIMClient.instance.$screen.start(pushStreamUrl, (code) => {
@@ -259,6 +264,8 @@ class Room extends React.Component<Props, State> {
           message.error('Screen share exit with error!');
         }
         this.setState({ isScreenRecording: false });
+        const cmd = { cmd: 4 };
+        YIMClient.instance.signing(room, 2, cmd);
       });
     } else {  // need stop
       YIMClient.instance.$screen.stop();

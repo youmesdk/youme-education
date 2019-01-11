@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-11-11 15:36:30
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-08 14:36:26
+ * @Last Modified time: 2019-01-11 18:28:20
  *
  * @flow
  *
@@ -388,7 +388,6 @@ export default class Client {
   handleSigining(msg) {
     const content = atob(msg.content);
     const { cmd, data } = JSON.parse(content);
-    console.log(JSON.parse(content), '======================================================');
 
     switch (cmd) {
       // 收到老师房间正常的回应
@@ -467,6 +466,20 @@ export default class Client {
           Client.store.dispatch(actions.updateOneOtherUser(newOther));
         }
         break;
+      }
+
+      // 教师关闭录屏
+      case 4: {
+        message.info('your teacher stop screen share!');
+        Client.store.dispatch(actions.setPanelRole(0)); // 去白板页面
+        break;
+      }
+
+      // 教师开启录屏
+      case 5: {
+        message.info('your teacher start share screen!');
+        const state = Client.store.getState();
+        Client.store.dispatch(actions.setPanelRole(1)); // 去录屏页面
       }
     }
   }
