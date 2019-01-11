@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-11-11 15:36:30
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-11 18:28:20
+ * @Last Modified time: 2019-01-11 19:11:06
  *
  * @flow
  *
@@ -36,7 +36,7 @@ export const CLASS_IS_NOT_EXIST = -100001;
 export const MAX_NUMBER_MEMBER_ERROR = -100002;
 
 export const MAX_NUMBER_MEMBER_IN_ROOM = 5;        // 房间最多允许多少人加入
-export const TASK_INTERVAL_IN_SECOND = 1000 * 2;  // 定时器时间间隔（以秒为单位）
+export const TASK_INTERVAL_IN_SECOND = 1000 * 5;  // 定时器时间间隔（以秒为单位）
 
 
 export default class Client {
