@@ -31,11 +31,24 @@
     right: 0;
   }
 
-  .shortcut_hover {
+  .right_bottom_tools {
     position: absolute;
     z-index: 999;
     right: 20px;
     bottom: 10px;
+    display: flex;
+    align-items: center;
+  }
+
+  .shortcut_hover {
+    margin-right: 20px;
     cursor: pointer;
   }
+
+  .pagination {
+    position: absolute;
+    z-index: 999;
+  }
+
+
 }

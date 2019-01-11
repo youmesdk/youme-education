@@ -13,11 +13,13 @@ export const UPDATE_ONE_OTHER_USER = 'UPDATE_ONE_OTHER_USER';
 export const SET_USER = 'SET_USER';
 export const SET_WHITE_BOARD_ROOM = 'SET_WHITE_BOARD_ROOM';
 export const RESET_APP_STATE = 'RESET_APP_STATE';
+export const SET_PANEL_ROLE = 'SET_PANEL_ROLE';
 
 import type {
    User,
    Role,
    WhiteBoardRoom,
+   PanelRole,
 } from '../reducers/app';
 
 export function setWhiteBoardRoom(room: WhiteBoardRoom) {
@@ -87,6 +89,13 @@ export function updateOneOtherUser(user: User) {
   return {
     type: UPDATE_ONE_OTHER_USER,
     user,
+  };
+}
+
+export function setPanelRole(role: PanelRole) {
+  return {
+    type: SET_PANEL_ROLE,
+    role,
   };
 }
 

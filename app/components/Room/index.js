@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-07-27 16:16:37
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-08 14:41:48
+ * @Last Modified time: 2019-01-11 18:19:17
  *
  * @flow
  *
@@ -33,7 +33,6 @@ import ScreenBoardPanel from './ScreenRecordPanel';
 
 import type { User, WhiteBoardRoom } from '../../reducers/app';
 
-type PanelRole = 0 | 1;  // 0 - whiteboard, 1 - screen share
 
 type Props = {
   history: { push: Function },
@@ -44,7 +43,6 @@ type State = {
   isScreenRecording: boolean,       // is screen recording?
   zoomScale: number,                // whiteboard canvas zoom scale
   boardRoom: object | null,         // whiteboard room params
-  currentPanelRole: PanelRole,      // 0 - Whiteboard 1 - Screen share
 };
 
 
@@ -57,7 +55,6 @@ class Room extends React.Component<Props, State> {
       isScreenRecording: false,
       boardRoom: null,
       zoomScale: 1.0,
-      currentPanelRole: 0,
     };
 
     this.whiteBoardSDK = new WhiteWebSdk();   // whiteboard sdk instance
@@ -246,7 +243,8 @@ class Room extends React.Component<Props, State> {
   }
 
   handlePanelRoleChange = (role: number) => {
-    this.setState({ currentPanelRole: role });
+    const { setPanelRole } = this.props;
+    setPanelRole(role);
   }
 
   handleScreenRecordSwitchChange = (checked: boolean) => {
@@ -281,13 +279,20 @@ class Room extends React.Component<Props, State> {
   }
 
   render() {
-    const { messages, nickname, users, room, user } = this.props;
+    const {
+      messages,
+      nickname,
+      users,
+      room,
+      user,
+      panelRole,
+    } = this.props;
+
     const {
       isWhiteBoardLoading,
       isScreenRecording,
       boardRoom,
       zoomScale,
-      currentPanelRole,
     } = this.state;
 
     const teacher = users.find(u => u.role == 0) || user;
@@ -350,7 +355,7 @@ class Room extends React.Component<Props, State> {
               onClick={() => this.handlePanelRoleChange(0)}
               className={[
                   styles.content_menus_item,
-                  currentPanelRole === 0 ? styles.content_menus_active : '',
+                  panelRole === 0 ? styles.content_menus_active : '',
                 ].join(' ')}
             >
               WhiteBoard
@@ -363,7 +368,7 @@ class Room extends React.Component<Props, State> {
                 onClick={() => this.handlePanelRoleChange(1)}
                 className={[
                     styles.content_menus_item,
-                    currentPanelRole === 1 ? styles.content_menus_active : '',
+                    panelRole === 1 ? styles.content_menus_active : '',
                   ].join(' ')}
                 >
                   Screen share
@@ -386,7 +391,7 @@ class Room extends React.Component<Props, State> {
 
           <section className={styles.content_main}>
             <div className={styles.content_main_left}>
-              {currentPanelRole === 0 && !!boardRoom && (
+              {panelRole === 0 && !!boardRoom && (
                 <WhiteBoardPanel
                   boardRoom={boardRoom}
                   zoomScale={zoomScale}
@@ -395,7 +400,7 @@ class Room extends React.Component<Props, State> {
                 />
               )}
 
-              {currentPanelRole === 1 && (
+              {panelRole === 1 && (
                 <ScreenBoardPanel roomId={room} />
               )}
             </div>
@@ -433,7 +438,7 @@ class Room extends React.Component<Props, State> {
 
 const mapStateToProps = (state) => {
   const { app } = state;
-  const { messages, room, users, user, whiteBoardRoom } = app;
+  const { messages, room, users, user, whiteBoardRoom, panelRole } = app;
 
   return {
     messages,
@@ -441,6 +446,7 @@ const mapStateToProps = (state) => {
     users,
     user,
     whiteBoardRoom,
+    panelRole,
   };
 };
 
@@ -450,6 +456,7 @@ const mapDispatchToProps = (dispatch) => {
     updateOneMessage: bindActionCreators(actions.updateOneMessage, dispatch),
     setWhiteBoardRoom: bindActionCreators(actions.setWhiteBoardRoom, dispatch),
     setUser: bindActionCreators(actions.setUser, dispatch),
+    setPanelRole: bindActionCreators(actions.setPanelRole, dispatch),
   };
 };
 

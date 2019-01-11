@@ -2,14 +2,14 @@
  * @Author: fan.li
  * @Date: 2019-01-07 16:03:46
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-07 17:12:37
+ * @Last Modified time: 2019-01-11 18:08:07
  *
  * 白板操作面板
  */
 
 import * as React from 'react';
 import { WhiteWebSdk, RoomWhiteboard, } from 'white-react-sdk';
-import { Tooltip } from 'antd';
+import { Tooltip, Pagination } from 'antd';
 import * as Icon from 'react-feather';
 
 import styles from './style.scss';
@@ -103,13 +103,23 @@ export default class WhiteboardPanel extends React.Component<Props> {
           />
         )}
 
-        <div
-          className={styles.shortcut_hover}
-          onClick={this.openWhiteBoardSidePanel}
-        >
-          <Tooltip title="快捷键说明" mouseEnterDelay={0.8}>
-            <Icon.Info size={22} />
-          </Tooltip>
+
+        <div className={styles.right_bottom_tools}>
+          <span className={styles.shortcut_hover}>
+            <Tooltip
+              title="快捷键说明"
+              mouseEnterDelay={0.8}
+              onClick={this.openWhiteBoardSidePanel}
+            >
+              <Icon.Info size={22} />
+            </Tooltip>
+          </span>
+
+          {/* <Pagination
+            size="small"
+            defaultCurrent={1}
+            total={500}
+          /> */}
         </div>
       </div>
     );

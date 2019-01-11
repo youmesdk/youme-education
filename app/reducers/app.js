@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-11-11 15:04:27
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-12-17 17:38:05
+ * @Last Modified time: 2019-01-11 18:15:10
  *
  * @flow
  *
@@ -21,6 +21,7 @@ import {
 
   SET_USER,
   SET_WHITE_BOARD_ROOM,
+  SET_PANEL_ROLE,
   RESET_APP_STATE,
 } from '../actions/app';
 
@@ -30,9 +31,11 @@ export type AppStateType = {
   user: User,
   users: Array<User>,
   whiteBoardRoom: WhiteBoardRoom,
+
 };
 
 export type Role = 0 | 1;  // 0: teacher; 1 student;
+export type PanelRole = 0 | 1;  // 0 - whiteboard, 1 - screen share
 
 export type User = {
   id: string,       // user id
@@ -53,6 +56,7 @@ const initialState: AppStateType = {
   users: [],
   user: { id: '', name: '', role: 0, isMicOn: true, isCameraOn: true },
   whiteBoardRoom: { uuid: '', roomToken: '' },
+  panelRole: 0,
 };
 
 
@@ -147,6 +151,14 @@ export default (state = initialState, action: { type: string }) => {
       return {
         ...state,
         whiteBoardRoom,
+      };
+    }
+
+    case SET_PANEL_ROLE: {
+      const { role } = action;
+      return {
+        ...state,
+        panelRole: role,
       };
     }
 
