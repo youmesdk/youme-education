@@ -269,11 +269,16 @@ class Room extends React.Component<Props, State> {
   }
 
   handleMicBtnPress = (u: User) => {
-    const { user: me, setUser } = this.props;
+    const { user: me, setUser, updateOneOtherUser } = this.props;
     const { id, isMicOn} = me;
     if (u.id !== id) {
-      return message.info('you can not operate other microphone!');
+      YIMClient.instance.setOtherMicMute(u.id, u.isMicOn);
+      message.info('change microphone status success!');
+      const tempUser = Object.assign({}, u, { isMicOn: !isMicOn });
+      updateOneOtherUser(tempUser);
+      return;
     }
+
     YIMClient.instance.setMicrophoneMute(isMicOn).then(() => {
       message.info('change microphone status success!');
       const tempUser = Object.assign({}, me, { isMicOn: !isMicOn });
@@ -393,6 +398,7 @@ const mapDispatchToProps = (dispatch) => {
     updateOneMessage: bindActionCreators(actions.updateOneMessage, dispatch),
     setWhiteBoardRoom: bindActionCreators(actions.setWhiteBoardRoom, dispatch),
     setUser: bindActionCreators(actions.setUser, dispatch),
+    updateOneOtherUser: bindActionCreators(actions.updateOneOtherUser, dispatch),
   };
 };
 

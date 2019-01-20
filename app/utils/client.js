@@ -150,6 +150,10 @@ export default class Client {
     })
   };
 
+  setOtherMicMute(strUserID: string, isOpen: boolean): void {
+    this.$video.setOtherMicMute(strUserID, isOpen)
+  }
+
   setCameraOpen(isOpen: boolean): Promise<any> {
     return new Promise((resolve, reject) => {
       if (isOpen) {
