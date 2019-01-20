@@ -328,6 +328,7 @@ class Room extends React.Component<Props, State> {
             {users.map((s) => (
               <VideoCanvas
                 id={`canvas-${s.id}`}
+                key={s.id}
                 user={s}
                 className={styles.content_header_item}
                 onCameraPress={this.handleCameraBtnPress}

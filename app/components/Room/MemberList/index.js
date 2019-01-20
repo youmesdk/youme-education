@@ -29,20 +29,6 @@ type Props = {
 export default class MemberList extends React.Component<Props> {
   constructor(props) {
     super(props);
-    this.fakeMembers = [
-      { id: '1', name: 'name1', role: 1, isMicOn: true, isCameraOn: true },
-      { id: '2', name: 'name2', role: 1, isMicOn: true, isCameraOn: true },
-      { id: '3', name: 'name3', role: 1, isMicOn: true, isCameraOn: true },
-      { id: '4', name: 'name4', role: 1, isMicOn: true, isCameraOn: true },
-      { id: '5', name: 'name5', role: 1, isMicOn: true, isCameraOn: true },
-      { id: '6', name: 'name6', role: 1, isMicOn: true, isCameraOn: true },
-      { id: '7', name: 'name7', role: 1, isMicOn: true, isCameraOn: true },
-      { id: '8', name: 'name7', role: 1, isMicOn: true, isCameraOn: true },
-      { id: '9', name: 'name7', role: 1, isMicOn: true, isCameraOn: true },
-      { id: '10', name: 'name10', role: 1, isMicOn: true, isCameraOn: true },
-      { id: '11', name: 'name11', role: 1, isMicOn: true, isCameraOn: true },
-      { id: '12', name: 'name12', role: 1, isMicOn: true, isCameraOn: true },
-    ];
   }
 
   render() {
@@ -59,9 +45,9 @@ export default class MemberList extends React.Component<Props> {
     return (
       <div className={styles.container}>
         <header>
-          <Dropdown className={styles.chevron_down} overlay={menu}>
+          {/* <Dropdown className={styles.chevron_down} overlay={menu}>
             <Icon.ChevronDown />
-          </Dropdown>
+          </Dropdown> */}
           <h1 className={styles.title}>参会者({memberCount})</h1>
         </header>
 
@@ -89,8 +75,8 @@ export default class MemberList extends React.Component<Props> {
         </main>
 
         <footer>
-          <span>静音</span>
-          <span>举手</span>
+          {/* <span>静音</span> */}
+          {/* <span>举手</span> */}
         </footer>
       </div>
     );

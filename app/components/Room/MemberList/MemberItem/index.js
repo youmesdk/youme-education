@@ -15,6 +15,7 @@ import * as Icon from 'react-feather';
 import styles from './style.scss';
 import type { User, Role } from '../../../../reducers/app';
 import Avatar from '../Avatar';
+import AvatarImg from '../../../../assets/images/avatar.png';
 
 
 type Props = {
@@ -26,19 +27,18 @@ type Props = {
 };
 
 export default function MemberItem(props: Props) {
-  const fakeAvatar = 'https://avatars3.githubusercontent.com/u/22721646?s=400&u=dc9fb8e89d7433cbe665d88d92ca4ef23b9d6fb0&v=4';
   const { name, role, isMicOn, isCameraOn, isMyself } = props;
 
   const isPresenter = role === 0;
   const presenterText = isPresenter ? '主持人' : '' ;
   const myselfText = isMyself ? '我' : '';
 
-  const label = `${name} (${myselfText} ${presenterText})`;
+  const label = `(${myselfText} ${presenterText})`;
 
   return (
     <div className={styles.container}>
       <div className={styles.left}>
-        <Avatar title={name} src={fakeAvatar} />
+        <Avatar title={name} src={AvatarImg} />
         <span className={styles.label}>{name}</span>
         {isMyself || isPresenter && (
           <span>{label}</span>
