@@ -71,7 +71,7 @@ class Room extends React.Component<Props, State> {
     YIMClient.instance.$video.startCapture();
     this.pollingTask = setInterval(this.doupdate, 50);  // update video
     // update whiteboard draw area when window size changed
-    window.addEventListener('resize', this.throttledWindowSizeChange, false);
+    // window.addEventListener('resize', this.throttledWindowSizeChange, false);
   }
 
   componentDidUpdate() {
@@ -84,7 +84,7 @@ class Room extends React.Component<Props, State> {
     if (this.pollingTask) {
       clearInterval(this.pollingTask);
     }
-    window.removeEventListener('resize', this.throttledWindowSizeChange, false);
+    // window.removeEventListener('resize', this.throttledWindowSizeChange, false);
   }
 
   _createWhiteBoardRoom = (token, room, limit = 5) => {
@@ -314,6 +314,7 @@ class Room extends React.Component<Props, State> {
               成员人数: {users.length + 1}
             </span>
           </div>
+
           <Button
             ghost
             icon="logout"
@@ -331,8 +332,8 @@ class Room extends React.Component<Props, State> {
                 className={styles.content_header_item}
                 onCameraPress={this.handleCameraBtnPress}
                 onMicPress={this.handleMicBtnPress}
-              />))
-            }
+              />)
+            )}
           </section>
 
           <section className={styles.content_main}>
@@ -340,7 +341,7 @@ class Room extends React.Component<Props, State> {
               <VideoCanvas
                 id={`canvas-${user.id}`}
                 user={user}
-                className={styles.content_header_item}
+                className={styles.content_main_left_video}
                 onCameraPress={this.handleCameraBtnPress}
                 onMicPress={this.handleMicBtnPress}
               />
