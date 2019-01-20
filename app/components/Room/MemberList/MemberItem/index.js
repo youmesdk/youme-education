@@ -29,10 +29,10 @@ type Props = {
 export default function MemberItem(props: Props) {
   const { name, role, isMicOn, isCameraOn, isMyself } = props;
 
+  console.log(isMyself, name);
   const isPresenter = role === 0;
   const presenterText = isPresenter ? '主持人' : '' ;
   const myselfText = isMyself ? '我' : '';
-
   const label = `(${myselfText} ${presenterText})`;
 
   return (

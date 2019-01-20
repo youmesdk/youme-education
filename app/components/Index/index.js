@@ -165,13 +165,13 @@ class Index extends React.Component<null, State> {
             <input
               name="name"
               className={styles.form__input}
-              placeholder="N A M E"
+              placeholder="昵称"
               onChange={this.onInputChange}
             />
             <input
               name="room"
               className={styles.form__input}
-              placeholder="R O O M"
+              placeholder="会议编号，其他人可加入该会议"
               onChange={this.onInputChange}
             />
           </section>
@@ -202,8 +202,8 @@ class Index extends React.Component<null, State> {
             value={role}
             onChange={this.onRadioChange}
           >
-            <Radio className={styles.roles_radio} value={0}>Teacher</Radio>
-            <Radio className={styles.roles_radio} value={1}>Student</Radio>
+            <Radio className={styles.roles_radio} value={0}>主持人</Radio>
+            <Radio className={styles.roles_radio} value={1}>参会人</Radio>
           </RadioGroup>
 
           <section style={{ marginTop: '3%' }}>
@@ -212,7 +212,7 @@ class Index extends React.Component<null, State> {
               onClick={this.handleSubmit}
               disabled={isLoading}
             >
-              { role === 0 ? 'create room' : 'Join' }
+              { role === 0 ? 'Create Metting' : 'Join Metting' }
             </button>
           </section>
         </main>

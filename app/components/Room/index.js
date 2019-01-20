@@ -308,10 +308,7 @@ class Room extends React.Component<Props, State> {
         <TitleBar>
           <div className={styles.info_bar}>
             <span className={styles.info_bar_item}>
-              房间名称: {room}
-            </span>
-            <span className={styles.info_bar_item}>
-              成员人数: {users.length + 1}
+              Metting Room: {room}
             </span>
           </div>
 
