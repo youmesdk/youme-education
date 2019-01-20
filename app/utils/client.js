@@ -315,7 +315,7 @@ export default class Client {
       }
     });
 
-    // other close mic
+    // other close mic by self
     this.$video.on('YOUME_EVENT_OTHERS_MIC_OFF', (evt) => {
       const { param: userId } = evt;
       const state = Client.store.getState();
@@ -329,7 +329,23 @@ export default class Client {
       }
     });
 
-    // other open camera
+    // my mic open by other
+    this.$video.on('YOUME_EVENT_MIC_CTR_ON', (evt) => {
+      const state = Client.store.getState();
+      const { user } = state.app;
+      const nextUser = Object.assign({}, user, { isMicOn: true });
+      Client.store.dispatch(actions.setUser(nextUser));
+    });
+
+    // my mic close by other
+    this.$video.on('YOUME_EVENT_MIC_CTR_OFF', (evt) => {
+      const state = Client.store.getState();
+      const { user } = state.app;
+      const nextUser = Object.assign({}, user, { isMicOn: false });
+      Client.store.dispatch(actions.setUser(nextUser));
+    });
+
+    // other open camera by self
     this.$video.on('YOUME_EVENT_OTHERS_VIDEO_INPUT_START', (evt) => {
       const { param: userId } = evt;
       const state = Client.store.getState();

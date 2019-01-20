@@ -9,6 +9,7 @@
 
 import * as React from 'react';
 import { Button, Modal } from 'antd';
+import YIMClient from '../../../utils/client';
 
 import styles from './style.scss';
 
@@ -54,6 +55,7 @@ class TitleBar extends React.Component<Props, State> {
       okText: '确定',
       cancelText: '取消',
       onOk: () => {
+        YIMClient.instance.logout();
         ipcRenderer.send('close-window')
       }
     })
