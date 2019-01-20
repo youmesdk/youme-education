@@ -1,0 +1,54 @@
+.container {
+  display: flex;
+  flex: 1;
+  position: relative;
+
+  .whiteboard {
+    display: flex;
+    flex: 1;
+  }
+
+  .docker {
+    position: absolute;
+    z-index: 999;
+    top: 20px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .scaler {
+    position: absolute;
+    z-index: 999;
+    left: 10px;
+    bottom: 10px;
+  }
+
+  .side_panel {
+    position: absolute;
+    z-index: 9999;
+    top: 0;
+    bottom: 0;
+    right: 0;
+  }
+
+  .right_bottom_tools {
+    position: absolute;
+    z-index: 999;
+    right: 20px;
+    bottom: 10px;
+    display: flex;
+    align-items: center;
+  }
+
+  .shortcut_hover {
+    margin-right: 20px;
+    cursor: pointer;
+  }
+
+  .pagination {
+    position: absolute;
+    z-index: 999;
+  }
+
+
+}

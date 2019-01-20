@@ -12,6 +12,7 @@
     font-size: 16px;
     color: #FFF;
     font-weight: bold;
+
     &_item {
       margin-right: 30px;
     }
@@ -80,10 +81,12 @@
         background: #FFF;
         display: flex;
         position: relative;
+
         .whiteboard {
           display: flex;
           flex: 1;
         }
+
         .docker {
           position: absolute;
           z-index: 999;
@@ -91,12 +94,14 @@
           margin-left: 50%;
           transform: translateX(-50%);
         }
+
         .scaler {
           position: absolute;
           z-index: 999;
           left: 10px;
           bottom: 10px;
         }
+
         .side_panel {
           position: absolute;
           z-index: 9999;
@@ -104,6 +109,7 @@
           bottom: 0;
           right: 0;
         }
+
         .shortcut_hover {
           position: absolute;
           z-index: 999;
@@ -117,7 +123,8 @@
         margin-left: 8px;
         display: flex;
         flex-direction: column;
-        width: 250px;
+        width: 300px;
+
         .video {
           border-radius: 10px;
           background: #000;
@@ -125,16 +132,26 @@
           height: 180px;
           position: relative;
         }
+
         .im {
           flex: 1;
           display: flex;
           flex-direction: column;
           margin-top: 8px;
-          border-radius: 8px;
+          border-radius: 8px 8px 0 0;
           background: #FFF;
+
           &_list {
             flex: 1
           }
+        }
+
+        .members {
+          flex: 1;
+          display: flex;
+          flex-direction: row;
+          background: #FFF;
+          border-radius: 8px 8px 0 0;
         }
       }
     }

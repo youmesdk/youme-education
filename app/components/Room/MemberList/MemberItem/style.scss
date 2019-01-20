@@ -1,0 +1,25 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  cursor: default;
+  padding: 3px 8px;
+
+  &:hover {
+    background: #DDDDDD
+  }
+
+  .label {
+    margin-left: 6px;
+    font-size: 14px;
+  }
+
+  .right {
+    display: flex;
+    align-items: center;
+  }
+
+  .icon {
+    margin-right: 6px;
+  }
+}

@@ -30,6 +30,7 @@ import WhiteBoardTool from '../commons/WhiteBoardTool';
 import WhiteBoardScaler from '../commons/WhiteBoardScaler';
 import WhiteBoardSidePanel from '../commons/WhiteBoardSidePanel';
 import VideoCanvas from '../commons/VideoCanvas';
+import MemberList from './MemberList';
 
 
 import type { User, WhiteBoardRoom } from '../../reducers/app';
@@ -302,9 +303,6 @@ class Room extends React.Component<Props, State> {
     const { messages, nickname, users, room, user } = this.props;
     const { isWhiteBoardLoading, boardRoom, isSidePanelShow, zoomScale } = this.state;
 
-    const teacher = users.find(u => u.role == 0) || user;
-    const otherStudents = users.filter((u) => u.role === 1);
-
     return (
       <div className={styles.container}>
         <TitleBar>
@@ -326,79 +324,35 @@ class Room extends React.Component<Props, State> {
 
         <main className={styles.content}>
           <section className={styles.content_header}>
-            {/* myself */}
-            {
-              user.role !== 0 && (
-                <VideoCanvas
-                  id={`canvas-${user.id}`}
-                  user={user}
-                  className={styles.content_header_item}
-                  onCameraPress={this.handleCameraBtnPress}
-                  onMicPress={this.handleMicBtnPress}
-                />
-              )
-            }
-
-            {/* other student */}
-            {
-              otherStudents.map((s) => {
-                return (
-                  <VideoCanvas
-                    id={`canvas-${s.id}`}
-                    user={s}
-                    className={styles.content_header_item}
-                    onCameraPress={this.handleCameraBtnPress}
-                    onMicPress={this.handleMicBtnPress}
-                  />
-                );
-              })
+            {users.map((s) => (
+              <VideoCanvas
+                id={`canvas-${s.id}`}
+                user={s}
+                className={styles.content_header_item}
+                onCameraPress={this.handleCameraBtnPress}
+                onMicPress={this.handleMicBtnPress}
+              />))
             }
           </section>
 
           <section className={styles.content_main}>
-            <div className={styles.content_main_left} id='whiteboard'>
-              {
-                boardRoom &&
-               <RoomWhiteboard
-                 className={styles.whiteboard}
-                 room={boardRoom}
-               />
-              }
-
-              <WhiteBoardTool className={styles.docker} onToolChange={this.handleWhiteBoardToolChange} />
-
-              <WhiteBoardScaler
-                className={styles.scaler}
-                scale={zoomScale}
-                onDecreasePress={this.handleZoomScaleDecreasePress}
-                onIncreasePress={this.handleZoomScaleIncreasePress}
-              />
-              {
-                isSidePanelShow &&
-                <WhiteBoardSidePanel
-                  className={styles.side_panel}
-                  onClosePress={this.closeWhiteBoardSidePanel}
-                />
-              }
-
-              <div
-                className={styles.shortcut_hover}
-                onClick={this.openWhiteBoardSidePanel}
-              >
-                <Tooltip title="快捷键说明" mouseEnterDelay={0.8}>
-                  <Icon.Info size={22}/>
-                </Tooltip>
-              </div>
-            </div>
-
-            <div className={styles.content_main_right}>
+            <div className={styles.content_main_left}>
               <VideoCanvas
-                id={`canvas-${teacher.id}`}
-                className={styles.video}
-                user={teacher}
+                id={`canvas-${user.id}`}
+                user={user}
+                className={styles.content_header_item}
                 onCameraPress={this.handleCameraBtnPress}
                 onMicPress={this.handleMicBtnPress}
               />
+            </div>
+
+            <div className={styles.content_main_right}>
+              <div className={styles.members}>
+                <MemberList
+                  user={user}
+                  members={users}
+                />
+              </div>
 
               <div className={styles.im}>
                 <MessageList

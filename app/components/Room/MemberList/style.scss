@@ -1,0 +1,69 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 8px 0;
+
+
+  .chevron_down {
+    float: left;
+    font-size: 18px;
+  }
+
+  header {
+    padding: 4px 8px;
+
+    .title {
+      text-align: center;
+      font-size: 16px;
+      font-weight: bold;
+    }
+  }
+
+  main {
+    flex: 1;
+    overflow-y: scroll;
+    margin-bottom: 10px;
+
+    &::-webkit-scrollbar {
+      // 滚动条整体样式
+      width: 4px; // 滚动条的尺寸
+      height: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      // 滚动条里的小方块
+      border-radius: 5px;
+      -webkit-box-shadow: inset 0 0 3px #166EEB;
+      -moz-box-shadow: inset 0 0 3px #166EEB;
+      box-shadow: inset 0 0 3px #166EEB;
+    }
+
+    &::-webkit-scrollbar-track {
+      // 滑道
+      -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+      -moz-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+      border-radius: 0;
+      background: rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  footer {
+    display: flex;
+    justify-content: space-evenly;
+    font-size: 14px;
+    font-weight: bold;
+
+    span {
+      cursor: pointer;
+      background: #F0F0F6;
+      padding: 2px 4px;
+      border-radius: 10%;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+}
