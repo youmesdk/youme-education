@@ -120,7 +120,7 @@ class TitleBar extends React.Component<Props, State> {
           onCancel={this.hideInfoModal}
         >
           <span>
-            游密通讯云 for education demo, 涵盖IM、实时视频、实时白板功能。官网：
+            游密通讯云demo;
             <a onClick={this.openHomePage}>https://www.youme.im/</a>
           </span>
         </Modal>

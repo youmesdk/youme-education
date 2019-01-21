@@ -1,6 +1,6 @@
 {
-  "name": "youme-education",
-  "productName": "YoumeEducation",
+  "name": "youme-metting-demo",
+  "productName": "YoumeMetting",
   "version": "0.13.3",
   "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
   "scripts": {
@@ -41,8 +41,8 @@
     ]
   },
   "build": {
-    "productName": "YoumeEducation",
-    "appId": "im.youme.YoumeEducation",
+    "productName": "YoumeMetting",
+    "appId": "im.youme.metting",
     "files": [
       "dist/",
       "node_modules/",

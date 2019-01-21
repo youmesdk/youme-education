@@ -1,8 +1,8 @@
 {
-  "name": "youme-education",
-  "productName": "YoumeEducation",
+  "name": "youme-metting-demo",
+  "productName": "YoumeMetting",
   "version": "1.0.0",
-  "description": "Youme Sdk for education electron demo",
+  "description": "Youme Sdk for metting electron demo",
   "main": "./main.prod.js",
   "author": {
     "name": "fanlion",
