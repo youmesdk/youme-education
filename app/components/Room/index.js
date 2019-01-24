@@ -313,7 +313,7 @@ class Room extends React.Component<Props, State> {
         <TitleBar>
           <div className={styles.info_bar}>
             <span className={styles.info_bar_item}>
-              Metting Room: {room}
+              Meeting Room: {room}
             </span>
           </div>
 

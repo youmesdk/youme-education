@@ -1,8 +1,8 @@
 {
-  "name": "youme-metting-demo",
-  "productName": "YoumeMetting",
+  "name": "youme-meeting-demo",
+  "productName": "YoumeMeeting",
   "version": "1.0.0",
-  "description": "Youme Sdk for metting electron demo",
+  "description": "Youme Sdk for meeting electron demo",
   "main": "./main.prod.js",
   "author": {
     "name": "fanlion",

@@ -212,7 +212,7 @@ class Index extends React.Component<null, State> {
               onClick={this.handleSubmit}
               disabled={isLoading}
             >
-              { role === 0 ? 'Create Metting' : 'Join Metting' }
+              { role === 0 ? 'Create Meeting' : 'Join Meeting' }
             </button>
           </section>
         </main>
