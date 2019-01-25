@@ -294,6 +294,7 @@ export default class Client {
               this.logout();
               window.location.hash = '';
             } else {
+              this.$video.removeCanvasBind(`canvas-${userid}`);
               Client.store.dispatch(actions.removeOneOtherUser(userid));
             }
           }
