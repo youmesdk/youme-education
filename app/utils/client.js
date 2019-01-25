@@ -290,7 +290,7 @@ export default class Client {
           if (user.id !== userid) {
             const role = parseInt(userid.split('_')[2], 10);
             if (role === 0) {  // teacher logout, student need logout too
-              message.info('your teacher close class!');
+              message.info('meeting host close meeting!');
               this.logout();
               window.location.hash = '';
             } else {
