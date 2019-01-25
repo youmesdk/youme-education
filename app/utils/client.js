@@ -29,7 +29,7 @@ export const CLASS_IS_NOT_EXIST = -100001;
 export const MAX_NUMBER_MEMBER_ERROR = -100002;
 
 export const MAX_NUMBER_MEMBER_IN_ROOM = 5;        // 房间最多允许多少人加入
-export const TASK_INTERVAL_IN_SECOND = 1000 * 1;  // 定时器时间间隔（以秒为单位）
+export const TASK_INTERVAL_IN_SECOND = 1000 * 0.5;  // 定时器时间间隔（以秒为单位）
 
 
 export default class Client {
