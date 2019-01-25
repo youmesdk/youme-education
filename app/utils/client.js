@@ -265,50 +265,69 @@ export default class Client {
 
   _bindVideoEvents() {
     this.$video.on('onMemberChange', ({ memchange }) => {
+      console.log('onMemberChage', memchange);
       const state = Client.store.getState();
-      const { app, } = state;
-      const { users, user } = app;
+      const { user } = state.app;
 
       memchange.forEach((item) => {
         const { isJoin, userid } = item;
-        if (isJoin) {
-          const index = users.findIndex((u) => u.id === userid);
-          if (index === -1 && user.id !== userid) {
+        if (user.id !== userid) {
+          const name = userid.split('_')[0];
+          if (isJoin) {
             // userid: name_timestamp_role
-            const name = userid.split('_')[0];
-            const role = parseInt(userid.split('_')[2], 10);
-            const user = {
-              id: userid,
-              name: name,
-              role: role,
-              isMicOn: true,
-              isCameraOn: true,
-            };
-            Client.store.dispatch(actions.addOneOtherUser(user));
-          }
-        } else {
-          if (user.id !== userid) {
-            const role = parseInt(userid.split('_')[2], 10);
-            if (role === 0) {  // teacher logout, student need logout too
-              message.info('meeting host close meeting!');
-              this.logout();
-              window.location.hash = '';
-            } else {
-              Client.store.dispatch(actions.removeOneOtherUser(userid));
-            }
+            message.info(`${name} join meeting`);
+          } else {
+            message.info(`${name} leave meeting`);
           }
         }
       });
     });
 
+    this.$video.on('YOUME_EVENT_OTHERS_VIDEO_SHUT_DOWN', (evt) => {
+      console.log('YOUME_EVENT_OTHERS_VIDEO_SHUT_DOWN', evt);
+      const { param: userId } = evt;
+      const state = Client.store.getState();
+      const { users, user } = state.app;
+
+      if (user.id !== userId) {
+        const role = parseInt(userId.split('_')[2], 10);
+        if (role === 0) { // teacher logout, student need logout too
+          message.info('meeting host close meeting!');
+          this.logout();
+          window.location.hash = '';
+        } else {
+          Client.store.dispatch(actions.removeOneOtherUser(userId));
+        }
+      }
+    });
+
+    this.$video.on('YOUME_EVENT_OTHERS_VIDEO_ON', (evt) => {
+      console.log('YOUME_EVENT_OTHERS_VIDEO_ON', evt);
+      const state = Client.store.getState();
+      const { users } = state.app;
+      const { param: userId } = evt;
+
+      // userid: name_timestamp_role
+      const name = userId.split('_')[0];
+      const role = parseInt(userId.split('_')[2], 10);
+      const prevUser = users.find((item) => item.id === userId);
+      if (prevUser) {
+        const nextUser = Object.assign({}, prevUser, { isCameraOn: true });
+        Client.store.dispatch(actions.updateOneOtherUser(nextUser));
+      } else {
+        const nextUser = { id: userId, name, role, isMicOn: false, isCameraOn: true };
+        Client.store.dispatch(actions.addOneOtherUser(nextUser));
+      }
+    });
+
     // other open mic
     this.$video.on('YOUME_EVENT_OTHERS_MIC_ON', (evt) => {
+      console.log('YOUME_EVENT_OTHERS_MIC_ON', evt);
       const { param: userId } = evt;
       const state = Client.store.getState();
       const { users } = state.app;
 
       const prevUser = users.find((item) => item.id === userId);
-      console.log('Other mic on: ', evt);
       if (prevUser) {
         const nextUser = Object.assign({}, prevUser, { isMicOn: true });
         Client.store.dispatch(actions.updateOneOtherUser(nextUser));
@@ -317,12 +336,12 @@ export default class Client {
 
     // other close mic by self
     this.$video.on('YOUME_EVENT_OTHERS_MIC_OFF', (evt) => {
+      console.log('YOUME_EVENT_OTHERS_MIC_OFF: ', evt);
       const { param: userId } = evt;
       const state = Client.store.getState();
       const { users } = state.app;
 
       const prevUser = users.find((item) => item.id === userId);
-      console.log('Other mic off: ', evt);
       if (prevUser) {
         const nextUser = Object.assign({}, prevUser, { isMicOn: false });
         Client.store.dispatch(actions.updateOneOtherUser(nextUser));
@@ -331,6 +350,7 @@ export default class Client {
 
     // my mic open by other
     this.$video.on('YOUME_EVENT_MIC_CTR_ON', (evt) => {
+      console.log('YOUME_EVENT_MIC_CTR_ON', evt);
       const state = Client.store.getState();
       const { user } = state.app;
       const nextUser = Object.assign({}, user, { isMicOn: true });
@@ -339,6 +359,7 @@ export default class Client {
 
     // my mic close by other
     this.$video.on('YOUME_EVENT_MIC_CTR_OFF', (evt) => {
+      console.log('YOUME_EVENT_MIC_CTR_OFF', evt);
       const state = Client.store.getState();
       const { user } = state.app;
       const nextUser = Object.assign({}, user, { isMicOn: false });
@@ -347,12 +368,12 @@ export default class Client {
 
     // other open camera by self
     this.$video.on('YOUME_EVENT_OTHERS_VIDEO_INPUT_START', (evt) => {
+      console.log('YOUME_EVENT_OTHERS_VIDEO_INPUT_START', evt);
       const { param: userId } = evt;
       const state = Client.store.getState();
       const { users } = state.app;
 
       const prevUser = users.find((item) => item.id === userId);
-      console.log('Other video on: ', evt);
       if (prevUser) {
         const nextUser = Object.assign({}, prevUser, { isCameraOn: true });
         Client.store.dispatch(actions.updateOneOtherUser(nextUser));
@@ -361,12 +382,12 @@ export default class Client {
 
     // other close camare
     this.$video.on('YOUME_EVENT_OTHERS_VIDEO_INPUT_STOP', (evt) => {
+      console.log('YOUME_EVENT_OTHERS_VIDEO_INPUT_STOP', evt);
       const { param: userId } = evt;
       const state = Client.store.getState();
       const { users } = state.app;
 
       const prevUser = users.find((item) => item.id === userId);
-      console.log('Other video off: ', evt);
       if (prevUser) {
         const nextUser = Object.assign({}, prevUser, { isCameraOn: false });
         Client.store.dispatch(actions.updateOneOtherUser(nextUser));
