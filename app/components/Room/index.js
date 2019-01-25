@@ -63,11 +63,11 @@ class Room extends React.Component<Props, State> {
   componentDidMount() {
     const { user } = this.props;
     const { role } = user;
-    if (role === 0) { // teacher create a whiteboard room
-      this.createWhiteBoardRoom();
-    } else { // student join a whiteboard room
-      this.joinWhiteBoardRoom();
-    }
+    // if (role === 0) { // teacher create a whiteboard room
+    //   this.createWhiteBoardRoom();
+    // } else { // student join a whiteboard room
+    //   this.joinWhiteBoardRoom();
+    // }
     YIMClient.instance.$video.startCapture();
     this.pollingTask = setInterval(this.doupdate, 50);  // update video
     // update whiteboard draw area when window size changed
