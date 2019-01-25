@@ -7,7 +7,6 @@
 [![Flow](/internals/img/flow-padded-90.png)](https://flowtype.org/)
 [![ESLint](/internals/img/eslint-padded-90.png)](http://eslint.org/)
 [![Jest](/internals/img/jest-padded-90.png)](https://facebook.github.io/jest/)
-[![Yarn](/internals/img/yarn-padded-90.png)](https://yarnpkg.com/)
 
 游密 [Electron](http://electron.atom.io/) 版在线会议Demo， 基于[electron-react-boilerplate](https://github.com/electron-react-boilerplate/electron-react-boilerplate)
 
@@ -24,14 +23,12 @@
 
 First, clone the repo；
 
-And then install dependencies with yarn.
+And then install dependencies with npm.
 
 ```bash
 $ git checkout youme-metting
-$ yarn
+$ npm install
 ```
-
-**Note**: If you can't use [yarn](https://github.com/yarnpkg/yarn), run `npm install`.
 
 ## Run
 
