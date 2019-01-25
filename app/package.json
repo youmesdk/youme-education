@@ -1,7 +1,7 @@
 {
   "name": "youme-meeting-demo",
   "productName": "YoumeMeeting",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Youme Sdk for meeting electron demo",
   "main": "./main.prod.js",
   "author": {
