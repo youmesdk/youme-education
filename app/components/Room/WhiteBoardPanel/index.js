@@ -16,6 +16,7 @@ import styles from './style.scss';
 import WhiteBoardTool from '../../commons/WhiteBoardTool';
 import WhiteBoardScaler from '../../commons/WhiteBoardScaler';
 import WhiteBoardSidePanel from '../../commons/WhiteBoardSidePanel';
+import WhiteBoardDocSidePanel from '../../commons/WhiteBoardDocPanel';
 import { throttle } from '../../../utils/utils';
 
 import type { Tool } from '../../commons/WhiteBoardTool'
@@ -33,7 +34,8 @@ export default class WhiteboardPanel extends React.Component<Props> {
     super(props);
 
     this.state = {
-      isSidePanelShow: false,   // should show shortcut panel?
+      isShortcutPanelShow: false,   // should show shortcut panel?
+      isDocPanelShow: false,        // should show documents panel?
     };
 
     this.throttledWindowSizeChange = throttle(this.handleWindowSizeChange, 200);
@@ -65,17 +67,25 @@ export default class WhiteboardPanel extends React.Component<Props> {
     }
   }
 
-  openWhiteBoardSidePanel = () => {
-    this.setState({ isSidePanelShow: true });
+  openWhiteBoardShortcutSidePanel = () => {
+    this.setState({ isShortcutPanelShow: true });
   }
 
-  closeWhiteBoardSidePanel = () => {
-    this.setState({ isSidePanelShow: false });
+  closeWhiteBoardShortcutSidePanel = () => {
+    this.setState({ isShortcutPanelShow: false });
+  }
+
+  openWhiteBoardDocSidePanel = () => {
+    this.setState({ isDocPanelShow: true });
+  }
+
+  closeWhiteBoardDocSidePanel = () => {
+    this.setState({ isDocPanelShow: false });
   }
 
   render() {
     const { boardRoom, zoomScale, onZoomScaleDecrease, onZoomScaleIncrease } = this.props;
-    const { isSidePanelShow } = this.state;
+    const { isShortcutPanelShow, isDocPanelShow } = this.state;
 
     return (
       <div className={styles.container} id="whiteboard">
@@ -96,30 +106,46 @@ export default class WhiteboardPanel extends React.Component<Props> {
           onIncreasePress={onZoomScaleIncrease}
         />
 
-        {isSidePanelShow && (
+        {isShortcutPanelShow && (
           <WhiteBoardSidePanel
             className={styles.side_panel}
-            onClosePress={this.closeWhiteBoardSidePanel}
+            onClosePress={this.closeWhiteBoardShortcutSidePanel}
           />
         )}
 
+        {isDocPanelShow && (
+          <WhiteBoardDocSidePanel
+            contentClassName={styles.side_panel}
+            onClosePress={this.closeWhiteBoardDocSidePanel}
+          />
+        )}
 
         <div className={styles.right_bottom_tools}>
           <span className={styles.shortcut_hover}>
             <Tooltip
               title="快捷键说明"
               mouseEnterDelay={0.8}
-              onClick={this.openWhiteBoardSidePanel}
+              onClick={this.openWhiteBoardShortcutSidePanel}
             >
               <Icon.Info size={22} />
             </Tooltip>
           </span>
 
-          {/* <Pagination
+          <span className={styles.shortcut_hover}>
+            <Tooltip
+              title="文档"
+              mouseEnterDelay={0.8}
+              onClick={this.openWhiteBoardDocSidePanel}
+            >
+              <Icon.Package size={22} />
+            </Tooltip>
+          </span>
+
+          <Pagination
             size="small"
             defaultCurrent={1}
-            total={500}
-          /> */}
+            total={50}
+          />
         </div>
       </div>
     );

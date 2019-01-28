@@ -1,0 +1,110 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-width: 250px;
+  background: #FAFAFA;
+  box-shadow: -8px 0px 8px #ccc;
+  padding-top: 10px;
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #eee;
+    padding: 5px 16px;
+
+    h1 {
+      font-size: 14px;
+      font-weight: 600;
+      padding: 0;
+      margin: 0;
+    }
+
+    span {
+      font-weight: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  }
+
+  .content {
+    flex: 1;
+    padding: 10px;
+    overflow-y: scroll;
+
+    .page_item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      height: 120px;
+      width: 100%;
+      margin: 16px 6px;
+      cursor: pointer;
+
+      &__left {
+        font-size: 13px;
+        font-weight: bold;
+      }
+
+      .active {
+        font-size: 22px;
+        font-weight: bold;
+        color: darkcyan;
+      }
+
+      &__box {
+        flex: 1;
+        background: #FFF;
+        margin-left: 8px;
+        height: 100%;
+        box-shadow: 2px 0 2px #ccc;
+
+        &:hover {
+          background: #ddd;
+        }
+      }
+    }
+
+    &::-webkit-scrollbar {
+      // 滚动条整体样式
+      width: 4px; // 滚动条的尺寸
+      height: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      // 滚动条里的小方块
+      border-radius: 5px;
+      -webkit-box-shadow: inset 0 0 3px #166EEB;
+      -moz-box-shadow: inset 0 0 3px #166EEB;
+      box-shadow: inset 0 0 3px #166EEB;
+    }
+
+    &::-webkit-scrollbar-track {
+      // 滑道
+      -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+      -moz-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+      border-radius: 0;
+      background: rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .footer {
+    flex: 0;
+    text-align: center;
+    vertical-align: middle;
+    width: 100%;
+    padding: 10px 0;
+    background: #FFF;
+    font-size: 14px;
+    cursor: pointer;
+
+    &>span:first-child {
+      margin-right: 8px;
+    }
+
+    &:hover {
+      background: #F5F5F5;
+    }
+  }
+}
