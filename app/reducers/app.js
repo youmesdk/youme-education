@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-11-11 15:04:27
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-11 18:15:10
+ * @Last Modified time: 2019-01-28 21:57:37
  *
  * @flow
  *
@@ -35,7 +35,7 @@ export type AppStateType = {
 };
 
 export type Role = 0 | 1;  // 0: teacher; 1 student;
-export type PanelRole = 0 | 1;  // 0 - whiteboard, 1 - screen share
+export type PanelRole = 0 | 1 | 2;  // 0 - whiteboard, 1 - screen share, 2 - file sreen
 
 export type User = {
   id: string,       // user id

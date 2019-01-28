@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-07-27 16:16:37
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-11 18:35:14
+ * @Last Modified time: 2019-01-28 22:05:05
  *
  * @flow
  *
@@ -30,6 +30,7 @@ import { WHITEBOARD_TOKEN } from '../../config';
 import VideoCanvas from '../commons/VideoCanvas';
 import WhiteBoardPanel from './WhiteBoardPanel';
 import ScreenBoardPanel from './ScreenRecordPanel';
+import DocPanel from './DocPanel';
 
 import type { User, WhiteBoardRoom } from '../../reducers/app';
 
@@ -382,6 +383,18 @@ class Room extends React.Component<Props, State> {
               </div>
             )}
 
+            <span className={styles.content_menus_divider}>/</span>
+
+            <div
+              onClick={() => this.handlePanelRoleChange(2)}
+              className={[
+                styles.content_menus_item,
+                panelRole === 2 ? styles.content_menus_active : '',
+              ].join(' ')}
+            >
+              File Share
+            </div>
+
             {/* only teacher can share screen */}
             {user && user.role === 0 && (
               <Switch
@@ -409,6 +422,10 @@ class Room extends React.Component<Props, State> {
 
               {panelRole === 1 && (
                 <ScreenBoardPanel roomId={room} />
+              )}
+
+              {panelRole === 2 && (
+                <DocPanel />
               )}
             </div>
 
