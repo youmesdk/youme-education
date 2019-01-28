@@ -7,3 +7,4 @@
 *.dll binary
 *.exe binary
 *.dylib binary
+ymscreenrecord binary
