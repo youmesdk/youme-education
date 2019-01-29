@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2019-01-11 16:54:15
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-11 17:24:41
+ * @Last Modified time: 2019-01-29 16:14:48
  *
  * AliCloud 工具封装
  *
@@ -43,6 +43,8 @@ export default class AliClient {
     this.oss = new OSSClient({
       accessKeyId: ALI_ACCESS_KEY_ID,
       accessKeySecret: ALI_ACCESS_KEY_SECRET,
+      bucket: OSS_BUCKET_NAME,
+      region: OSS_REGION
     });
 
     return AliClient._instance || (AliClient._instance = this);
@@ -55,7 +57,8 @@ export default class AliClient {
   uploadFile(file: File): Promise<any> {
     const { name, path } = file;
     const fileName = Date.now() + "_" + name;
-    return this.oss.put(fileName, path);
+    const fileBlob = new Blob([file]);
+    return this.oss.put(fileName, fileBlob);
   }
 
   uploadDocAndConvertToImages(file: File, room: string): Promise<any> {
@@ -80,7 +83,7 @@ export default class AliClient {
       };
 
       return new Promise(async (resolve, reject) => {
-        const task = setInterval(() => {
+        const task = setInterval(async () => {
           const immQueryResult = await this.imm.request("GetOfficeConversionTask", immQueryParams);
           if (immQueryResult.Status !== "Running") {
             clearInterval(task);

@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2019-01-29 10:18:24
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-29 10:27:21
+ * @Last Modified time: 2019-01-29 15:09:17
  *
  * @flow
  *
@@ -26,7 +26,8 @@
      WhiteBoardClient.store = store;
    }
 
-   createRoom(token: string, room: string, limit = 5) {
+   // 创建一个白板
+   createRoom(token: string, room: string, limit = 5): Promise<any> {
      const url = `https://cloudcapiv3.herewhite.com/room?token=${token}`;
      return axios({
        url: url,
@@ -35,6 +36,19 @@
          'content-type': 'application/json',
        },
        data: { name: room, limit },
+     });
+   }
+
+   // 获取白板快照
+   fetchSnapshot(uuid: string, width: number, height: number, scene: number): Promise<any> {
+     const url = `https://cloudcapiv3.herewhite.com/handle/room/snapshot?token=${token}`;
+     return axios({
+       url: url,
+       method: 'post',
+       headers: {
+         'content-type': 'application/json',
+       },
+       data: { uuid, width, height, scene }
      });
    }
  }

@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-07-27 16:16:37
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-28 22:05:05
+ * @Last Modified time: 2019-01-29 15:11:26
  *
  * @flow
  *
@@ -287,21 +287,8 @@ class Room extends React.Component<Props, State> {
   }
 
   render() {
-    const {
-      messages,
-      nickname,
-      users,
-      room,
-      user,
-      panelRole,
-    } = this.props;
-
-    const {
-      isWhiteBoardLoading,
-      isScreenRecording,
-      boardRoom,
-      zoomScale,
-    } = this.state;
+    const { messages, nickname, users, room, user, panelRole, } = this.props;
+    const { isWhiteBoardLoading, isScreenRecording, boardRoom, zoomScale, } = this.state;
 
     const teacher = users.find(u => u.role == 0) || user;
     const isTeacherIsMySelf = teacher.id === user.id;

@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2019-01-29 11:56:29
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-29 14:28:32
+ * @Last Modified time: 2019-01-29 15:29:31
  *
  * @flow
  *
@@ -17,7 +17,7 @@ import {
 } from '../actions/files';
 
 const initialState = {
-  files: [],
+  fileList: [],
 };
 
 
@@ -29,17 +29,34 @@ export default (state = initialState, action: { type: string, [key]: any }) => {
       const { files } = action;
       return {
         ...state,
-        files,
+        fileList: files,
       };
     }
 
     case CLEAN_ALL_FILES: {
       return {
         ...state,
-        files: [],
+        fileList: [],
       };
     }
 
-    case
+    case ADD_ONE_FILE: {
+      const { file } = action;
+      return {
+        ...state,
+        fileList: [...fileList, file]
+      };
+    }
+
+    case REMOVE_ONE_FILE: {
+      return {
+        ...state,
+      };
+    };
+
+    default: {
+      return state;
+    }
+
   }
 }

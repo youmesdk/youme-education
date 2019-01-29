@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-11-11 15:36:30
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-29 14:51:31
+ * @Last Modified time: 2019-01-29 16:12:51
  *
  * @flow
  *
@@ -62,7 +62,7 @@ export default class Client {
     this.$ymrtc = new YMRTC({
       appKey: APP_KEY,
       video: true,
-      debug: true,
+      debug: false,
       dev: false
     });
 

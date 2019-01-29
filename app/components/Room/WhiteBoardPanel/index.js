@@ -2,14 +2,16 @@
  * @Author: fan.li
  * @Date: 2019-01-07 16:03:46
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-29 14:44:23
+ * @Last Modified time: 2019-01-29 17:17:25
  *
  * 白板操作面板
  */
 
 import * as React from 'react';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 import { WhiteWebSdk, RoomWhiteboard, } from 'white-react-sdk';
-import { Tooltip, Pagination } from 'antd';
+import { Tooltip, Pagination, message } from 'antd';
 import * as Icon from 'react-feather';
 
 import styles from './style.scss';
@@ -18,8 +20,12 @@ import WhiteBoardScaler from '../../commons/WhiteBoardScaler';
 import WhiteBoardSidePanel from '../../commons/WhiteBoardSidePanel';
 import WhiteBoardDocSidePanel from '../../commons/WhiteBoardDocPanel';
 import { throttle } from '../../../utils/utils';
-
 import type { Tool } from '../../commons/WhiteBoardTool'
+
+import * as fileActions from '../../../actions/files';
+import * as appActions from '../../../actions/app';
+
+import AliClient from '../../../utils/AliClient';
 
 
 type Props = {
@@ -29,7 +35,7 @@ type Props = {
   onZoomScaleIncrease: () => void,
 };
 
-export default class WhiteboardPanel extends React.Component<Props> {
+class WhiteboardPanel extends React.Component<Props> {
   constructor(props) {
     super(props);
 
@@ -67,8 +73,54 @@ export default class WhiteboardPanel extends React.Component<Props> {
     }
   }
 
-  handleWhiteBoardChooseFile = (file: File) => {
-    const { type } = file;
+  fileToImage = (file: File) => {
+    const fileReader = new FileReader();
+    const img = new Image();
+    return new Promise((resolve, reject) => {
+      fileReader.onload = function() {
+        img.src = fileReader.result;
+      }
+
+      fileReader.onerror = function(err) {
+        reject(err);
+      }
+
+      img.onload = function() {
+        resolve(img);
+      }
+
+      img.onerror = function(err) {
+        reject(err);
+      }
+      fileReader.readAsDataURL(file);
+    });
+  }
+
+  handleWhiteBoardChooseFile = async (file: File) => {
+    try {
+      const { boardRoom } = this.props;
+
+      // 选中的是图片,在白板中插入图片
+      if (/image/.test(file.type)) {
+        if (boardRoom) {
+          const img: Image = await this.fileToImage(file);
+          const imgRes = await AliClient.instance.uploadFile(file);
+          const { name: uuid, url } = imgRes;
+
+          boardRoom.insertImage({
+            uuid: uuid,
+            centerX: 0,
+            centerY: 0,
+            width: img.width,
+            height: img.height,
+          });
+          boardRoom.completeImageUpload(uuid, url);
+        }
+      }
+    } catch(err) {
+      message.error('upload file error');
+    } finally {
+    }
   }
 
   openWhiteBoardShortcutSidePanel = () => {
@@ -156,3 +208,23 @@ export default class WhiteboardPanel extends React.Component<Props> {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  const { app, files } = state;
+  const { room, user, whiteBoardRoom } = app;
+  const { fileList } = files;
+
+  return {
+    room,
+    user,
+    whiteBoardRoom,
+    fileList,
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(WhiteboardPanel);
