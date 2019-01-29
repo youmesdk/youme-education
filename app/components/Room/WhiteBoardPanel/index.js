@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2019-01-07 16:03:46
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-11 18:08:07
+ * @Last Modified time: 2019-01-29 14:44:23
  *
  * 白板操作面板
  */
@@ -67,6 +67,10 @@ export default class WhiteboardPanel extends React.Component<Props> {
     }
   }
 
+  handleWhiteBoardChooseFile = (file: File) => {
+    const { type } = file;
+  }
+
   openWhiteBoardShortcutSidePanel = () => {
     this.setState({ isShortcutPanelShow: true });
   }
@@ -97,6 +101,7 @@ export default class WhiteboardPanel extends React.Component<Props> {
         <WhiteBoardTool
           className={styles.docker}
           onToolChange={this.handleWhiteBoardToolChange}
+          onChooseFile={this.handleWhiteBoardChooseFile}
         />
 
         <WhiteBoardScaler

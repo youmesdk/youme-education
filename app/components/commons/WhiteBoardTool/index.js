@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-12-19 15:45:54
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-12-19 20:36:04
+ * @Last Modified time: 2019-01-29 14:36:18
  *
  * @flow
  *
@@ -11,7 +11,7 @@
 
 import * as React from 'react';
 import * as Icon from 'react-feather';
-import { Tooltip, Menu } from 'antd';
+import { Tooltip, Menu, Upload } from 'antd';
 import { CirclePicker } from 'react-color';
 
 import styles from './style.scss';
@@ -22,6 +22,7 @@ type Props = {
   defaultColor?: string,
   onColorChange?: (color: string) => void,
   onToolChange?: (tool: Tool) => void,
+  onChooseFile?: (file: File) => void,
 };
 
 type State = {
@@ -48,6 +49,7 @@ export default class WhiteBoardTool extends React.Component<Props, State> {
       color: defaultColor,
       isColorPickerShow: false,
     };
+    this.fileInputRef = null;
   }
 
   componentDidMount() {
@@ -79,6 +81,18 @@ export default class WhiteBoardTool extends React.Component<Props, State> {
     this.setState({ color: color.hex });
     const { onColorChange } = this.props;
     onColorChange(color.hex);
+  }
+
+  handleFileInputChange = (e) => {
+    const file = e.target.files[0];
+    const { onChooseFile } = this.props;
+    onChooseFile(file);
+  }
+
+  handleUploadBtnClick = () => {
+    if (this.fileInputRef) {
+      this.fileInputRef.click();
+    }
   }
 
   handleKeyboard = (event: KeyboardEvent) => {
@@ -182,6 +196,22 @@ export default class WhiteBoardTool extends React.Component<Props, State> {
           </Tooltip>
         </div>
 
+        <div
+          className={styles.icon}
+          onClick={this.handleUploadBtnClick}
+        >
+          <Tooltip title="上传图片或文档" mouseEnterDelay={1.0}>
+            <input
+              type="file"
+              name="file"
+              onChange={this.handleFileInputChange}
+              style={{ display: "none" }}
+              ref={o => this.fileInputRef = o}
+            />
+            <Icon.Upload />
+          </Tooltip>
+        </div>
+
         {/* <div
           className={[styles.icon, styles.color_container].join(' ')}
           onClick={this.handleColorSelected}
@@ -210,4 +240,5 @@ WhiteBoardTool.defaultProps = {
   defaultColor: '#000',
   onColorChange: f => f,
   onToolChange: f => f,
+  onChooseFile: f => f,
 };

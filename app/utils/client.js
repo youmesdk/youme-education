@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-11-11 15:36:30
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-11 19:11:06
+ * @Last Modified time: 2019-01-29 14:51:31
  *
  * @flow
  *
@@ -95,34 +95,6 @@ export default class Client {
 
   initScreenRecord() {
     this.$screen.setParam(1, false, 15, true);
-    // const logDir = path.join(__dirname, 'logs');
-    // this.$screen.yimlog.configure({
-    //   appenders: {
-    //     file: {
-    //       type: "file",
-    //       filename: path.join(logDir, "ym-screenrecord.txt"),
-    //       maxLogSize: 10 * 1024 * 1024, // = 10Mb
-    //       numBackups: 3, // keep five backup files
-    //       compress: true, // compress the backups
-    //       encoding: "utf-8",
-    //       mode: 0o0640,
-    //       flags: "w+"
-    //     },
-    //     dateFile: {
-    //       type: "dateFile",
-    //       filename: path.join(logDir, "more-ym-screenrecord.txt"),
-    //       pattern: "yyyy-MM-dd-hh",
-    //       compress: true
-    //     },
-    //     out: {
-    //       type: "stdout"
-    //     }
-    //   },
-    //   categories: {
-    //     default: { appenders: ["file", "dateFile", "out"], level: 'info' },
-    //     ymscreenrecord: { appenders: ["file", "out", "dateFile"], level: 'info' }
-    //   }
-    // });
   }
 
   login(uname, upasswd = '123456', utoken = ''): Promise < any > {
@@ -134,12 +106,7 @@ export default class Client {
 
     const imLoginPromise = new Promise((resolve, reject) => {
       this.$im.login(uname, upasswd, utoken, (code, evt) => {
-        return code === 0 ? resolve({
-          code,
-          evt
-        }) : reject({
-          code
-        });
+        return code === 0 ? resolve({ code, evt }) : reject({ code });
       });
     });
 
@@ -167,19 +134,14 @@ export default class Client {
     return new Promise((resolve, reject) => {
       this.$im.joinChatRoom(uroom, (code, evt) => {
         if (code !== 0) {
-          return reject({
-            code
-          });
+          return reject({ code });
         }
 
         this.task = setTimeout(() => {
           this.rejectHash.delete(CREATE_ROOM_EVENT);
           this.resolveHash.delete(CREATE_ROOM_EVENT);
           // 指定时间内没收到该房间内其他老师的占用声明，则视为该课堂没人占用,可以开课
-          return resolve({
-            code,
-            evt
-          });
+          return resolve({ code, evt });
         }, TASK_INTERVAL_IN_SECOND);
 
         this.rejectHash.set(CREATE_ROOM_EVENT, reject);
@@ -192,18 +154,14 @@ export default class Client {
     return new Promise((resolve, reject) => {
       this.$im.joinChatRoom(uroom, (code, evt) => {
         if (code !== 0) {
-          return reject({
-            code
-          });
+          return reject({ code });
         }
 
         this.task = setTimeout(() => {
           this.rejectHash.delete(JOIN_ROOM_EVENT);
           this.resolveHash.delete(JOIN_ROOM_EVENT);
           // 指定时间内没有得到老师响应，则表明该课堂没有开课, 学生不能加入课堂
-          return reject({
-            code: CLASS_IS_NOT_EXIST
-          });
+          return reject({ code: CLASS_IS_NOT_EXIST });
         }, TASK_INTERVAL_IN_SECOND);
 
         this.rejectHash.set(JOIN_ROOM_EVENT, reject);
@@ -214,11 +172,7 @@ export default class Client {
 
   setMicrophoneMute(memberId: string, isOpen: boolean): void {
     const state = Client.store.getState();
-    const {
-      users,
-      user,
-      room
-    } = state.app;
+    const { users, user, room } = state.app;
     if (memberId === user.id) { // change myself microphone
       if (isOpen && this.$ymrtc.isLocalAudioPaused()) {
         this.$ymrtc.resumeLocalAudio();
@@ -228,30 +182,18 @@ export default class Client {
       }
     } else {
       const oldUser = users.find((item: User) => item.id === memberId);
-      const newUser = Object.assign({}, oldUser, {
-        isMicOn: isOpen
-      });
+      const newUser = Object.assign({}, oldUser, { isMicOn: isOpen });
       Client.store.dispatch(actions.updateOneOtherUser(newUser));
     }
 
     // notify other in room
-    const cmd = {
-      cmd: 2,
-      data: {
-        userId: memberId,
-        isMicOn: isOpen
-      }
-    };
+    const cmd = { cmd: 2, data: { userId: memberId, isMicOn: isOpen } };
     this.signing(room, 2, cmd);
   };
 
   setCameraOpen(memberId: string, isOpen: boolean): void {
     const state = Client.store.getState();
-    const {
-      users,
-      user,
-      room
-    } = state.app;
+    const { users, user, room } = state.app;
     if (memberId === user.id) {
       if (isOpen && this.$ymrtc.isLocalVideoPaused()) {
         this.$ymrtc.resumeLocalVideo();
@@ -261,32 +203,19 @@ export default class Client {
       }
     } else {
       const oldUser = users.find((item: User) => item.id === memberId);
-      const newUser = Object.assign({}, oldUser, {
-        isCameraOn: isOpen
-      });
+      const newUser = Object.assign({}, oldUser, { isCameraOn: isOpen });
       Client.store.dispatch(actions.updateOneOtherUser(newUser));
     }
 
     // notify other in room
-    const cmd = {
-      cmd: 3,
-      data: {
-        userId: memberId,
-        isCameraOn: isOpen
-      }
-    };
+    const cmd = { cmd: 3, data: { userId: memberId, isCameraOn: isOpen } };
     this.signing(room, 2, cmd);
   }
 
   sendTextMessage(recvId: string, chatType: number, text: string): Promise < any > {
     return new Promise((resolve, reject) => {
       this.$im.sendTextMessage(recvId, chatType, text, (code, evt) => {
-        return code === 0 ? resolve({
-          code,
-          evt
-        }) : reject({
-          code
-        });
+        return code === 0 ? resolve({ code, evt }) : reject({ code });
       });
     });
   }
@@ -294,12 +223,7 @@ export default class Client {
   sendCustomMessage(recvId: string, chatType: number, content: string): Promise < any > {
     return new Promise((resolve, reject) => {
       this.$im.sendCustomMessage(recvId, chatType, content, (code, evt) => {
-        return code === 0 ? resolve({
-          code,
-          evt
-        }) : reject({
-          code
-        });
+        return code === 0 ? resolve({ code, evt }) : reject({ code });
       });
     });
   }
@@ -330,57 +254,28 @@ export default class Client {
     });
 
     this.$im.on('OnUserLeaveChatRoom', (msg) => {
-      const {
-        channelID,
-        userID
-      } = msg;
+      const { channelID, userID } = msg;
       console.log('OnUserLeaveChatRoom:', msg);
     });
 
     this.$im.on('OnUserJoinChatRoom', (msg) => {
-      const {
-        channelID,
-        userID
-      } = msg;
+      const { channelID, userID } = msg;
       const state = Client.store.getState();
-      const {
-        app
-      } = state;
-      const {
-        user,
-        room,
-        users,
-        whiteBoardRoom
-      } = app;
-      const {
-        id,
-        name,
-        role
-      } = user;
-      const {
-        uuid,
-        roomToken
-      } = whiteBoardRoom;
-
+      const { app } = state;
+      const { user, room, users, whiteBoardRoom } = app;
+      const { id, name, role } = user;
+      const { uuid, roomToken } = whiteBoardRoom;
       if (role === 0) { // teacher should send a sigining to student
         if (users.length <= MAX_NUMBER_MEMBER_IN_ROOM) {
           const cmd = {
             cmd: 0,
-            data: {
-              whiteBoardRoom: {
-                uuid,
-                roomToken
-              }
-            }
+            data: { whiteBoardRoom: { uuid, roomToken } }
           };
           this.signing(userID, 1, cmd);
         } else {
           const cmd = {
             cmd: 1,
-            data: {
-              max: MAX_NUMBER_MEMBER_IN_ROOM,
-              count: users.length - 1
-            }
+            data: { max: MAX_NUMBER_MEMBER_IN_ROOM, count: users.length - 1 }
           };
           this.signing(userID, 1, cmd);
         }
@@ -433,12 +328,7 @@ export default class Client {
 
     this.$ymrtc.on('local-media.has-stream', (stream: MediaStream) => {
       const state = Client.store.getState();
-      const {
-        app
-      } = state;
-      const {
-        user
-      } = app;
+      const { user } = state.app;
       this.$ymrtc.setLocalAudioVolumeGain(0.1);
       const videoDom: HTMLVideoElement = document.getElementById(`canvas-${user.id}`);
       if (videoDom) {
@@ -455,179 +345,129 @@ export default class Client {
 
     this.$ymrtc.on('local-media.pause-audio', () => {
       const state = Client.store.getState();
-      const {
-        user
-      } = state.app;
-      const tempUser = Object.assign({}, user, {
-        isMicOn: false
-      });
+      const { user } = state.app;
+      const tempUser = Object.assign({}, user, { isMicOn: false });
       Client.store.dispatch(actions.setUser(tempUser));
     });
 
     this.$ymrtc.on('local-media.pause-video', () => {
       const state = Client.store.getState();
-      const {
-        user
-      } = state.app;
-      const tempUser = Object.assign({}, user, {
-        isCameraOn: false
-      });
+      const { user } = state.app;
+      const tempUser = Object.assign({}, user, { isCameraOn: false });
       Client.store.dispatch(actions.setUser(tempUser));
     });
 
     this.$ymrtc.on('local-media.resume-audio', () => {
       const state = Client.store.getState();
-      const {
-        user
-      } = state.app;
-      const tempUser = Object.assign({}, user, {
-        isMicOn: true
-      });
+      const { user } = state.app;
+      const tempUser = Object.assign({}, user, { isMicOn: true });
       Client.store.dispatch(actions.setUser(tempUser));
     });
 
     this.$ymrtc.on('local-media.resume-video', () => {
       const state = Client.store.getState();
-      const {
-        user
-      } = state.app;
-      const tempUser = Object.assign({}, user, {
-        isCameraOn: true
-      });
+      const { user } = state.app;
+      const tempUser = Object.assign({}, user, { isCameraOn: true });
       Client.store.dispatch(actions.setUser(tempUser));
     });
   }
 
   handleSigining(msg) {
     const content = atob(msg.content);
-    const {
-      cmd,
-      data
-    } = JSON.parse(content);
+    const { cmd, data } = JSON.parse(content);
 
     switch (cmd) {
       // 收到老师房间正常的回应
-      case 0:
-        {
-          this.resolveHash.delete(CREATE_ROOM_EVENT);
-          if (this.rejectHash.has(CREATE_ROOM_EVENT)) {
-            const reject = this.rejectHash.get(CREATE_ROOM_EVENT);
-            this.rejectHash.delete(CREATE_ROOM_EVENT);
-            // 该课堂有其他老师声明课程被占用了, 不能再这个房间再次开课
-            reject({
-              code: CLASS_IS_EXIST
-            });
-          }
-
-          this.rejectHash.delete(JOIN_ROOM_EVENT);
-          if (this.resolveHash.has(JOIN_ROOM_EVENT)) {
-            const resolve = this.resolveHash.get(JOIN_ROOM_EVENT);
-            // 收到了该课堂老师的回应，学生可以加入到房间
-            resolve({
-              code: 0,
-              evt: data
-            });
-          }
-          break;
+      case 0: {
+        this.resolveHash.delete(CREATE_ROOM_EVENT);
+        if (this.rejectHash.has(CREATE_ROOM_EVENT)) {
+          const reject = this.rejectHash.get(CREATE_ROOM_EVENT);
+          this.rejectHash.delete(CREATE_ROOM_EVENT);
+          // 该课堂有其他老师声明课程被占用了, 不能再这个房间再次开课
+          reject({ code: CLASS_IS_EXIST });
         }
 
-        // 收到老师端房间超员的回应
-      case 1:
-        {
-          this.resolveHash.delete(CREATE_ROOM_EVENT);
-          if (this.rejectHash.has(CREATE_ROOM_EVENT)) {
-            const reject = this.rejectHash.get(CREATE_ROOM_EVENT);
-            this.rejectHash.delete(CREATE_ROOM_EVENT);
-            // 该课堂有其他老师声明课程被占用了, 不能再这个房间再次开课
-            reject({
-              code: CLASS_IS_EXIST
-            });
+        this.rejectHash.delete(JOIN_ROOM_EVENT);
+        if (this.resolveHash.has(JOIN_ROOM_EVENT)) {
+          const resolve = this.resolveHash.get(JOIN_ROOM_EVENT);
+          // 收到了该课堂老师的回应，学生可以加入到房间
+          resolve({ code: 0, evt: data });
+        }
+        break;
+      }
+
+      // 收到老师端房间超员的回应
+      case 1: {
+        this.resolveHash.delete(CREATE_ROOM_EVENT);
+        if (this.rejectHash.has(CREATE_ROOM_EVENT)) {
+          const reject = this.rejectHash.get(CREATE_ROOM_EVENT);
+          this.rejectHash.delete(CREATE_ROOM_EVENT);
+          // 该课堂有其他老师声明课程被占用了, 不能再这个房间再次开课
+          reject({ code: CLASS_IS_EXIST });
+        }
+
+        this.resolveHash.delete(JOIN_ROOM_EVENT);
+        if (this.rejectHash.has(JOIN_ROOM_EVENT)) {
+          const reject = this.rejectHash.get(JOIN_ROOM_EVENT);
+          // 收到了该课堂老师的回应，但是房间超员了，学生也不能进入房间
+          reject({ code: MAX_NUMBER_MEMBER_ERROR, });
+        }
+        break;
+      }
+
+      // 远端用户麦克风状态改变 （开/关）
+      case 2: {
+        const state = Client.store.getState();
+        const { user, users } = state.app;
+        const { userId, isMicOn } = data;
+        if (userId === user.id) { // teacher change my microphone status
+          if (isMicOn && this.$ymrtc.isLocalAudioPaused()) {
+            this.$ymrtc.resumeLocalAudio();
           }
-
-          this.resolveHash.delete(JOIN_ROOM_EVENT);
-          if (this.rejectHash.has(JOIN_ROOM_EVENT)) {
-            const reject = this.rejectHash.get(JOIN_ROOM_EVENT);
-            // 收到了该课堂老师的回应，但是房间超员了，学生也不能进入房间
-            reject({
-              code: MAX_NUMBER_MEMBER_ERROR,
-            });
+          if (!isMicOn && !this.$ymrtc.isLocalAudioPaused()) {
+            this.$ymrtc.pauseLocalAudio();
           }
-          break;
+        } else { // teacher change other student's microphone status
+          const oldOther = users.find((item: User) => item.id === userId);
+          const newOther = Object.assign({}, oldOther, { isMicOn: isMicOn });
+          Client.store.dispatch(actions.updateOneOtherUser(newOther));
         }
+        break;
+      }
 
-        // 远端用户麦克风状态改变 （开/关）
-      case 2:
-        {
-          const state = Client.store.getState();
-          const {
-            user,
-            users
-          } = state.app;
-          const {
-            userId,
-            isMicOn
-          } = data;
-          if (userId === user.id) { // teacher change my microphone status
-            if (isMicOn && this.$ymrtc.isLocalAudioPaused()) {
-              this.$ymrtc.resumeLocalAudio();
-            }
-            if (!isMicOn && !this.$ymrtc.isLocalAudioPaused()) {
-              this.$ymrtc.pauseLocalAudio();
-            }
-          } else { // teacher change other student's microphone status
-            const oldOther = users.find((item: User) => item.id === userId);
-            const newOther = Object.assign({}, oldOther, {
-              isMicOn: isMicOn
-            });
-            Client.store.dispatch(actions.updateOneOtherUser(newOther));
+      // 远端用户视频状态改变（开/关）
+      case 3: {
+        const state = Client.store.getState();
+        const { user, users } = state.app;
+        const { userId, isCameraOn } = data;
+        if (userId === user.id) { // teacher change my camera status
+          if (isCameraOn && this.$ymrtc.isLocalVideoPaused()) {
+            this.$ymrtc.resumeLocalVideo();
           }
-          break;
-        }
-
-        // 远端用户视频状态改变（开/关）
-      case 3:
-        {
-          const state = Client.store.getState();
-          const {
-            user,
-            users
-          } = state.app;
-          const {
-            userId,
-            isCameraOn
-          } = data;
-          if (userId === user.id) { // teacher change my camera status
-            if (isCameraOn && this.$ymrtc.isLocalVideoPaused()) {
-              this.$ymrtc.resumeLocalVideo();
-            }
-            if (!isCameraOn && !this.$ymrtc.isLocalVideoPaused()) {
-              this.$ymrtc.resumeLocalVideo();
-            }
-          } else { // teacher change other student's camera status
-            const oldOther = users.find((item: User) => item.id === userId);
-            const newOther = Object.assign({}, oldOther, {
-              isCameraOn: isCameraOn
-            });
-            Client.store.dispatch(actions.updateOneOtherUser(newOther));
+          if (!isCameraOn && !this.$ymrtc.isLocalVideoPaused()) {
+            this.$ymrtc.resumeLocalVideo();
           }
-          break;
+        } else { // teacher change other student's camera status
+          const oldOther = users.find((item: User) => item.id === userId);
+          const newOther = Object.assign({}, oldOther, { isCameraOn: isCameraOn });
+          Client.store.dispatch(actions.updateOneOtherUser(newOther));
         }
+        break;
+      }
 
-        // 教师关闭录屏
-      case 4:
-        {
-          message.info('your teacher stop screen share!');
-          Client.store.dispatch(actions.setPanelRole(0)); // 去白板页面
-          break;
-        }
+      // 教师关闭录屏
+      case 4: {
+        message.info('your teacher stop screen share!');
+        Client.store.dispatch(actions.setPanelRole(0)); // 去白板页面
+        break;
+      }
 
-        // 教师开启录屏
-      case 5:
-        {
-          message.info('your teacher start share screen!');
-          const state = Client.store.getState();
-          Client.store.dispatch(actions.setPanelRole(1)); // 去录屏页面
-        }
+      // 教师开启录屏
+      case 5: {
+        message.info('your teacher start share screen!');
+        const state = Client.store.getState();
+        Client.store.dispatch(actions.setPanelRole(1)); // 去录屏页面
+      }
     }
   }
 }
