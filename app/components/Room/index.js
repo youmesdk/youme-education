@@ -21,7 +21,8 @@ import styles from './style.scss';
 import MessageList from './MessageList';
 import MessageText from './MessageText';
 import ChatBottom from './ChatBottom';
-import * as actions from '../../actions/app';
+import * as appActions from '../../actions/app';
+import * as whiteboardActions from '../../actions/whiteboard';
 import YIMClient, { MAX_NUMBER_MEMBER_IN_ROOM } from '../../utils/client';
 import { isEmpty } from '../../utils/utils';
 import avatarIcon from '../../assets/images/avatar.png';
@@ -56,7 +57,6 @@ class Room extends React.Component<Props, State> {
       isScreenRecording: false,
       boardRoom: null,
       zoomScale: 1.0,
-      scenes: [],
     };
 
     this.whiteBoardSDK = new WhiteWebSdk();   // whiteboard sdk instance
@@ -209,13 +209,24 @@ class Room extends React.Component<Props, State> {
   }
 
   onWhiteBoardStateChange = (state) => {
-    const { memberState, zoomScale, scenes } = state;
+    const { memberState, zoomScale, scenes, globalState } = state;
+    const { setWhiteBoardPageCount, setWhiteBoardCurrentPage } = this.props;
+
     if (zoomScale) {
       this.setState({ zoomScale: zoomScale });
     }
 
     if (scenes) {
-      this.setState({ scenes: scenes });
+      console.log(scenes, '==============================scenes');
+      const pageCount = scenes.length;
+      setWhiteBoardPageCount(pageCount);
+    }
+
+    if (globalState) {
+      const { currentSceneIndex } = globalState;
+      setWhiteBoardCurrentPage(currentSceneIndex);
+      console.log(globalState, '===============================global state');
+
     }
   }
 
@@ -454,7 +465,7 @@ class Room extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state) => {
-  const { app } = state;
+  const { app, whiteboard } = state;
   const { messages, room, users, user, whiteBoardRoom, panelRole } = app;
 
   return {
@@ -469,11 +480,14 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    addOneMessage: bindActionCreators(actions.addOneMessage, dispatch),
-    updateOneMessage: bindActionCreators(actions.updateOneMessage, dispatch),
-    setWhiteBoardRoom: bindActionCreators(actions.setWhiteBoardRoom, dispatch),
-    setUser: bindActionCreators(actions.setUser, dispatch),
-    setPanelRole: bindActionCreators(actions.setPanelRole, dispatch),
+    addOneMessage: bindActionCreators(appActions.addOneMessage, dispatch),
+    updateOneMessage: bindActionCreators(appActions.updateOneMessage, dispatch),
+    setWhiteBoardRoom: bindActionCreators(appActions.setWhiteBoardRoom, dispatch),
+    setUser: bindActionCreators(appActions.setUser, dispatch),
+    setPanelRole: bindActionCreators(appActions.setPanelRole, dispatch),
+    setWhiteBoardPageCount: bindActionCreators(whiteboardActions.setPageCount, dispatch),
+    setWhiteBoardCurrentPage: bindActionCreators(whiteboardActions.setCurrentPage, dispatch),
+
   };
 };
 

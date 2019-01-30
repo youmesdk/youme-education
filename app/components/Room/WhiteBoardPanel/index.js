@@ -198,6 +198,7 @@ class WhiteboardPanel extends React.Component<Props> {
       // push new page into whiteboard
       boardRoom.insertNewPage(count);
       setWhiteBoardPageCount(count + 1);
+      // TODO: redux异步更改，可能导致fetchSnapshot()获取到未更新的store
       this.fetchSnapshot();
     }
   }
