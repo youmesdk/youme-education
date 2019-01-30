@@ -10,22 +10,18 @@
  */
 
 import * as React from 'react';
-import { message } from 'antd';
 
 import styles from './style.scss';
-import WhiteBoardClient from '../../../utils/WhiteBoardClient';
 
 type Props = {
   contentClassName?: string,
   onClosePress?: () => void,
   onAddPage?: () => void,
   onRemovePage?: () => void,
-  boardRoom: object | null;
-  whiteBoardRoom: { uuid: string }
-};
-
-type State = {
-  pages: Arrany<Page>
+  onPageClick?: (page: Page) => void,
+  total: number,
+  currentPage: number,
+  pages: Page[],
 };
 
 type Page = {
@@ -36,74 +32,17 @@ type Page = {
 export default class WhiteBoardDocPanel extends React.Component<Props, State> {
   constructor(props) {
     super(props);
-    this.state = {
-      pages: [],
-      current: 0,
-    };
-  }
-
-  componentDidMount() {
-    this.fetchSnapshot();
-  }
-
-  fetchSnapshot = async () => {
-    try {
-      const { whiteBoardRoom, total } = this.props;
-      const { uuid } = whiteBoardRoom;
-      const pages: Page[] = [];
-
-      for (let i = 0; i < total; i++) {
-        const res = await WhiteBoardClient.instance.fetchSnapshot(uuid, 250, 120, i);
-        const imgDataURL = await this.imageBlobToDataURL(res.data);
-        const page = { index: i, img: imgDataURL };
-        pages.push(page);
-      }
-
-      this.setState({ pages: pages });
-    } catch(err) {
-      message.error('获取画板预览图失败，请重试');
-    }
-  }
-
-  imageBlobToDataURL = (blob: Blob) => {
-    const fileReader = new FileReader();
-    fileReader.readAsDataURL(blob);
-
-    return new Promise((resolve, reject) => {
-      fileReader.onload = function() {
-        resolve(fileReader.result);
-      }
-
-      fileReader.onerror = function(err) {
-        reject(err);
-      }
-    });
-  }
-
-  handlePageClick = (page: Page) => {
-    const { boardRoom } = this.props;
-    const { index } = page;
-    if (boardRoom) {
-      boardRoom.setGlobalState({
-        currentSceneIndex: index,
-      });
-    }
-  }
-
-  handleAddPage = () => {
-    const { boardRoom } = this.props;
-    const {} = this.props;
-
-    if (boardRoom) {
-      boardRoom.insertNewPage(1)
-      console.log(boardRoom.state);
-
-    }
   }
 
   render() {
-    const { contentClassName, onClosePress } = this.props;
-    const { pages, current } = this.state;
+    const {
+      contentClassName,
+      onClosePress,
+      currentPage,
+      pages,
+      onAddPage,
+      onPageClick,
+    } = this.props;
 
     return (
       <div className={[styles.container, contentClassName].join(' ')}>
@@ -115,12 +54,12 @@ export default class WhiteBoardDocPanel extends React.Component<Props, State> {
         <main className={styles.content}>
           {pages.map((item) => {
             const { index, img } = item;
-            const isSelected = index === current;
+            const isSelected = index === currentPage;
 
             return (
               <div
                 className={styles.page_item} key={index}
-                onClick={() => this.handlePageClick(item)}
+                onClick={() => onPageClick(item)}
               >
                 <div className={[styles.page_item__left, isSelected ? styles.active : ''].join(' ')}>
                   {index + 1}
@@ -134,7 +73,7 @@ export default class WhiteBoardDocPanel extends React.Component<Props, State> {
         </main>
 
         <footer className={styles.footer}>
-          <div onClick={this.handleAddPage}>
+          <div onClick={onAddPage}>
             <span>+</span>
             <span>新增页面</span>
           </div>
@@ -146,11 +85,10 @@ export default class WhiteBoardDocPanel extends React.Component<Props, State> {
 
 WhiteBoardDocPanel.defaultProps = {
   contentClassName: '',
-  total: 1,
-  current: 0,
 
   onClosePress: f => f,
   onAddPage: f => f,
   onRemovePage: f => f,
+  onPageClick: f => f,
 };
 

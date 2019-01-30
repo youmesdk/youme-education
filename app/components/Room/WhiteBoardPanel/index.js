@@ -24,16 +24,27 @@ import type { Tool } from '../../commons/WhiteBoardTool'
 
 import * as fileActions from '../../../actions/files';
 import * as appActions from '../../../actions/app';
+import * as whiteboardActions from '../../../actions/whiteboard';
 
 import AliClient from '../../../utils/AliClient';
 import WhiteBoardClient from '../../../utils/WhiteBoardClient';
 
+type Page = {
+  index: number,
+  img: string,
+};
 
 type Props = {
   boardRoom: object,
   zoomScale: number,
   onZoomScaleDecrease: () => void,
   onZoomScaleIncrease: () => void,
+};
+
+type State = {
+  isShortcutPanelShow: boolean,
+  isDocPanelShow: boolean,
+  pages: Pages[],
 };
 
 class WhiteboardPanel extends React.Component<Props> {
@@ -43,6 +54,7 @@ class WhiteboardPanel extends React.Component<Props> {
     this.state = {
       isShortcutPanelShow: false,   // should show shortcut panel?
       isDocPanelShow: false,        // should show documents panel?
+      pages: [],
     };
 
     this.throttledWindowSizeChange = throttle(this.handleWindowSizeChange, 200);
@@ -51,11 +63,47 @@ class WhiteboardPanel extends React.Component<Props> {
   componentDidMount() {
     // update whiteboard draw area when window size changed
     window.addEventListener('resize', this.throttledWindowSizeChange, false);
+    // fetch whiteboard page preview
+    this.fetchSnapshot();
   }
 
   componentWillUnmount() {
     // remove resize listener when compoent will unmount
     window.removeEventListener('resize', this.throttledWindowSizeChange, false);
+  }
+
+  fetchSnapshot = async () => {
+    try {
+      const { whiteBoardRoom, count } = this.props;
+      const { uuid } = whiteBoardRoom;
+      const pages: Page[] = [];
+
+      for (let i = 0; i < count; i++) {
+        const res = await WhiteBoardClient.instance.fetchSnapshot(uuid, 250, 120, i);
+        const imgDataURL = await this.imageBlobToDataURL(res.data);
+        const page = { index: i, img: imgDataURL };
+        pages.push(page);
+      }
+
+      this.setState({ pages: pages });
+    } catch(err) {
+      message.error('获取画板预览图失败，请重试');
+    }
+  }
+
+  imageBlobToDataURL = (blob: Blob) => {
+    const fileReader = new FileReader();
+    fileReader.readAsDataURL(blob);
+
+    return new Promise((resolve, reject) => {
+      fileReader.onload = function() {
+        resolve(fileReader.result);
+      }
+
+      fileReader.onerror = function(err) {
+        reject(err);
+      }
+    });
   }
 
   handleWindowSizeChange = () => {
@@ -133,6 +181,7 @@ class WhiteboardPanel extends React.Component<Props> {
 
   openWhiteBoardDocSidePanel = () => {
     this.setState({ isDocPanelShow: true });
+    this.fetchSnapshot();
   }
 
   closeWhiteBoardDocSidePanel = () => {
@@ -143,12 +192,40 @@ class WhiteboardPanel extends React.Component<Props> {
     this.setState({ isDocPanelShow: false });
   }
 
+  handleWhiteBoarddDocAddPage = () => {
+    const { setWhiteBoardPageCount, count, boardRoom } = this.props;
+    if (boardRoom) {
+      // push new page into whiteboard
+      boardRoom.insertNewPage(count);
+      setWhiteBoardPageCount(count + 1);
+      this.fetchSnapshot();
+    }
+  }
+
+  handleWhiteBoardDocPageClick = (page: Page) => {
+    const { boardRoom, setWhiteBoardCurrentPage } = this.props;
+    const { index } = page;
+    if (boardRoom) {
+      boardRoom.setGlobalState({ currentSceneIndex: index });
+      setWhiteBoardCurrentPage(index);
+    }
+  }
+
+  handlePaginationChange = (index: number) => {
+    const { boardRoom, setWhiteBoardCurrentPage } = this.props;
+    if (boardRoom) {
+      boardRoom.setGlobalState({ currentSceneIndex: index - 1 });
+      setWhiteBoardCurrentPage(index -1);
+    }
+  }
+
   render() {
     const {
       boardRoom, zoomScale, onZoomScaleDecrease, onZoomScaleIncrease,
-      whiteBoardRoom,
+      whiteBoardRoom, currentPage, count,
     } = this.props;
-    const { isShortcutPanelShow, isDocPanelShow } = this.state;
+
+    const { isShortcutPanelShow, isDocPanelShow, pages } = this.state;
 
     return (
       <div className={styles.container} id="whiteboard">
@@ -180,9 +257,12 @@ class WhiteboardPanel extends React.Component<Props> {
         {isDocPanelShow && (
           <WhiteBoardDocSidePanel
             contentClassName={styles.side_panel}
+            total={count}
+            currentPage={currentPage}
+            onAddPage={this.handleWhiteBoarddDocAddPage}
+            onPageClick={this.handleWhiteBoardDocPageClick}
             onClosePress={this.closeWhiteBoardDocSidePanel}
-            boardRoom={boardRoom}
-            whiteBoardRoom={whiteBoardRoom}
+            pages={pages}
           />
         )}
 
@@ -209,8 +289,9 @@ class WhiteboardPanel extends React.Component<Props> {
 
           <Pagination
             size="small"
-            defaultCurrent={1}
-            total={50}
+            current={currentPage + 1}
+            total={count * 10}
+            onChange={this.handlePaginationChange}
           />
         </div>
       </div>
@@ -219,20 +300,26 @@ class WhiteboardPanel extends React.Component<Props> {
 }
 
 const mapStateToProps = (state) => {
-  const { app, files } = state;
+  const { app, files, whiteboard } = state;
+
   const { room, user, whiteBoardRoom } = app;
   const { fileList } = files;
+  const { count, currentPage, } = whiteboard;
 
   return {
     room,
     user,
     whiteBoardRoom,
     fileList,
+    count,
+    currentPage,
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    setWhiteBoardPageCount: bindActionCreators(whiteboardActions.setPageCount, dispatch),
+    setWhiteBoardCurrentPage: bindActionCreators(whiteboardActions.setCurrentPage, dispatch),
   }
 }
 
