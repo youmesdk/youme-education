@@ -24,7 +24,16 @@ type Props = {
   whiteBoardRoom: { uuid: string }
 };
 
-export default class WhiteBoardDocPanel extends React.Component<Props> {
+type State = {
+  pages: Arrany<Page>
+};
+
+type Page = {
+  index: number,
+  img: string,
+};
+
+export default class WhiteBoardDocPanel extends React.Component<Props, State> {
   constructor(props) {
     super(props);
     this.state = {
@@ -41,19 +50,17 @@ export default class WhiteBoardDocPanel extends React.Component<Props> {
     try {
       const { whiteBoardRoom, total } = this.props;
       const { uuid } = whiteBoardRoom;
-      const pages = [];
+      const pages: Page[] = [];
 
       for (let i = 0; i < total; i++) {
         const res = await WhiteBoardClient.instance.fetchSnapshot(uuid, 250, 120, i);
         const imgDataURL = await this.imageBlobToDataURL(res.data);
-        console.log(imgDataURL);
         const page = { index: i, img: imgDataURL };
         pages.push(page);
       }
 
       this.setState({ pages: pages });
     } catch(err) {
-      console.log(err);
       message.error('获取画板预览图失败，请重试');
     }
   }
@@ -73,21 +80,30 @@ export default class WhiteBoardDocPanel extends React.Component<Props> {
     });
   }
 
-  handlePageClick = (index: number) => {
+  handlePageClick = (page: Page) => {
     const { boardRoom } = this.props;
-    if (!boardRoom) {
-      return;
+    const { index } = page;
+    if (boardRoom) {
+      boardRoom.setGlobalState({
+        currentSceneIndex: index,
+      });
     }
+  }
 
-    boardRoom.setGlobalState({
-      currentSceneIndex: index,
-    });
+  handleAddPage = () => {
+    const { boardRoom } = this.props;
+    const {} = this.props;
+
+    if (boardRoom) {
+      boardRoom.insertNewPage(1)
+      console.log(boardRoom.state);
+
+    }
   }
 
   render() {
     const { contentClassName, onClosePress } = this.props;
     const { pages, current } = this.state;
-    console.log(pages);
 
     return (
       <div className={[styles.container, contentClassName].join(' ')}>
@@ -102,7 +118,10 @@ export default class WhiteBoardDocPanel extends React.Component<Props> {
             const isSelected = index === current;
 
             return (
-              <div className={styles.page_item} key={index}>
+              <div
+                className={styles.page_item} key={index}
+                onClick={() => this.handlePageClick(item)}
+              >
                 <div className={[styles.page_item__left, isSelected ? styles.active : ''].join(' ')}>
                   {index + 1}
                 </div>
@@ -115,8 +134,10 @@ export default class WhiteBoardDocPanel extends React.Component<Props> {
         </main>
 
         <footer className={styles.footer}>
-          <span>+</span>
-          <span>新增页面</span>
+          <div onClick={this.handleAddPage}>
+            <span>+</span>
+            <span>新增页面</span>
+          </div>
         </footer>
       </div>
     );

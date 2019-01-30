@@ -11,8 +11,9 @@
 
 import {
   SET_WHITE_BOARD_ROOM,
-  SET_TOTAL_PAGES,
+  SET_PAGE_COUNT,
   SET_CURRENT_PAGE,
+  RESET_WHITEBOARD_STATE,
 } from '../actions/whiteboard';
 
 export type WhiteBoardRoom = {
@@ -21,7 +22,56 @@ export type WhiteBoardRoom = {
 };
 
 export type WhiteBoardStateType = {
-
+  whiteBoardRoom: WhiteBoardRoom, // whiteboard params return by server
+  count: number,                  // whiteboard page count
+  currentPage: number,            // whiteboard current page index
 };
 
-// const initialState:
+export type ActionType = {
+  type: string,
+  [key]: any,
+};
+
+const initialState: WhiteBoardStateType = {
+  whiteBoardRoom: { uuid: '', roomToken: '' },
+  count: 1,
+  currentPage: 0,
+};
+
+export default (state = initialState, action: ActionType) => {
+  switch(action.type) {
+    case SET_WHITE_BOARD_ROOM: {
+      const { whiteBoardRoom } = action;
+      return {
+        ...state,
+        whiteBoardRoom,
+      };
+    }
+
+    case SET_PAGE_COUNT: {
+      const { count } = action;
+      return {
+        ...state,
+        count,
+      };
+    }
+
+    case SET_CURRENT_PAGE: {
+      const { currentPage } = action;
+      return {
+        ...state,
+        currentPage ,
+      };
+    }
+
+    case RESET_WHITEBOARD_STATE: {
+      return {
+        ...initialState,
+      };
+    }
+
+    default: {
+      return state;
+    }
+  }
+}

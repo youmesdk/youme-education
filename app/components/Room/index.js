@@ -56,6 +56,7 @@ class Room extends React.Component<Props, State> {
       isScreenRecording: false,
       boardRoom: null,
       zoomScale: 1.0,
+      scenes: [],
     };
 
     this.whiteBoardSDK = new WhiteWebSdk();   // whiteboard sdk instance
@@ -208,10 +209,13 @@ class Room extends React.Component<Props, State> {
   }
 
   onWhiteBoardStateChange = (state) => {
-    console.log(state, '==========================state');
-    const { memberState, zoomScale } = state;
+    const { memberState, zoomScale, scenes } = state;
     if (zoomScale) {
       this.setState({ zoomScale: zoomScale });
+    }
+
+    if (scenes) {
+      this.setState({ scenes: scenes });
     }
   }
 
