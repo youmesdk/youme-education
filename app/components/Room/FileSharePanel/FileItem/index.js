@@ -18,12 +18,23 @@ type Props = {
   fileSize: number,
   fileUrl: string,
   createTime: string | number,
-  onDownloadClick?: f => f;
+  onDownloadClick?: (url: string) => void;
 };
 
 export default class FileItem extends React.Component<Props> {
   constructor(props) {
     super(props);
+  }
+
+  formatFileSize = (fileSize: number): string => {
+    // fileSize 单位为B
+    if (fileSize / 1024 / 1024 > 1) { // M
+      return Math.round(fileSize / 1024 / 1024) + 'M'
+    } else if (fileSize / 1024 > 1) { // K
+      return Math.round(fileSize / 1024 > 1); + 'K';
+    } else {
+      return fileSize + 'B';
+    }
   }
 
   render() {
@@ -36,13 +47,19 @@ export default class FileItem extends React.Component<Props> {
             {fileType.toUpperCase()}
           </div>
 
-          <div className={styles.info_item}>文件类型：{fileType}</div>
-          <div className={styles.info_item}>文件大小：{fileSize}</div>
+          <div className={styles.info_item}>
+            文件类型：{fileType.length > 10 ? `${fileType.substr(0, 10)}...` : fileType}
+          </div>
+          <div className={styles.info_item}>
+            文件大小：{this.formatFileSize(fileSize)}
+          </div>
         </div>
 
         <div className={styles.bottom}>
-         <span className={styles.name}>{fileName}</span>
-         <span className={styles.link} onClick={onDownloadClick}>下载</span>
+         <span className={styles.name}>
+           {fileName.length > 20 ? `${fileName.substr(0, 20)}...` : fileName}
+         </span>
+         <span className={styles.link} onClick={() => onDownloadClick(fileUrl)}>下载</span>
         </div>
       </div>
     );

@@ -164,6 +164,8 @@ class WhiteboardPanel extends React.Component<Props> {
           });
           boardRoom.completeImageUpload(uuid, url);
         }
+      } else {
+        message.info('only support image file');
       }
     } catch(err) {
       message.error('upload file error');

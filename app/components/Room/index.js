@@ -23,6 +23,7 @@ import MessageText from './MessageText';
 import ChatBottom from './ChatBottom';
 import * as appActions from '../../actions/app';
 import * as whiteboardActions from '../../actions/whiteboard';
+import * as fileActions from '../../actions/files';
 import YIMClient, { MAX_NUMBER_MEMBER_IN_ROOM } from '../../utils/client';
 import { isEmpty } from '../../utils/utils';
 import avatarIcon from '../../assets/images/avatar.png';
@@ -31,7 +32,8 @@ import { WHITEBOARD_TOKEN } from '../../config';
 import VideoCanvas from '../commons/VideoCanvas';
 import WhiteBoardPanel from './WhiteBoardPanel';
 import ScreenBoardPanel from './ScreenRecordPanel';
-import DocPanel from './DocPanel';
+import FileSharePanel from './FileSharePanel';
+import AliClient from '../../utils/AliClient';
 
 import type { User, WhiteBoardRoom } from '../../reducers/app';
 
@@ -231,7 +233,6 @@ class Room extends React.Component<Props, State> {
     }
 
     if (scenes) {
-      console.log(scenes, '==============================scenes');
       const pageCount = scenes.length;
       setWhiteBoardPageCount(pageCount);
     }
@@ -239,8 +240,6 @@ class Room extends React.Component<Props, State> {
     if (globalState) {
       const { currentSceneIndex } = globalState;
       setWhiteBoardCurrentPage(currentSceneIndex);
-      console.log(globalState, '===============================global state');
-
     }
   }
 
@@ -305,6 +304,35 @@ class Room extends React.Component<Props, State> {
     }
   }
 
+  handleUploadFile = async (file: File) => {
+    try {
+      const { addOneFile} = this.props;
+      message.info('start upload file');
+
+      const res = await AliClient.instance.uploadFile(file);
+      message.info('upload file success');
+      const  { name: fileName } = file;
+
+      const lastDotIndex = fileName.lastIndexOf('.');
+      let fileType = 'unknow';
+      if (lastDotIndex > 0) {
+        fileType = fileName.substring(lastDotIndex + 1, fileName.length);
+      }
+
+      const f = {
+        fileName: fileName,
+        fileType: fileType,
+        fileSize: file.size,
+        fileUrl: res.url,
+        createTime: Date.now(),
+      };
+      addOneFile(f);
+    } catch(err) {
+      console.log(err);
+      message.error('upload file fail!');
+    }
+  }
+
   renderListItem = ({ item }) => {
     return (
       <MessageText
@@ -318,7 +346,7 @@ class Room extends React.Component<Props, State> {
   }
 
   render() {
-    const { messages, nickname, users, room, user, panelRole, } = this.props;
+    const { messages, nickname, users, room, user, panelRole, fileList } = this.props;
     const { isWhiteBoardLoading, isScreenRecording, boardRoom, zoomScale, } = this.state;
 
     const teacher = users.find(u => u.role == 0) || user;
@@ -443,7 +471,10 @@ class Room extends React.Component<Props, State> {
               )}
 
               {panelRole === 2 && (
-                <DocPanel />
+                <FileSharePanel
+                  files={fileList}
+                  onChooseFile={this.handleUploadFile}
+                />
               )}
             </div>
 
@@ -479,8 +510,9 @@ class Room extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state) => {
-  const { app, whiteboard } = state;
+  const { app, files } = state;
   const { messages, room, users, user, whiteBoardRoom, panelRole } = app;
+  const { fileList } = files;
 
   return {
     messages,
@@ -489,6 +521,7 @@ const mapStateToProps = (state) => {
     user,
     whiteBoardRoom,
     panelRole,
+    fileList,
   };
 };
 
@@ -501,7 +534,7 @@ const mapDispatchToProps = (dispatch) => {
     setPanelRole: bindActionCreators(appActions.setPanelRole, dispatch),
     setWhiteBoardPageCount: bindActionCreators(whiteboardActions.setPageCount, dispatch),
     setWhiteBoardCurrentPage: bindActionCreators(whiteboardActions.setCurrentPage, dispatch),
-
+    addOneFile: bindActionCreators(fileActions.addOneFile, dispatch),
   };
 };
 

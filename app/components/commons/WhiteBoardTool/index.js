@@ -200,7 +200,7 @@ export default class WhiteBoardTool extends React.Component<Props, State> {
           className={styles.icon}
           onClick={this.handleUploadBtnClick}
         >
-          <Tooltip title="上传图片或文档" mouseEnterDelay={1.0}>
+          <Tooltip title="上传图片" mouseEnterDelay={1.0}>
             <input
               type="file"
               name="file"

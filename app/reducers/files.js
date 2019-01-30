@@ -42,6 +42,7 @@ export default (state = initialState, action: { type: string, [key]: any }) => {
 
     case ADD_ONE_FILE: {
       const { file } = action;
+      const { fileList } = state;
       return {
         ...state,
         fileList: [...fileList, file]
