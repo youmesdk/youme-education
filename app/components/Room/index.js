@@ -122,6 +122,7 @@ class Room extends React.Component<Props, State> {
       // uuid and roomToken will send to student when connected
       setWhiteBoardRoom(whiteBoardRoom);
       this.setState({ boardRoom: boardRoom });
+      this.initWhiteBoardState(boardRoom);
     } catch(err) {
       message.error('create whiteboard room error!, please close app and try agian!');
     } finally {
@@ -144,6 +145,7 @@ class Room extends React.Component<Props, State> {
       });
       boardRoom.setViewMode('follower');
       this.setState({ boardRoom });
+      this.initWhiteBoardState(boardRoom);
     } catch(err) {
       message.error('join whiteboard room error!, please close app and try agian!');
     } finally {
@@ -168,6 +170,18 @@ class Room extends React.Component<Props, State> {
           message.error(err.name);
         }
       });
+    }
+  }
+
+  initWhiteBoardState = (boardRoom) => {
+    const { setWhiteBoardCurrentPage, setWhiteBoardPageCount } = this.props;
+    if (boardRoom) {
+      const { scenes, zoomScale, globalState } = boardRoom.state;
+      const { currentSceneIndex } = globalState;
+
+      setWhiteBoardCurrentPage(currentSceneIndex);
+      setWhiteBoardPageCount(scenes.length);
+      this.setState({ zoomScale: zoomScale });
     }
   }
 
