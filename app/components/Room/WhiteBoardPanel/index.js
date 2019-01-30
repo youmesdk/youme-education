@@ -64,7 +64,9 @@ class WhiteboardPanel extends React.Component<Props> {
     // update whiteboard draw area when window size changed
     window.addEventListener('resize', this.throttledWindowSizeChange, false);
     // fetch whiteboard page preview
-    this.fetchSnapshot();
+    const { count, whiteBoardRoom } = this.props;
+    const { uuid } = whiteBoardRoom;
+    this.fetchSnapshot(uuid, count);
   }
 
   componentWillUnmount() {
@@ -72,10 +74,8 @@ class WhiteboardPanel extends React.Component<Props> {
     window.removeEventListener('resize', this.throttledWindowSizeChange, false);
   }
 
-  fetchSnapshot = async () => {
+  fetchSnapshot = async (uuid: string, count: number) => {
     try {
-      const { whiteBoardRoom, count } = this.props;
-      const { uuid } = whiteBoardRoom;
       const pages: Page[] = [];
 
       for (let i = 0; i < count; i++) {
@@ -181,25 +181,24 @@ class WhiteboardPanel extends React.Component<Props> {
 
   openWhiteBoardDocSidePanel = () => {
     this.setState({ isDocPanelShow: true });
-    this.fetchSnapshot();
+    const { count, whiteBoardRoom } = this.props;
+    const { uuid } = whiteBoardRoom;
+    this.fetchSnapshot(uuid, count);
   }
 
   closeWhiteBoardDocSidePanel = () => {
-    const { boardRoom} = this.props;
-    if (boardRoom) {
-      console.log(boardRoom.state);
-    }
     this.setState({ isDocPanelShow: false });
   }
 
   handleWhiteBoarddDocAddPage = () => {
-    const { setWhiteBoardPageCount, count, boardRoom } = this.props;
+    const { setWhiteBoardPageCount, count, boardRoom, whiteBoardRoom } = this.props;
+    const { uuid } = whiteBoardRoom;
+
     if (boardRoom) {
       // push new page into whiteboard
       boardRoom.insertNewPage(count);
       setWhiteBoardPageCount(count + 1);
-      // TODO: redux异步更改，可能导致fetchSnapshot()获取到未更新的store
-      this.fetchSnapshot();
+      this.fetchSnapshot(uuid, count + 1);
     }
   }
 
