@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-12-21 21:09:23
  * @Last Modified by: fan.li
- * @Last Modified time: 2018-12-21 22:00:03
+ * @Last Modified time: 2019-01-29 20:46:35
  *
  * @flow
  *
@@ -39,9 +39,21 @@ export default function VideoCanvas(props: Props) {
     onCameraPress(user);
   }
 
-  const handleVideoElementClick = (e) => {
-    if (e.target.requestFullScreen) {
-      e.target.requestFullScreen();
+  const handleVideoElementClick = async (e) => {
+    try {
+      const videoDom = document.getElementById(id);
+      if (!videoDom) {
+        return;
+      }
+
+      if (videoDom !== document.pictureInPictureElement) {
+        console.log(videoDom);
+        await videoDom.requestPictureInPicture();
+      } else {
+        await document.exitPictureInPicture();
+      }
+    } catch(err) {
+      console.log(err, '=======================picture in picture error');
     }
   }
 

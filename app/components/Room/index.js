@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2018-07-27 16:16:37
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-29 15:11:26
+ * @Last Modified time: 2019-01-29 17:59:07
  *
  * @flow
  *
@@ -139,6 +139,7 @@ class Room extends React.Component<Props, State> {
          uuid, roomToken,
       }, {
         onRoomStateChanged: this.onWhiteBoardStateChange,
+
       });
       boardRoom.setViewMode('follower');
       this.setState({ boardRoom });
@@ -207,6 +208,7 @@ class Room extends React.Component<Props, State> {
   }
 
   onWhiteBoardStateChange = (state) => {
+    console.log(state, '==========================state');
     const { memberState, zoomScale } = state;
     if (zoomScale) {
       this.setState({ zoomScale: zoomScale });

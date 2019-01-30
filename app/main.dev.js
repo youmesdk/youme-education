@@ -17,6 +17,18 @@ import MenuBuilder from './menu'
 
 let mainWindow: any = null
 
+app.commandLine.appendSwitch('enable-experimental-web-platform-features');
+app.commandLine.appendSwitch('disable-background-video-track');
+app.commandLine.appendSwitch('enable-picture-in-picture');
+app.commandLine.appendArgument('enable-Surfaces-for-videos');
+
+
+app.commandLine.appendArgument('--enable-experimental-web-platform-features');
+app.commandLine.appendArgument('--enable-picture-in-picture');
+app.commandLine.appendArgument('--disable-background-video-track');
+app.commandLine.appendArgument('--enable-Surfaces-for-videos');
+
+
 if (os.platform() === 'win32') {
   //app.disableHardwareAcceleration();
   app.commandLine.appendSwitch('disable-direct-composition')
@@ -75,7 +87,8 @@ app.on('ready', async () => {
     transparent: true,
     resizable: true,
     minWidth: 1178,
-    minHeight: 704
+    minHeight: 704,
+    experimentalFeatures: true,
   })
 
   mainWindow.loadURL(`file://${__dirname}/app.html`)

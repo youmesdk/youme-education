@@ -2,7 +2,7 @@
  * @Author: fan.li
  * @Date: 2019-01-07 16:03:46
  * @Last Modified by: fan.li
- * @Last Modified time: 2019-01-29 17:17:25
+ * @Last Modified time: 2019-01-29 20:16:09
  *
  * 白板操作面板
  */
@@ -26,6 +26,7 @@ import * as fileActions from '../../../actions/files';
 import * as appActions from '../../../actions/app';
 
 import AliClient from '../../../utils/AliClient';
+import WhiteBoardClient from '../../../utils/WhiteBoardClient';
 
 
 type Props = {
@@ -99,7 +100,6 @@ class WhiteboardPanel extends React.Component<Props> {
   handleWhiteBoardChooseFile = async (file: File) => {
     try {
       const { boardRoom } = this.props;
-
       // 选中的是图片,在白板中插入图片
       if (/image/.test(file.type)) {
         if (boardRoom) {
@@ -136,11 +136,18 @@ class WhiteboardPanel extends React.Component<Props> {
   }
 
   closeWhiteBoardDocSidePanel = () => {
+    const { boardRoom} = this.props;
+    if (boardRoom) {
+      console.log(boardRoom.state);
+    }
     this.setState({ isDocPanelShow: false });
   }
 
   render() {
-    const { boardRoom, zoomScale, onZoomScaleDecrease, onZoomScaleIncrease } = this.props;
+    const {
+      boardRoom, zoomScale, onZoomScaleDecrease, onZoomScaleIncrease,
+      whiteBoardRoom,
+    } = this.props;
     const { isShortcutPanelShow, isDocPanelShow } = this.state;
 
     return (
@@ -174,6 +181,8 @@ class WhiteboardPanel extends React.Component<Props> {
           <WhiteBoardDocSidePanel
             contentClassName={styles.side_panel}
             onClosePress={this.closeWhiteBoardDocSidePanel}
+            boardRoom={boardRoom}
+            whiteBoardRoom={whiteBoardRoom}
           />
         )}
 
