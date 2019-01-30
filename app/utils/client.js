@@ -261,15 +261,18 @@ export default class Client {
     this.$im.on('OnUserJoinChatRoom', (msg) => {
       const { channelID, userID } = msg;
       const state = Client.store.getState();
-      const { app } = state;
+      const { app, files } = state;
       const { user, room, users, whiteBoardRoom } = app;
       const { id, name, role } = user;
+
       const { uuid, roomToken } = whiteBoardRoom;
+      const { fileList } = files;
+
       if (role === 0) { // teacher should send a sigining to student
         if (users.length <= MAX_NUMBER_MEMBER_IN_ROOM) {
           const cmd = {
             cmd: 0,
-            data: { whiteBoardRoom: { uuid, roomToken } }
+            data: { whiteBoardRoom: { uuid, roomToken }, files: { fileList } }
           };
           this.signing(userID, 1, cmd);
         } else {
