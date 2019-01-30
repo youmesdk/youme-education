@@ -306,7 +306,7 @@ class Room extends React.Component<Props, State> {
 
   handleUploadFile = async (file: File) => {
     try {
-      const { addOneFile} = this.props;
+      const { addOneFile, room } = this.props;
       message.info('start upload file');
 
       const res = await AliClient.instance.uploadFile(file);
@@ -327,6 +327,10 @@ class Room extends React.Component<Props, State> {
         createTime: Date.now(),
       };
       addOneFile(f);
+
+      // 通知其他客户端,有新文件
+      const cmd = { cmd: 6, data: { file: f }};
+      YIMClient.instance.signing(room, 2, cmd);
     } catch(err) {
       console.log(err);
       message.error('upload file fail!');

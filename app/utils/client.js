@@ -26,7 +26,8 @@ import {
 import {
   configureStore
 } from '../store/configureStore';
-import * as actions from '../actions/app';
+import * as appActions from '../actions/app';
+import * as fileActions from '../actions/files';
 import YMRTC from '../YouMeSDK/Webrtc/ymrtc';
 
 import type {
@@ -127,7 +128,7 @@ export default class Client {
       this.$screen.stop();
     }
 
-    Client.store.dispatch(actions.resetAppState());
+    Client.store.dispatch(appActions.resetAppState());
   }
 
   createChatRoom(uroom) {
@@ -183,7 +184,7 @@ export default class Client {
     } else {
       const oldUser = users.find((item: User) => item.id === memberId);
       const newUser = Object.assign({}, oldUser, { isMicOn: isOpen });
-      Client.store.dispatch(actions.updateOneOtherUser(newUser));
+      Client.store.dispatch(appActions.updateOneOtherUser(newUser));
     }
 
     // notify other in room
@@ -204,7 +205,7 @@ export default class Client {
     } else {
       const oldUser = users.find((item: User) => item.id === memberId);
       const newUser = Object.assign({}, oldUser, { isCameraOn: isOpen });
-      Client.store.dispatch(actions.updateOneOtherUser(newUser));
+      Client.store.dispatch(appActions.updateOneOtherUser(newUser));
     }
 
     // notify other in room
@@ -243,7 +244,7 @@ export default class Client {
           isFromMe: false,
           avatar: require('../assets/images/avatar.png')
         };
-        Client.store.dispatch(actions.addOneMessage(formatedMsg));
+        Client.store.dispatch(appActions.addOneMessage(formatedMsg));
       } else if (msg.messageType === 2) { // customer message singing
         this.handleSigining(msg);
       }
@@ -286,7 +287,7 @@ export default class Client {
     });
 
     this.$im.on('OnLogout', (msg) => {
-      Client.store.dispatch(actions.resetAppState());
+      Client.store.dispatch(appActions.resetAppState());
       const state = Client.store.getState();
       window.location.hash = '';
     });
@@ -305,7 +306,7 @@ export default class Client {
         isCameraOn: true,
       };
 
-      Client.store.dispatch(actions.addOneOtherUser(user));
+      Client.store.dispatch(appActions.addOneOtherUser(user));
       this.$ymrtc.requestUserStream(memberId).then((stream: MediaStream) => {
         // hack: 获取存在些问题，不一定更改Redux后就能立马渲染出Dom
         const videoDom = document.getElementById(`canvas-${memberId}`);
@@ -326,7 +327,7 @@ export default class Client {
         return;
       }
 
-      Client.store.dispatch(actions.removeOneOtherUser(memberId));
+      Client.store.dispatch(appActions.removeOneOtherUser(memberId));
     });
 
     this.$ymrtc.on('local-media.has-stream', (stream: MediaStream) => {
@@ -350,28 +351,28 @@ export default class Client {
       const state = Client.store.getState();
       const { user } = state.app;
       const tempUser = Object.assign({}, user, { isMicOn: false });
-      Client.store.dispatch(actions.setUser(tempUser));
+      Client.store.dispatch(appActions.setUser(tempUser));
     });
 
     this.$ymrtc.on('local-media.pause-video', () => {
       const state = Client.store.getState();
       const { user } = state.app;
       const tempUser = Object.assign({}, user, { isCameraOn: false });
-      Client.store.dispatch(actions.setUser(tempUser));
+      Client.store.dispatch(appActions.setUser(tempUser));
     });
 
     this.$ymrtc.on('local-media.resume-audio', () => {
       const state = Client.store.getState();
       const { user } = state.app;
       const tempUser = Object.assign({}, user, { isMicOn: true });
-      Client.store.dispatch(actions.setUser(tempUser));
+      Client.store.dispatch(appActions.setUser(tempUser));
     });
 
     this.$ymrtc.on('local-media.resume-video', () => {
       const state = Client.store.getState();
       const { user } = state.app;
       const tempUser = Object.assign({}, user, { isCameraOn: true });
-      Client.store.dispatch(actions.setUser(tempUser));
+      Client.store.dispatch(appActions.setUser(tempUser));
     });
   }
 
@@ -433,7 +434,7 @@ export default class Client {
         } else { // teacher change other student's microphone status
           const oldOther = users.find((item: User) => item.id === userId);
           const newOther = Object.assign({}, oldOther, { isMicOn: isMicOn });
-          Client.store.dispatch(actions.updateOneOtherUser(newOther));
+          Client.store.dispatch(appActions.updateOneOtherUser(newOther));
         }
         break;
       }
@@ -453,7 +454,7 @@ export default class Client {
         } else { // teacher change other student's camera status
           const oldOther = users.find((item: User) => item.id === userId);
           const newOther = Object.assign({}, oldOther, { isCameraOn: isCameraOn });
-          Client.store.dispatch(actions.updateOneOtherUser(newOther));
+          Client.store.dispatch(appActions.updateOneOtherUser(newOther));
         }
         break;
       }
@@ -461,7 +462,7 @@ export default class Client {
       // 教师关闭录屏
       case 4: {
         message.info('your teacher stop screen share!');
-        Client.store.dispatch(actions.setPanelRole(0)); // 去白板页面
+        Client.store.dispatch(appActions.setPanelRole(0)); // 去白板页面
         break;
       }
 
@@ -469,7 +470,16 @@ export default class Client {
       case 5: {
         message.info('your teacher start share screen!');
         const state = Client.store.getState();
-        Client.store.dispatch(actions.setPanelRole(1)); // 去录屏页面
+        Client.store.dispatch(appActions.setPanelRole(1)); // 去录屏页面
+        break;
+      }
+
+      // 有人上传文件
+      case 6: {
+        message.info('new file uploaded by other');
+        const { file } = data;
+        Client.store.dispatch(fileActions.addOneFile(file));
+        break;
       }
     }
   }
