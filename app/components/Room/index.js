@@ -82,7 +82,7 @@ class Room extends React.Component<Props, State> {
     }
   }
 
-  _createWhiteBoardRoom = (token, room, limit = 5) => {
+  _createWhiteBoardRoom = (token, room, limit = 500) => {
     const url = `https://cloudcapiv3.herewhite.com/room?token=${token}`;
     return axios({
       url: url,
@@ -99,7 +99,7 @@ class Room extends React.Component<Props, State> {
     try {
       const { room, setWhiteBoardRoom } = this.props;
       this.setState({ isWhiteBoardLoading: true });
-      const res = await this._createWhiteBoardRoom(WHITEBOARD_TOKEN, room, MAX_NUMBER_MEMBER_IN_ROOM);
+      const res = await this._createWhiteBoardRoom(WHITEBOARD_TOKEN, room);
       const { data } = res;
       const { code, msg } = data;
       if (code !== 200) {

@@ -29,7 +29,7 @@ import { WHITEBOARD_TOKEN } from '../config';
    }
 
    // 创建一个白板
-   createRoom(room: string, limit = 5): Promise<any> {
+   createRoom(room: string, limit = 100): Promise<any> {
      const url = `https://cloudcapiv3.herewhite.com/room?token=${WHITEBOARD_TOKEN}`;
      return axios({
        url: url,
