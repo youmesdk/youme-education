@@ -30,6 +30,14 @@
 
 ![Youme education demo device student](./screenshots/screen4.png)
 
+- 文档插入图片及分页
+
+![Youme eduction demo pagination](./screenshots/screen5.png)
+
+- 文件共享
+
+![Youme eduction demo fileshare](./screenshots/screen6.png)
+
 ## Install
 
 * **Note: requires a node version >= 7 and an npm version >= 4.**
