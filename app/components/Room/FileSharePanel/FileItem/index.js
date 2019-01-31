@@ -31,7 +31,7 @@ export default class FileItem extends React.Component<Props> {
     if (fileSize / 1024 / 1024 > 1) { // M
       return Math.round(fileSize / 1024 / 1024) + 'M'
     } else if (fileSize / 1024 > 1) { // K
-      return Math.round(fileSize / 1024 > 1); + 'K';
+      return Math.round(fileSize / 1024) + 'K';
     } else {
       return fileSize + 'B';
     }

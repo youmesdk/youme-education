@@ -19,14 +19,15 @@ export const WHITEBOARD_TOKEN = 'WHITEcGFydG5lcl9pZD1uVUcwRUFmaGpkRzZLd1BScWdqSn
 export const PUSH_STREAM_BASE_URL = 'rtmp://pili-publish.youme.im/youmetest/';     // 推流服务器地址
 export const PULL_STREAM_BASE_URL = 'http://pili-live-rtmp.youme.im/youmetest/';  // 拉流服务器地址
 
-export const ALI_ACCESS_KEY_ID = process.env.ACCESS_KEY_ID;
-export const ALI_ACCESS_KEY_SECRET = process.env.ACCESS_KEY_SECRET;
+export const ALI_ACCESS_KEY_ID = 'LTAInM5gYC17YD0h';
+export const ALI_ACCESS_KEY_SECRET = 'vKEYtnDCxPY1l9xgVDnwPa7wyu7OlF';
 
 export const IMM_END_POINT = 'https://imm.cn-beijing.aliyuncs.com/'; // 文档转图片
 export const IMM_API_VERSION = '2017-09-06';
 export const IMM_PROJECT_NAME = 'ym-edu-demo';
 export const IMM_TARGET_URI_BASE = 'oss://ym-edu-demo/docs/';
-export const OSS_SRC_URI_BASE = 'oss://ym-edu-demo/';
-export const OSS_END_POINT = 'https://oss-cn-beijing.aliyuncs.com/'; // 云存储
-export const OSS_BUCKET_NAME = "ym-edu-demo";
-export const OSS_REGION = "oss-cn-beijing";
+
+export const OSS_SRC_URI_BASE = 'oss://youme-byy/';
+export const OSS_END_POINT = 'https://oss-cn-shenzhen.aliyuncs.com/'; // 云存储
+export const OSS_BUCKET_NAME = "youme-byy";
+export const OSS_REGION = "oss-cn-shenzhen";
