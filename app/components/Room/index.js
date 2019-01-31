@@ -307,11 +307,16 @@ class Room extends React.Component<Props, State> {
   handleUploadFile = async (file: File) => {
     try {
       const { addOneFile, room } = this.props;
-      message.info('start upload file');
+      const  { name: fileName, size: fileSize } = file;
 
+      if (fileSize / 1024 / 1024 > 200) { // 大于200M
+        message.info('文件大小最大不超过200M');
+        return;
+      }
+
+      message.info('start upload file');
       const res = await AliClient.instance.uploadFile(file);
       message.info('upload file success');
-      const  { name: fileName } = file;
 
       const lastDotIndex = fileName.lastIndexOf('.');
       let fileType = 'unknow';
@@ -322,7 +327,7 @@ class Room extends React.Component<Props, State> {
       const f = {
         fileName: fileName,
         fileType: fileType,
-        fileSize: file.size,
+        fileSize: fileSize,
         fileUrl: res.url,
         createTime: Date.now(),
       };
