@@ -14,6 +14,7 @@ import {
   CLEAN_ALL_FILES,
   ADD_ONE_FILE,
   REMOVE_ONE_FILE,
+  RESET_FILE_STATE,
 } from '../actions/files';
 
 const initialState = {
@@ -54,6 +55,12 @@ export default (state = initialState, action: { type: string, [key]: any }) => {
         ...state,
       };
     };
+
+    case RESET_FILE_STATE: {
+      return {
+        ...initialState,
+      }
+    }
 
     default: {
       return state;

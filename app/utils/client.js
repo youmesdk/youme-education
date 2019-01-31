@@ -28,6 +28,7 @@ import {
 } from '../store/configureStore';
 import * as appActions from '../actions/app';
 import * as fileActions from '../actions/files';
+import * as whiteboardActions from '../actions/whiteboard';
 import YMRTC from '../YouMeSDK/Webrtc/ymrtc';
 
 import type {
@@ -129,6 +130,8 @@ export default class Client {
     }
 
     Client.store.dispatch(appActions.resetAppState());
+    Client.store.dispatch(fileActions.resetFileState());
+    Client.store.dispatch(whiteboardActions.resetWhiteBoardState());
   }
 
   createChatRoom(uroom) {

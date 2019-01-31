@@ -13,6 +13,7 @@ export const SET_FILES = 'SET_FILES';
 export const CLEAN_ALL_FILES = 'CLEAN_ALL_FILES';
 export const ADD_ONE_FILE = 'ADD_ONE_FILE';
 export const REMOVE_ONE_FILE = 'REMOVE_ONE_FILE';
+export const RESET_FILE_STATE = 'RESET_FILE_STATE';
 
 
 export function setFiles(files: Array) {
@@ -41,5 +42,13 @@ export function cleanAllFiles() {
     type: CLEAN_ALL_FILES,
   };
 }
+
+export function resetFileState() {
+  return {
+    type: RESET_FILE_STATE,
+  };
+}
+
+
 
 
