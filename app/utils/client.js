@@ -274,11 +274,14 @@ export default class Client {
 
       if (role === 0) { // teacher should send a sigining to student
         if (users.length <= MAX_NUMBER_MEMBER_IN_ROOM) {
-          const cmd = {
-            cmd: 0,
-            data: { whiteBoardRoom: { uuid, roomToken }, files: { fileList } }
-          };
+          const cmd = { cmd: 0, data: { whiteBoardRoom: { uuid, roomToken }} };
           this.signing(userID, 1, cmd);
+
+          fileList.forEach(file => {
+            const fileCmd = { cmd: 7, data: { file: file } };
+            this.signing(userID, 1, fileCmd);
+          });
+
         } else {
           const cmd = {
             cmd: 1,
@@ -477,9 +480,16 @@ export default class Client {
         break;
       }
 
-      // 有人上传文件
+      // 有人上传文件(进入房间后有人上传文件)
       case 6: {
         message.info('new file uploaded by other');
+        const { file } = data;
+        Client.store.dispatch(fileActions.addOneFile(file));
+        break;
+      }
+
+      // 用户一加入房间，教师会把文件列表一个个的传给学生
+      case 7: {
         const { file } = data;
         Client.store.dispatch(fileActions.addOneFile(file));
         break;

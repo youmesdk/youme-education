@@ -20,7 +20,6 @@ import logo from '../../assets/images/logo.png';
 import { isEmpty } from '../../utils/utils';
 import styles from './style.scss';
 import * as appActions from '../../actions/app';
-import * as fileActions from '../../actions/files';
 
 import YIMClient, {
    CLASS_IS_EXIST,
@@ -53,7 +52,7 @@ class Index extends React.Component<null, State> {
   handleSubmit = async () => {
     try {
       const { role, name, room } = this.state;
-      const { setRoom, setUser, history, setWhiteBoardRoom, setFiles } = this.props;
+      const { setRoom, setUser, history, setWhiteBoardRoom } = this.props;
 
       if (isEmpty(name) || isEmpty(room)) {
         return message.warn("username and room name not allow empty");
@@ -111,7 +110,6 @@ class Index extends React.Component<null, State> {
         const { whiteBoardRoom, files } = evt;
         // get whiteboard params and save into redux
         setWhiteBoardRoom(whiteBoardRoom);
-        setFiles(files.fileList);
       }
 
       // save room and nickname into redux
@@ -191,7 +189,6 @@ const mapDispatchToProps = (dispatch) => {
     setRoom: bindActionCreators(appActions.setRoom, dispatch),
     setUser: bindActionCreators(appActions.setUser, dispatch),
     setWhiteBoardRoom: bindActionCreators(appActions.setWhiteBoardRoom, dispatch),
-    setFiles: bindActionCreators(fileActions.setFiles, dispatch),
   };
 };
 
