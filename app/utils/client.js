@@ -233,7 +233,7 @@ export default class Client {
   }
 
   signing(recvId: string, chatType: number, content: object): Promise < any > {
-    const base64 = btoa(JSON.stringify(content));
+    const base64 = btoa(encodeURIComponent(JSON.stringify(content)));
     return this.sendCustomMessage(recvId, chatType, base64);
   }
 
@@ -380,7 +380,7 @@ export default class Client {
   }
 
   handleSigining(msg) {
-    const content = atob(msg.content);
+    const content = decodeURIComponent(atob(msg.content));
     const { cmd, data } = JSON.parse(content);
 
     switch (cmd) {
