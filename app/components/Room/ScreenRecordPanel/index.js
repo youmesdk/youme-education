@@ -11,7 +11,7 @@
 
 import * as React from 'react';
 import { Switch, Icon } from 'antd';
-import videojs from 'video.js';
+// import videojs from 'video.js';
 
 import YIMClient from '../../../utils/client';
 import styles from './style.scss';
@@ -42,9 +42,10 @@ export default class ScreenRecordPanel extends React.Component<Props, State> {
     const options = {
       bigPlayButton: false,
       textTrackDisplay: false,
-      controBar: true,
+      controlBar: false,
       errorDisplay: false,
       posterImage: false,
+      muted: true
     };
 
     const self = this;
@@ -92,7 +93,7 @@ export default class ScreenRecordPanel extends React.Component<Props, State> {
           data-setup="{}"
           autoPlay
         >
-          <source src={pullStreamUrl} type="application/x-mpegURL" />
+          <source src={pullStreamUrl} type="video/x-flv" />
         </video>
       </div>
     );

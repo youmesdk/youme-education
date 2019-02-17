@@ -87,7 +87,7 @@ export default class Client {
   }
 
   static getPullStreamUrl(room: string) {
-    return PULL_STREAM_BASE_URL + room + '.m3u8';
+    return PULL_STREAM_BASE_URL + room + '.flv';
   }
 
   initIM() {
